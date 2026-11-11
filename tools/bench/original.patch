@@ -1,3 +1,40 @@
+diff --git a/src/Animation.cpp b/src/Animation.cpp
+index 02b0091a..7ac0b880 100644
+--- a/src/Animation.cpp
++++ b/src/Animation.cpp
+@@ -344,6 +344,20 @@ void Animation::setActiveSubFrame(const std::string& _active_sub_frame) {
+ 		active_sub_frame = ACTIVE_SUBFRAME_END;
+ }
+ 
++// Bench: name, type, frames, sub-frames, total, active frames, active
++// sub-frame, default, and the frames per direction: x y w h ox oy key
++void Animation::benchDump(FILE* f) {
++	fprintf(f, "anim %s %d %u\n", name.c_str(), type, frame_count);
++	fprintf(f, "sub");
++	for (size_t i = 0; i < sub_frames.size(); ++i) fprintf(f, " %u", sub_frames[i]);
++	fprintf(f, "\ntotal %u\nactive", total_frame_count);
++	for (size_t i = 0; i < active_frames.size(); ++i) fprintf(f, " %d", active_frames[i]);
++	fprintf(f, "\nactive_sub %d %d\n", active_sub_frame, default_active_frames);
++	fprintf(f, "blend %d %d %d,%d,%d\n", blend_mode, alpha_mod, color_mod.r, color_mod.g, color_mod.b);
++	for (size_t i = 0; i < gfx.size(); ++i)
++		fprintf(f, "gfx %u %d %d %d %d %d %d %s\n", static_cast<unsigned>(i), gfx[i].second.x, gfx[i].second.y, gfx[i].second.w, gfx[i].second.h, render_offset[i].x, render_offset[i].y, keys[i].c_str());
++}
++
+ bool Animation::isFirstFrame() {
+ 	return sub_frame == 0 && static_cast<float>(sub_frame) == sub_frame_f;
+ }
+diff --git a/src/Animation.h b/src/Animation.h
+index 59cc8c24..024a445a 100644
+--- a/src/Animation.h
++++ b/src/Animation.h
+@@ -100,6 +100,7 @@ protected:
+ 	unsigned short getLastSubFrame(const short &frame); // given a frame, gets the last sub frame that points to it
+ 
+ public:
++	void benchDump(FILE* f); // Bench: the fields, for the comparison with the port
+ 	Animation(const std::string &_name, const std::string &_type, AnimationMedia *_sprite, uint8_t _blend_mode, uint8_t _alpha_mod, Color _color_mod);
+ 
+ 	// Traditional way to create an animation.
 diff --git a/src/Bench.h b/src/Bench.h
 new file mode 100644
 index 00000000..c176262a
@@ -335,10 +372,16 @@ index ac8e7f36..2eb51356 100644
  	SDL_RenderClear(renderer);
  	SDL_RenderCopy(renderer, texture, NULL, NULL);
 diff --git a/src/main.cpp b/src/main.cpp
-index a3dccedf..f25b3ba9 100644
+index a3dccedf..04c9c14e 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -29,6 +29,7 @@ FLARE.  If not, see http://www.gnu.org/licenses/
+@@ -25,10 +25,13 @@ FLARE.  If not, see http://www.gnu.org/licenses/
+ #include <ctime>
+ #include <limits.h>
+ 
++#include "Animation.h"
+ #include "AnimationManager.h"
++#include "AnimationSet.h"
  #include "CombatText.h"
  #include "DeviceList.h"
  #include "EngineSettings.h"
@@ -346,7 +389,7 @@ index a3dccedf..f25b3ba9 100644
  #include "GameSwitcher.h"
  #include "InputState.h"
  #include "MessageEngine.h"
-@@ -178,6 +179,114 @@ static float getSecondsElapsed(uint64_t prev_ticks, uint64_t now_ticks) {
+@@ -178,6 +181,134 @@ static float getSecondsElapsed(uint64_t prev_ticks, uint64_t now_ticks) {
  	return (static_cast<float>(now_ticks - prev_ticks) / static_cast<float>(SDL_GetPerformanceFrequency()));
  }
  
@@ -434,6 +477,26 @@ index a3dccedf..f25b3ba9 100644
 +	fflush(out);
 +}
 +
++// Bench: each animation file of the list FLARE_ANIM, as AnimationSet
++// loads it, to the trace
++static void benchAnim() {
++	FILE* list = fopen(bench::env("FLARE_ANIM"), "r");
++	FILE* out = bench::trace();
++	if (!list || !out) return;
++	char line[1024];
++	while (fgets(line, sizeof(line), list)) {
++		std::string path = Parse::trim(line);
++		if (path.empty()) continue;
++		anim->increaseCount(path);
++		AnimationSet* set = anim->getAnimationSet(path);
++		fprintf(out, "file %s %s\n", path.c_str(), set->getAnimation("")->getName().c_str());
++		for (size_t i = 0; i < set->animations.size(); ++i)
++			set->animations[i]->benchDump(out);
++	}
++	fclose(list);
++	fflush(out);
++}
++
 +// Bench: one logic frame, then the frame count and the end of the run
 +static bool benchLogic() {
 +	SDL_PumpEvents();
@@ -461,7 +524,7 @@ index a3dccedf..f25b3ba9 100644
  static void mainLoop () {
  	bool done = false;
  
-@@ -188,6 +297,11 @@ static void mainLoop () {
+@@ -188,6 +319,11 @@ static void mainLoop () {
  
  	float last_fps = -1;
  
@@ -473,7 +536,7 @@ index a3dccedf..f25b3ba9 100644
  	while ( !done ) {
  		int loops = 0;
  		uint64_t now_ticks = SDL_GetPerformanceCounter();
-@@ -203,6 +317,7 @@ static void mainLoop () {
+@@ -203,6 +339,7 @@ static void mainLoop () {
  			}
  
  			SDL_PumpEvents();
@@ -481,7 +544,7 @@ index a3dccedf..f25b3ba9 100644
  			inpt->handle();
  
  			// Skip game logic when minimized
-@@ -212,6 +327,9 @@ static void mainLoop () {
+@@ -212,6 +349,9 @@ static void mainLoop () {
  
  			gswitch->logic();
  			inpt->resetScroll();
@@ -491,13 +554,15 @@ index a3dccedf..f25b3ba9 100644
  
  			// Engine done means the user escapes the main game menu.
  			// Input done means the user closes the window.
-@@ -437,13 +555,17 @@ soft_reset:
+@@ -437,13 +577,19 @@ soft_reset:
  		if (debug_event)
  			inpt->enableEventLog();
  
 -		mainLoop();
 +		if (bench::env("FLARE_INI"))
 +			benchIni();
++		else if (bench::env("FLARE_ANIM"))
++			benchAnim();
 +		else
 +			mainLoop();
  #endif
