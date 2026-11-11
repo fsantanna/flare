@@ -22,6 +22,7 @@ The patch adds `src/Bench.h`, included before every source file
 | `FLARE_INPUT=<file>` | scripted input, by logic frame |
 | `FLARE_TRACE=<file>` | the trace (`-` for stdout) |
 | `FLARE_DUMP=1` | also the hero in every frame |
+| `FLARE_RNG=1` | also the calls to `rand()` in each frame that has some |
 | `FLARE_NEWGAME=<i>` | skip the title: a new game of class i (`run.sh`: 0) |
 | `FLARE_MAP=<file>` | the first map of that game, instead of `maps/spawn.txt`, with the hero at its `hero_pos` |
 | `FLARE_POS=<x>,<y>` | the position of the hero in that map |
@@ -74,6 +75,7 @@ the order they are first seen, again from 1 at each map.
 | `<f> power <id> <power> <x> <y>` | it asks to activate a power, at a target |
 | `<f> loot <item> <quantity> <x> <y>` | loot is put on the ground |
 | `<f> hero <x> <y> <state> <hp> <direction>` | with `FLARE_DUMP`, every frame |
+| `<f> rng <n>` | with `FLARE_RNG`, the calls to `rand()` in the frame, if any |
 
 The states are those of `StatBlock`: 0 stance, 1 move, 2 power, 3
 spawn, 4 block, 5 hit, 6 dead, 7 critdead. The activation of an event
@@ -96,7 +98,31 @@ same trace.
 |-----|------|
 | `walk` | the first map: walk with W and D, one attack in the air |
 | `fight` | `cave_of_living_bones1`, next to an antlion: attack it until the hero dies |
+| `hero-walk` | the first map: walk in the 8 directions, into walls, with quick turns |
+| `hero-cliff` | the first map, from another place: along the cliffs, with slides |
+| `hero-cave` | `cave1`: along the walls of a cave, with its enemies standing |
+
+The port plays the runs listed in `tst/runs.txt`, and `tools/compare.sh`
+compares its traces with these, line by line.
+
+## Hidden draws
+
+The original calls `rand()` where it is not seen, and the port must call
+its generator at the same places, or every later draw differs:
+
+- `Map_Enemy` takes a random direction in its constructor
+  (`direction(rand() % 8)`), and `EntityManager::handleSpawn` builds one
+  in every logic frame, even when there is nothing to spawn: one draw per
+  frame. `EntityManager::handleNewMap` builds another one for every map,
+  and one when the game starts (`GameStatePlay()`).
+- `EntityManager::handleNewMap` also calls `getRandomNeighbor` around the
+  hero for every map: one draw if any tile around is free.
+- The hero picks a sound of steps (`rand() % 4`) in every frame that it
+  moves, with or without audio.
+
+They were found with `FLARE_RNG`, and a build of the original with
+backtraces at each call.
 
 ## Differences
 
-None measured yet: the port does not run.
+None in the runs that the port plays (`tst/runs.txt`).
