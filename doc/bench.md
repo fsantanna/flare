@@ -5,9 +5,10 @@ Only measured numbers. Each table says when and how it was measured.
 ## The original, baseline (F0, 2026-11-11)
 
 - `flare-engine@56c747a` with `tools/bench/original.patch`, release
-  build (`-O3` of the CMake release type, g++ 13.3), software renderer,
-  SDL dummy video and audio drivers, no audio, in this container (4
-  cores of an AMD EPYC 9B14).
+  build (g++ 13.3, `-std=c++98 -O2`: the engine adds `-O2` after the
+  `-O3` of the CMake release type), software renderer, SDL dummy video
+  and audio drivers, no audio, in this container (4 cores of an Intel
+  Xeon at 2.10 GHz).
 - Window 1280x720; the engine renders at 1706x960 internally.
 - Started by `tools/bench/measure.sh`: a new game of the first class
   (`FLARE_NEWGAME=0`) on the given map, no input, seed 1.
