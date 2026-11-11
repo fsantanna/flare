@@ -59,6 +59,11 @@ In respect of the
       same variables, generator, and input as the patched original;
       animations (`src/anim.atm`) loaded exactly as the original loads
       them (`tools/compare-anim.sh`).
+- [x] F3: a map drawn (`engine/map.h`, `src/map.atm`): tilesets,
+      layers, animated tiles, the isometric view, and the camera; the 24
+      maps of `alpha_demo` give the same pixels as the original
+      (`tools/compare-map.sh`). Parallax layers and the fog of war, used
+      only by the Empyrean Campaign, are left for F9.
 
 ## Tests
 
