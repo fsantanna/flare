@@ -76,9 +76,11 @@ static const char* fl_env (const char* name) {
 ///////////////////////////////////////////////////////////////////////////////
 
 static uint64_t FL_RND = 0;
+static unsigned long FL_RND_CALLS = 0;      // since the last count (FLARE_RNG)
 
 // from 0 to 2^31-1, as rand() of glibc
 static int fl_rand (void) {
+    FL_RND_CALLS++;
     FL_RND = FL_RND * 6364136223846793005ULL + 1442695040888963407ULL;
     return (int)(FL_RND >> 33);
 }

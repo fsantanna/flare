@@ -39,6 +39,13 @@ val fl = [
         `:number fl_rand()`
     },
 
+    ;; the calls to fl.rand since the last time
+    rand_calls = func () {
+        val n = `:number FL_RND_CALLS`
+        `FL_RND_CALLS = 0;`
+        n
+    },
+
     ;; a line of the trace, after the logic frame
     trace = func (s) {
         `fl_trace(fl_cstr($s));`
