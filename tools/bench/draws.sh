@@ -14,7 +14,7 @@ B="$ORIG/draws"
 
 if [ "$1" = "build" ]; then
 	mkdir -p "$B"
-	sed 's|calls()++;|calls()++; if (getenv("FLARE_BT")) { void* b[8]; int n = backtrace(b, 8); backtrace_symbols_fd(b, n, 2); write(2, "--\\n", 3); }|; s|#include <vector>|#include <vector>\n#include <execinfo.h>\n#include <unistd.h>|' \
+	sed 's|calls()++;|calls()++; if (getenv("FLARE_BT")) { void* b[8]; int n = backtrace(b, 8); backtrace_symbols_fd(b, n, 2); if (write(2, "--\\n", 3)) {} }|; s|#include <vector>|#include <vector>\n#include <execinfo.h>\n#include <unistd.h>|' \
 		"$ORIG/flare-engine/src/Bench.h" > "$B/Bench.h"
 	cd "$B" && cmake "$ORIG/flare-engine" -DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_CXX_FLAGS="-include $B/Bench.h" -DCMAKE_EXE_LINKER_FLAGS="-rdynamic" > /dev/null \
