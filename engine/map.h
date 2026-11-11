@@ -128,6 +128,7 @@ static int             FL_OBJ_LAYER = 0;                // index_objectlayer
 static unsigned short* FL_COLLISION = NULL;             // the collision layer
 static unsigned char*  FL_DRAWN = NULL;                 // drawn_tiles
 static int64_t         FL_BG = 0x000000FF;              // background_color
+static int             FL_COL_EMPTY = 0;                // has_empty_tile
 
 static void fl_map_free (void) {
     for (int i=0; i<FL_LAYERS_N; i++) {
@@ -201,6 +202,10 @@ static void fl_map_done (void) {
     }
     if (FL_COLLISION == NULL) {
         FL_COLLISION = calloc((size_t)FL_MAP_W * FL_MAP_H, sizeof(unsigned short));
+    }
+    FL_COL_EMPTY = 0;
+    for (int k=0; k<FL_MAP_W*FL_MAP_H; k++) {
+        if (FL_COLLISION[k] == 0) FL_COL_EMPTY = 1;
     }
     for (int i=0; i<FL_LAYERS_N; i++) {
         if (!strcmp(FL_LAYER_NAMES[i], "object")) {
