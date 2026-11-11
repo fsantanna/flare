@@ -39,6 +39,12 @@ val fl = [
         `:number fl_rand()`
     },
 
+    ;; the names of the files of a directory with an extension, in the
+    ;; order of readdir, or nil
+    dir = func (path, ext) {
+        `:value fl_dir(fl_cstr($path), fl_cstr($ext))`
+    },
+
     ;; the calls to fl.rand since the last time
     rand_calls = func () {
         val n = `:number FL_RND_CALLS`

@@ -43,6 +43,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <time.h>
+#include <dirent.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
@@ -83,6 +84,32 @@ static int fl_rand (void) {
     FL_RND_CALLS++;
     FL_RND = FL_RND * 6364136223846793005ULL + 1442695040888963407ULL;
     return (int)(FL_RND >> 33);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// FILES
+///////////////////////////////////////////////////////////////////////////////
+
+// The names of the files of a directory that end in `ext`, in the order
+// of readdir, as Filesystem::getFileList: a vector, or nil.
+static AVal fl_dir (const char* path, const char* ext) {
+    DIR* dp = opendir(path);
+    if (dp == NULL) {
+        return a_nil();
+    }
+    AVal ret = a_tab();
+    size_t n = strlen(ext);
+    struct dirent* d;
+    while ((d = readdir(dp)) != NULL) {
+        size_t m = strlen(d->d_name);
+        if (m > n && strcmp(d->d_name + m - n, ext) == 0) {
+            AVal s = a_strz(d->d_name);
+            a_setindex_next(ret, s);
+            a_dec(s);
+        }
+    }
+    closedir(dp);
+    return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
