@@ -18,3 +18,7 @@ meanwhile.
 - Meanwhile: a function of the program (`func g` outside functions),
   with what it would capture passed as arguments.
 - What would help: `val func g` visible in its own body, with no cycle.
+- Fixed in `ceu-atmos@5b25d89`: `val func` and `val task` are visible in
+  their own bodies, with no capture. `ini.resolve` uses it again. Two
+  local functions that call each other still need a function of the
+  program.

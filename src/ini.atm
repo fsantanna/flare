@@ -86,22 +86,21 @@ val func ini_mod_key (dir, mod, key) {
 ;; `default` first, then each given mod after the mods it requires
 ;; (`requires=name:min:max,...` in its `settings.txt`), each mod once.
 ;; Versions and the game of each mod are not checked.
-func ini_add (dir, ret, name) {
-    if X.nin(name, ret) {
-        val req = ini_mod_key(dir, name, "requires")
-        if req {
-            loop _,r in string.split(req, ",") {
-                ini_add(dir, ret, ini.trim(string.split(r, ":")@0))
-            }
-        }
-        set ret@+ = name
-    }
-}
-
 func ini.resolve (dir, names) {
     val ret = ["default"]
+    val func add (name) {
+        if X.nin(name, ret) {
+            val req = ini_mod_key(dir, name, "requires")
+            if req {
+                loop _,r in string.split(req, ",") {
+                    add(ini.trim(string.split(r, ":")@0))
+                }
+            }
+            set ret@+ = name
+        }
+    }
     loop _,n in names {
-        ini_add(dir, ret, n)
+        add(n)
     }
     ret
 }
