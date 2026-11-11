@@ -1,0 +1,14 @@
+flare : image : none.png : Couldn't open none.png
+render	1706	960
+rand	908834774	1093944153	1392341196
+image	0	3370	1788
+missing	-1
+font	0	49	22
+5 mouse.motion 100 200
+6 mouse.dn 100 200
+7 mouse.up 100 200
+8 key.dn W nil
+9 key.up W nil
+9 ten frames
+flare: frames 30
+shot md5 91ec48ac75e4a7177ba604c980c50d68

@@ -1,0 +1,41 @@
+;; The engine: an image, a part of it, a text, a sound, the generator,
+;; the trace, the scripted input, and the clock of frames.
+;;
+;;      FLARE_FRAMES=30 FLARE_FAST=1 FLARE_SEED=1 FLARE_TRACE=- \
+;;      FLARE_INPUT=tst/engine.in FLARE_SHOT=20:out/engine.bmp ./run.sh tst/engine.atm
+
+include "../engine/engine.atm"
+include "../src/ini.atm"
+
+ini.set_mods(os.getenv("FLARE_DATA"), ini.resolve(os.getenv("FLARE_DATA"), ["alpha_demo"]))
+
+print("render", fl.W, fl.H)
+print("rand", fl.rand(), fl.rand(), fl.rand())
+
+val img = fl.img(ini.locate("images/enemies/zombie.png"))
+print("image", img, fl.size(img))
+print("missing", fl.img("none.png"))
+
+val font = fl.font(ini.locate("fonts/BonaNovaSC-Regular.ttf"), 18)
+print("font", font, fl.text_width(font, "Flare"), fl.text_height(font))
+
+spawn {
+    loop e on true {
+        if (e ?? :key) || (e ?? :mouse) {
+            fl.trace(e.tag ++ " " ++ X.tostring(e@0) ++ " " ++ X.tostring(e@1))
+        }
+    }
+}
+
+spawn {
+    await Frames(10)
+    fl.trace("ten frames")
+}
+
+loop on :draw {
+    ;; a frame of the zombie (the first one of its file), and a text
+    fl.part(img, 1955, 519, 77, 166, 100, 100)
+    fl.draw(img, 300, 0)
+    fl.fill(0xFF000080, 50, 50, 40, 40)
+    fl.text(font, "Flare in Atmos", 100, 300, 0xFFFF00)
+}

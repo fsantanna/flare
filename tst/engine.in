@@ -1,0 +1,5 @@
+5 move 100 200
+6 down 1
+7 up 1
+8 key W
+9 keyup W
