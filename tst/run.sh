@@ -6,6 +6,7 @@
 #   ASAN=1 tst/run.sh   the same, built with the address sanitizer
 #
 #   - ini: the INI reader on small files (tst/ini.atm);
+#   - parse: the values of the text files (tst/parse.atm);
 #   - engine: images, a text, the generator, the trace, scripted input,
 #     and a screenshot (tst/engine.atm), compared by its checksum;
 #   - data: every text file of alpha_demo and fantasycore, and of
@@ -36,9 +37,11 @@ check () {     # name, file
 
 [ "$1" = "update" ] && UPDATE=1
 
-# ini
-./run.sh tst/ini.atm > "$OUT/ini.out" 2>&1
-check ini "$OUT/ini.out"
+# units: tst/<name>.atm, each with its output
+for t in ini parse; do
+	./run.sh tst/$t.atm > "$OUT/$t.out" 2>&1
+	check $t "$OUT/$t.out"
+done
 
 # engine
 FLARE_FRAMES=30 FLARE_FAST=1 FLARE_SEED=1 FLARE_TRACE=- FLARE_MUTE=1 \

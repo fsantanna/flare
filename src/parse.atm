@@ -1,0 +1,109 @@
+;; The values of the text files, as `Parse::` of the original reads them
+;; (`flare-engine/src/UtilsParsing.cpp`).
+;;
+;;      parse.list(s)           the pieces between ',' or ';' (popFirstString)
+;;      parse.int(s [,def])     a leading integer, or def (0) (toInt)
+;;      parse.float(s [,def])   a leading real, or def (0) (toFloat)
+;;      parse.bool(s)           true, yes, 1 / false, no, 0 (toBool)
+;;      parse.duration(s)       "533ms" or "2s" in logic frames (toDuration)
+;;      parse.direction(s)      "N", "SE", or 0-7 (toDirection)
+;;      parse.rgb(s)            0xRRGGBB (toRGB)
+;;
+;; An absent piece of a list is nil, which is 0 as a number (or the
+;; default), as when `popFirstInt` pops from an empty string.
+
+```:prelude
+#include <stdlib.h>
+// as `std::stringstream(s) >> int`: blanks, a sign, digits; or the default
+static double fl_toint (const char* s, double def) {
+    char* end;
+    long v = strtol(s, &end, 10);
+    return (end == s) ? def : (double)(int)v;
+}
+// as `std::stringstream(s) >> float`
+static double fl_tofloat (const char* s, double def) {
+    char* end;
+    float v = strtof(s, &end);
+    return (end == s) ? def : (double)v;
+}
+```
+
+val parse = []
+
+func parse.list (s) {
+    val ret = []
+    var i = 0
+    var j = 0
+    loop {
+        while j < #s
+        val b = string.byte(s, j)
+        if (b == 44) || (b == 59) {        ;; ',' ';'
+            set ret@+ = string.sub(s, i, j - 1)
+            set i = j + 1
+        }
+        set j += 1
+    }
+    set ret@+ = string.sub(s, i, j - 1)
+    ret
+}
+
+func parse.int (s, def) {
+    val d = def || 0
+    if s == nil => d => `:number.integer fl_toint(A_STR_OF($s)->s, a_dbl($d))`
+}
+
+func parse.float (s, def) {
+    val d = def || 0
+    if s == nil => d => `:number.float fl_tofloat(A_STR_OF($s)->s, a_dbl($d))`
+}
+
+func parse.bool (s) {
+    val v = string.lower(ini.trim(s))
+    (v == "true") || (v == "yes") || (v == "1")
+}
+
+;; at 60 frames per second (`max_fps` of the settings)
+func parse.duration (s) {
+    val t = ini.trim(s)
+    val v = parse.int(t)
+    ;; the suffix: what follows the number
+    var k = 0
+    loop {
+        while k < #t
+        val b = string.byte(t, k)
+        while ((b >= 48) && (b <= 57)) || (b == 45) || (b == 43)
+        set k += 1
+    }
+    val suf = ini.trim(string.sub(t, k))
+    ifs {
+        v == 0 => 0
+        suf == "s" => v * 60
+        else => {
+            ;; floorf((float(val * max_fps) / 1000.f) + 0.5f), at least 1
+            val f = `:number.integer floorf(((float)((int)a_dbl($v) * 60) / 1000.f) + 0.5f)`
+            math.max(1, f)
+        }
+    }
+}
+
+func parse.direction (s) {
+    match s {
+        "N"  => 3
+        "NE" => 4
+        "E"  => 5
+        "SE" => 6
+        "S"  => 7
+        "SW" => 0
+        "W"  => 1
+        "NW" => 2
+        else => {
+            val d = parse.int(s)
+            if (d < 0) || (d > 7) => 0 => d
+        }
+    }
+}
+
+func parse.rgb (s) {
+    val l = parse.list(s)
+    ((parse.int(l@0) & 0xFF) << 16) | ((parse.int(l@1) & 0xFF) << 8) | (parse.int(l@2) & 0xFF)
+}

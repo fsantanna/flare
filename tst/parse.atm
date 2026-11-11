@@ -1,0 +1,12 @@
+;; The values of the text files, as Parse:: of the original reads them.
+
+include "../src/ini.atm"
+include "../src/parse.atm"
+
+X.print(parse.list("a,b;c,,d"), parse.list(""), parse.list("x"))
+print(parse.int("12"), parse.int(" -5"), parse.int("12abc"), parse.int("abc"), parse.int("abc", 7), parse.int(nil), parse.int("1.9"))
+print(parse.float("1.5"), parse.float("abc"), parse.float("0.1"))
+print(parse.bool("true"), parse.bool(" Yes "), parse.bool("1"), parse.bool("0"), parse.bool("x"))
+print(parse.duration("533ms"), parse.duration("2s"), parse.duration("1ms"), parse.duration("0"), parse.duration("100"), parse.duration("250ms"))
+print(parse.direction("N"), parse.direction("SW"), parse.direction("6"), parse.direction("9"))
+print(string.format("%06x", parse.rgb("255,128,0")), string.format("%06x", parse.rgb("1")))
