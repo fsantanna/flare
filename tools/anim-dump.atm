@@ -1,0 +1,43 @@
+;; Dumps animation files as `anim.load` reads them, in the format of
+;; FLARE_ANIM in the patched original (tools/bench/original.patch).
+;;
+;;      atmos tools/anim-dump.atm <data dir> <mod,mod,...> <list of paths>
+
+include "../engine/engine.atm"
+include "../src/ini.atm"
+include "../src/parse.atm"
+include "../src/anim.atm"
+
+val dir, mods, list = ...
+ini.set_mods(dir, string.split(mods, ","))
+
+val TYPES = [play_once=1, looped=2, back_forth=3]
+val SUBS = [end=0, start=1, all=2]
+
+func ints (t) {
+    var s = ""
+    loop _, v in t {
+        set s = s ++ " " ++ v
+    }
+    s
+}
+
+loop path in io.lines(list) {
+    if #path > 0 {
+        val aset = anim.load(path)
+        print("file " ++ path ++ " " ++ (aset.first || "default"))
+        loop _, a in aset.order {
+            print("anim " ++ a.name ++ " " ++ (TYPES@(a.type) || 0) ++ " " ++ a.frames)
+            print("sub" ++ ints(a.sub))
+            print("total " ++ a.total)
+            print("active" ++ ints(a.active))
+            print("active_sub " ++ SUBS@(a.active_sub) ++ " " ++ (if a.default_active => 1 => 0))
+            print(string.format("blend %d %d %d,%d,%d", a.blend, a.alpha,
+                (a.color >> 16) & 0xFF, (a.color >> 8) & 0xFF, a.color & 0xFF))
+            loop i in DIRECTIONS * a.frames {
+                val g = a.gfx@i || [0, 0, 0, 0, 0, 0, 0, ""]
+                print(string.format("gfx %d %d %d %d %d %d %d %s", i, g@1, g@2, g@3, g@4, g@5, g@6, g@7))
+            }
+        }
+    }
+}
