@@ -8,7 +8,10 @@
 //     SDL, and the test mode;
 //   - the generator of random numbers of the patched original;
 //   - the trace;
-//   - images: loading with a cache by path, and drawing of parts;
+//   - images: loading with a cache by path, and drawing of parts, as the
+//     software renderer of the original (SDLSoftwareRenderDevice): ARGB8888
+//     surfaces blitted onto a screen surface, which is copied to the
+//     window once per frame, so that the pixels are the same;
 //   - fonts (TrueType) and texts;
 //   - sounds and music.
 //
@@ -47,7 +50,8 @@
 
 static SDL_Window*   FL_WIN = NULL;
 static SDL_Renderer* FL_REN = NULL;
-static SDL_Texture*  FL_TGT = NULL;     // the render, at FL_W x FL_H
+static SDL_Surface*  FL_SCREEN = NULL;  // the render, at FL_W x FL_H
+static SDL_Texture*  FL_TEX = NULL;     // the render, sent to the window
 static int           FL_W   = 1706;
 static int           FL_H   = 960;
 static int           FL_SND = 0;        // audio is open
@@ -99,7 +103,7 @@ static void fl_trace (const char* s) {
 
 typedef struct {
     char*        path;
-    SDL_Texture* tex;
+    SDL_Surface* tex;
     int          w, h;
 } FlImg;
 
@@ -119,13 +123,16 @@ static int fl_img_load (const char* path) {
     }
     FlImg* img = &FL_IMGS[FL_IMGS_N];
     img->path = strdup(path);
-    img->tex = IMG_LoadTexture(FL_REN, path);
+    SDL_Surface* raw = IMG_Load(path);
+    img->tex = NULL;
     img->w = img->h = 0;
-    if (img->tex == NULL) {
+    if (raw == NULL) {
         fprintf(stderr, "flare : image : %s : %s\n", path, IMG_GetError());
     } else {
-        SDL_QueryTexture(img->tex, NULL, NULL, &img->w, &img->h);
-        SDL_SetTextureBlendMode(img->tex, SDL_BLENDMODE_BLEND);
+        img->tex = SDL_ConvertSurfaceFormat(raw, SDL_PIXELFORMAT_ARGB8888, 0);
+        SDL_FreeSurface(raw);
+        img->w = img->tex->w;
+        img->h = img->tex->h;
     }
     return (img->tex != NULL) ? FL_IMGS_N++ : (FL_IMGS_N++, -1);
 }
@@ -149,25 +156,21 @@ static void fl_img_draw (int i, int sx, int sy, int sw, int sh, int dx, int dy,
     }
     SDL_Rect src = { sx, sy, sw, sh };
     SDL_Rect dst = { dx, dy, sw, sh };
-    SDL_SetTextureAlphaMod(img->tex, (Uint8)alpha);
-    SDL_SetTextureColorMod(img->tex, (color>>16)&0xFF, (color>>8)&0xFF, color&0xFF);
-    SDL_SetTextureBlendMode(img->tex, blend ? SDL_BLENDMODE_ADD : SDL_BLENDMODE_BLEND);
-    SDL_RenderCopy(FL_REN, img->tex, &src, &dst);
+    SDL_SetSurfaceBlendMode(img->tex, blend ? SDL_BLENDMODE_ADD : SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceColorMod(img->tex, (color>>16)&0xFF, (color>>8)&0xFF, color&0xFF);
+    SDL_SetSurfaceAlphaMod(img->tex, (Uint8)alpha);
+    SDL_BlitSurface(img->tex, &src, FL_SCREEN, &dst);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // SHAPES
 ///////////////////////////////////////////////////////////////////////////////
 
-static void fl_color (int64_t rgba) {
-    SDL_SetRenderDrawBlendMode(FL_REN, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(FL_REN, (rgba>>24)&0xFF, (rgba>>16)&0xFF, (rgba>>8)&0xFF, rgba&0xFF);
-}
-
+// fills a rectangle with a color 0xRRGGBBAA, with no blending, as SDL_FillRect
 static void fl_fill (int64_t rgba, int x, int y, int w, int h) {
     SDL_Rect r = { x, y, w, h };
-    fl_color(rgba);
-    SDL_RenderFillRect(FL_REN, &r);
+    SDL_FillRect(FL_SCREEN, &r, SDL_MapRGBA(FL_SCREEN->format,
+        (rgba>>24)&0xFF, (rgba>>16)&0xFF, (rgba>>8)&0xFF, rgba&0xFF));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -224,11 +227,10 @@ static void fl_font_draw (int fi, const char* s, int x, int y, int justify, int 
     if (sfc == NULL) {
         return;
     }
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(FL_REN, sfc);
     SDL_Rect dst = { x, y, sfc->w, sfc->h };
-    SDL_RenderCopy(FL_REN, tex, NULL, &dst);
-    SDL_RenderCopy(FL_REN, tex, NULL, &dst);
-    SDL_DestroyTexture(tex);
+    SDL_BlitSurface(sfc, NULL, FL_SCREEN, &dst);
+    dst.x = x; dst.y = y; dst.w = sfc->w; dst.h = sfc->h;
+    SDL_BlitSurface(sfc, NULL, FL_SCREEN, &dst);
     SDL_FreeSurface(sfc);
 }
 
@@ -294,6 +296,8 @@ static void fl_music (const char* path) {
     }
 }
 
+#include "engine/map.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 // DRIVER
 ///////////////////////////////////////////////////////////////////////////////
@@ -331,10 +335,7 @@ static AStatus fl_emit (const char* tag, const char* name, int x, int y, int but
 
 // Saves the render as a BMP, as the patched original does.
 static void fl_shot (const char* path) {
-    SDL_Surface* sfc = SDL_CreateRGBSurfaceWithFormat(0, FL_W, FL_H, 32, SDL_PIXELFORMAT_ARGB8888);
-    SDL_RenderReadPixels(FL_REN, NULL, SDL_PIXELFORMAT_ARGB8888, sfc->pixels, sfc->pitch);
-    SDL_SaveBMP(sfc, path);
-    SDL_FreeSurface(sfc);
+    SDL_SaveBMP(FL_SCREEN, path);
 }
 
 // The scripted input (FLARE_INPUT): the lines of the frame that are
@@ -424,14 +425,15 @@ int main (int argc, char** argv) {
     FL_W = (int)((float)sw * ((float)FL_H / (float)sh));
     FL_WIN = SDL_CreateWindow("Flare", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, sw, sh, 0);
     if (FL_WIN != NULL) {
-        FL_REN = SDL_CreateRenderer(FL_WIN, -1, SDL_RENDERER_TARGETTEXTURE);
+        FL_REN = SDL_CreateRenderer(FL_WIN, -1, 0);
     }
     if (FL_REN == NULL) {
         fprintf(stderr, "flare : %s\n", SDL_GetError());
         exit(1);
     }
     FL_SCALE = (float)FL_H / (float)sh;
-    FL_TGT = SDL_CreateTexture(FL_REN, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, FL_W, FL_H);
+    FL_SCREEN = SDL_CreateRGBSurfaceWithFormat(0, FL_W, FL_H, 32, SDL_PIXELFORMAT_ARGB8888);
+    FL_TEX = SDL_CreateTexture(FL_REN, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, FL_W, FL_H);
 
     atm_init(argc, argv);
     AStatus st = atm_main();
@@ -491,15 +493,14 @@ int main (int argc, char** argv) {
 
         // the screen
         if (st == A_OK) {
-            SDL_SetRenderTarget(FL_REN, FL_TGT);
-            SDL_SetRenderDrawColor(FL_REN, 0, 0, 0, 255);
-            SDL_RenderClear(FL_REN);
+            SDL_FillRect(FL_SCREEN, NULL, SDL_MapRGBA(FL_SCREEN->format, 0, 0, 0, 255));
             st = fl_emit("draw", NULL, -1, -1, -1);
             if (shot_path && FL_FRAME == (unsigned long)shot) {
                 fl_shot(shot_path);
             }
-            SDL_SetRenderTarget(FL_REN, NULL);
-            SDL_RenderCopy(FL_REN, FL_TGT, NULL, NULL);
+            SDL_UpdateTexture(FL_TEX, NULL, FL_SCREEN->pixels, FL_SCREEN->pitch);
+            SDL_RenderClear(FL_REN);
+            SDL_RenderCopy(FL_REN, FL_TEX, NULL, NULL);
             SDL_RenderPresent(FL_REN);
         }
 
