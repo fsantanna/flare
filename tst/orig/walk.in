@@ -1,0 +1,9 @@
+# env: FLARE_FRAMES=240 FLARE_DUMP=1
+# walk up with W, attack with the left button, walk right with D
+30 key W
+90 keyup W
+100 move 900 300
+100 down 1
+104 up 1
+150 key D
+200 keyup D
