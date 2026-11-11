@@ -92,6 +92,69 @@ val fl = [
     music_stop = func () {
         `fl_music_stop();`
     },
+
+    ;; the map: see `engine/map.h`
+    tset_reset = func () {
+        `fl_tset_reset();`
+    },
+    tset_tile = func (i, img, x, y, w, h, ox, oy) {
+        `fl_tset_tile(fl_int($i), fl_int($img), fl_int($x), fl_int($y), fl_int($w), fl_int($h), fl_int($ox), fl_int($oy));`
+    },
+    tset_anim = func (i, x, y, dur) {
+        `fl_tset_anim(fl_int($i), fl_int($x), fl_int($y), fl_int($dur));`
+    },
+    tset_done = func () {
+        `fl_tset_done();`
+    },
+    tset_logic = func () {
+        `fl_tset_logic();`
+    },
+    map_new = func (w, h) {
+        `fl_map_new(fl_int($w), fl_int($h));`
+    },
+    map_layer = func (name) {
+        `:number fl_map_layer(fl_cstr($name))`
+    },
+    map_row = func (l, y, s) {
+        `:boolean fl_map_row(fl_int($l), fl_int($y), fl_cstr($s))`
+    },
+    map_done = func (bg) {
+        `FL_BG = (int64_t)a_dbl($bg);`
+        `fl_map_done();`
+    },
+    map_render = func () {
+        `fl_map_render();`
+    },
+    ;; the camera: positions are 32-bit floats
+    cam_warp = func (x, y) {
+        `fl_cam_warp((float)a_dbl($x), (float)a_dbl($y));`
+    },
+    cam_target = func (x, y) {
+        `fl_cam_target((float)a_dbl($x), (float)a_dbl($y));`
+    },
+    cam_logic = func () {
+        `fl_cam_logic();`
+    },
+    cam = func () {
+        return `:number.float (double)FL_CAM.x`, `:number.float (double)FL_CAM.y`
+    },
+    ;; objects to draw in this frame: fl.ren(dead, img, sx,sy,sw,sh, ox,oy, mx,my, prio, hero, alpha, color, blend)
+    ren_clear = func () {
+        `fl_ren_clear();`
+    },
+    ren = func (dead, img, sx, sy, sw, sh, ox, oy, mx, my, prio, hero, alpha, color, blend) {
+        val d = if dead => 1 => 0
+        val h = if hero => 1 => 0
+        val a = alpha || 255
+        val c = color || 0xFFFFFF
+        val b = blend || 0
+        `fl_ren_push(fl_int($d), fl_int($img), fl_int($sx), fl_int($sy), fl_int($sw), fl_int($sh), fl_int($ox), fl_int($oy), (float)a_dbl($mx), (float)a_dbl($my), fl_int($prio), fl_int($h), fl_int($a), fl_int($c), fl_int($b));`
+    },
+
+    ;; f32(x): x rounded to 32 bits, as a `float` of the original
+    f32 = func (x) {
+        `:number.float (double)(float)a_dbl($x)`
+    },
 ]
 
 ;; awaits n logic frames

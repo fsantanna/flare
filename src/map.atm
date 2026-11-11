@@ -1,0 +1,111 @@
+;; Maps: the files of `maps/` and of `tilesetdefs/`, as Map::load,
+;; MapRenderer::load, and TileSet::load read them. The layers and the
+;; tileset go to C (`engine/map.h`), which draws them.
+;;
+;;      map.load(path)      loads a map, and evaluates to its header:
+;;          :Map [path, w, h, title, music, tileset, hero=[x,y],
+;;                bg=0xRRGGBBAA, secs=<the sections of the file>]
+;;      map.tileset(path)   loads a tileset into C, once
+;;
+;; The other sections of the file (npcs, enemies, events) are read by
+;; the tasks that use them, from `secs`.
+
+val map = [
+    tileset_path = nil,     ;; the tileset in C
+]
+
+func map.tileset (path) {
+    if path == map.tileset_path {
+        return nil
+    }
+    set map.tileset_path = path
+    fl.tset_reset()
+    var img = -1
+    var first = true
+    loop i, s in ini.load(path) || [] {
+        ;; a new image at each `[tileset]`, or with keys before any section
+        if (s.name == "tileset") && !((i == 0) && s.cont) {
+            set img = -1
+        }
+        loop _, kv in s.keys {
+            val k, v = kv@0, kv@1
+            match k {
+                "img" => {
+                    set img = fl.img(ini.locate(v) || v)
+                }
+                "tile" => {
+                    val l = parse.list(v)
+                    fl.tset_tile(parse.int(l@0), img, parse.int(l@1), parse.int(l@2),
+                        parse.int(l@3), parse.int(l@4), parse.int(l@5), parse.int(l@6))
+                }
+                "animation" => {
+                    ;; index, then x, y, duration for each frame
+                    val l = parse.list(v)
+                    val idx = parse.int(l@0)
+                    var k = 1
+                    loop {
+                        while (l@k != nil) && (l@k != "")
+                        fl.tset_anim(idx, parse.int(l@k), parse.int(l@(k+1)), parse.duration(l@(k+2) || ""))
+                        set k += 3
+                    }
+                }
+            }
+        }
+    }
+    fl.tset_done()
+}
+
+func map.load (path) {
+    val secs = ini.load(path) || []
+    val m = :Map [path = path, w = 0, h = 0, title = "", music = "", tileset = "",
+                  hero = [0, 0], bg = 0x000000FF, secs = secs]
+    ;; the header first: the size of the layers
+    loop _, s in secs {
+        if s.name == "header" {
+            loop _, kv in s.keys {
+                val k, v = kv@0, kv@1
+                match k {
+                    "width"    => { set m.w = parse.int(v) }
+                    "height"   => { set m.h = parse.int(v) }
+                    "title"    => { set m.title = v }
+                    "music"    => { set m.music = v }
+                    "tileset"  => { set m.tileset = v }
+                    "hero_pos" => {
+                        val l = parse.list(v)
+                        set m.hero = [parse.int(l@0) + 0.5, parse.int(l@1) + 0.5]
+                    }
+                    "background_color" => {
+                        val l = parse.list(v)
+                        set m.bg = ((parse.int(l@0) & 0xFF) << 24) | ((parse.int(l@1) & 0xFF) << 16) |
+                                   ((parse.int(l@2) & 0xFF) << 8) | (parse.int(l@3) & 0xFF)
+                    }
+                }
+            }
+        }
+    }
+    fl.map_new(m.w, m.h)
+    loop _, s in secs {
+        if s.name == "layer" {
+            var l = -1
+            var y = nil         ;; the next row, after `data=`
+            loop _, kv in s.keys {
+                val k, v = kv@0, kv@1
+                ifs {
+                    k == "type" => {
+                        set l = fl.map_layer(v)
+                    }
+                    k == "data" => {
+                        set y = 0
+                    }
+                    (k == "") && (y != nil) && (y < m.h) => {
+                        fl.map_row(l, y, v)
+                        set y += 1
+                    }
+                }
+            }
+        }
+    }
+    map.tileset(m.tileset)
+    fl.map_done(m.bg)
+    m
+}
