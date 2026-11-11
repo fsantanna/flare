@@ -1,0 +1,32 @@
+;; Fonts: the styles of font_settings.txt, the colors of font_colors.txt,
+;; justified and shadowed texts.
+
+include "../engine/engine.atm"
+include "../src/ini.atm"
+include "../src/parse.atm"
+include "../src/font.atm"
+
+ini.set_mods(os.getenv("FLARE_DATA"), ini.resolve(os.getenv("FLARE_DATA"), ["alpha_demo"]))
+font.init()
+
+val ids = []
+loop k, _ in font.styles {
+    set ids@+ = k
+}
+vector.sort(ids)
+loop _, id in ids {
+    val st = font.styles@id
+    print(id, st.blend, X.tostring(st.shadow), st.height, font.width(id, "Frontier Outpost"))
+}
+print(string.format("%06x %06x %06x", font.color("menu_normal"), font.color("menu_bonus"), font.color("none")))
+
+loop on :draw {
+    var y = 20
+    loop _, id in ids {
+        font.text(id, id, 853, y, font.CENTER, font.color("menu_normal"))
+        set y += font.height(id)
+    }
+    font.text("font_regular", "left", 100, 700, font.LEFT, 0xFF0000)
+    font.text("font_regular", "right", 100, 740, font.RIGHT, 0x00FF00)
+    font.shadowed("font_region_title", "Frontier Outpost", 853, 800, font.CENTER, 0xFFFFFF)
+}

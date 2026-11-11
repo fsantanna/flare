@@ -10,6 +10,7 @@
 #   - engine: images, a text, the generator, the trace, scripted input,
 #     and a screenshot (tst/engine.atm), compared by its checksum;
 #   - anim: an animation set, and a looped animation (tst/anim.atm);
+#   - font: the styles and colors of the fonts (tst/font.atm);
 #   - data: every text file of alpha_demo and fantasycore, and of
 #     empyrean_campaign and fantasycore, read as the original reads them,
 #     and every animation file loaded (the dumps are compared by their
@@ -57,6 +58,12 @@ FLARE_FRAMES=70 FLARE_FAST=1 FLARE_TRACE=- FLARE_MUTE=1 FLARE_SHOT=40:"$OUT/anim
 	./run.sh tst/anim.atm > "$OUT/anim.out" 2>&1
 echo "shot md5 $(md5sum < "$OUT/anim.bmp" | cut -c1-32)" >> "$OUT/anim.out"
 check anim "$OUT/anim.out"
+
+# fonts: the styles, justified and shadowed texts
+FLARE_FRAMES=2 FLARE_FAST=1 FLARE_MUTE=1 FLARE_SHOT=1:"$OUT/font.bmp" \
+	./run.sh tst/font.atm > "$OUT/font.out" 2>&1
+echo "shot md5 $(md5sum < "$OUT/font.bmp" | cut -c1-32)" >> "$OUT/font.out"
+check font "$OUT/font.out"
 
 # data
 for mods in fantasycore,alpha_demo fantasycore,empyrean_campaign; do

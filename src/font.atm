@@ -1,0 +1,98 @@
+;; Fonts and their colors, as FontEngine and SDLFontEngine of the original
+;; read `engine/font_settings.txt` and `engine/font_colors.txt`.
+;;
+;;      font.init()                 loads the styles (language "en") and colors
+;;      font.text(id, s, x, y, justify, color)      a text in a style
+;;      font.shadowed(id, s, x, y, justify, color)  with a black shadow first
+;;      font.width(id, s), font.height(id)
+;;      font.color(name)            a color of font_colors.txt, as 0xRRGGBB
+;;
+;; Justify: font.LEFT, font.RIGHT, font.CENTER, as FontEngine::JUSTIFY_*.
+
+val font = [
+    LEFT = 0, RIGHT = 1, CENTER = 2,
+    styles = [],        ;; id -> [img, blend, shadow=[x,y], height]
+    colors = [],        ;; name -> 0xRRGGBB
+    first = nil,        ;; the first style, the fallback
+]
+
+func font.init () {
+    loop _, s in ini.load("engine/font_settings.txt") || [] {
+        var id = nil
+        var use_default = true
+        val st = [path = nil, size = 0, blend = true, bold = false, italic = false,
+                  underline = false, shadow = [1, 1]]
+        loop _, kv in s.keys {
+            val k, v = kv@0, kv@1
+            ifs {
+                k == "id" => {
+                    set id = v
+                }
+                k == "style" => {
+                    val l = parse.list(v)
+                    val lang = l@0
+                    if ((lang == "default") && use_default) || (lang == "en") {
+                        if lang != "default" {
+                            set use_default = false
+                        }
+                        set st.path = l@1
+                        set st.size = parse.int(l@2)
+                        set st.blend = parse.bool(l@3 || "")
+                        set st.bold = (#(l@4 || "") > 0) && parse.bool(l@4)
+                        set st.italic = (#(l@5 || "") > 0) && parse.bool(l@5)
+                        set st.underline = (#(l@6 || "") > 0) && parse.bool(l@6)
+                        set st.shadow = if (#(l@7 || "") > 0) && (#(l@8 || "") > 0) {
+                            [parse.int(l@7), parse.int(l@8)]
+                        } else {
+                            [1, 1]
+                        }
+                    }
+                }
+            }
+        }
+        if id && st.path {
+            val path = ini.locate(st.path) || ini.locate("fonts/" ++ st.path)
+            val style = (if st.bold => 1 => 0) | (if st.italic => 2 => 0) | (if st.underline => 4 => 0)
+            val f = fl.font(path || "", st.size, style)
+            if f >= 0 {
+                set font.styles@id = [img = f, blend = st.blend, shadow = st.shadow,
+                                      height = fl.text_height(f)]
+                if font.first == nil {
+                    set font.first = id
+                }
+            }
+        }
+    }
+    loop _, s in ini.load("engine/font_colors.txt") || [] {
+        loop _, kv in s.keys {
+            set font.colors@(kv@0) = parse.rgb(kv@1)
+        }
+    }
+}
+
+func font_style (id) {
+    font.styles@id || font.styles@(font.first)
+}
+
+func font.color (name) {
+    font.colors@name || 0xFFFFFF
+}
+
+func font.text (id, s, x, y, justify, color) {
+    val st = font_style(id)
+    fl.text(st.img, s, x, y, color, justify, st.blend)
+}
+
+func font.shadowed (id, s, x, y, justify, color) {
+    val st = font_style(id)
+    fl.text(st.img, s, x + st.shadow@0, y + st.shadow@1, 0x000000, justify, st.blend)
+    fl.text(st.img, s, x, y, color, justify, st.blend)
+}
+
+func font.width (id, s) {
+    fl.text_width(font_style(id).img, s)
+}
+
+func font.height (id) {
+    font_style(id).height
+}
