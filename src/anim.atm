@@ -343,3 +343,124 @@ task anim.Loop (a) {
     }
     await(false)
 }
+
+;; A cursor in an animation: the state of `Animation` of the original
+;; that tells which frame to draw, advanced by its owner once per logic
+;; frame (`advanceFrame`), and asked by it (`isFirstFrame`, ...).
+;;
+;;      anim.cursor(a)          a new cursor at the start of `a`
+;;      anim.advance(c)         advanceFrame
+;;      anim.is_first(c), anim.is_last(c), anim.is_active(c), anim.played(c)
+;;
+;; `f` is the sub-frame as a 32-bit float (sub_frame_f), and `speed` the
+;; speed of the play (1.0 by default).
+func anim.cursor (a) {
+    :Cursor [a = a, sub = 0, f = 0.0, times = 0, rev = false, speed = 1.0, triggered = false]
+}
+
+func anim.advance (c) {
+    val a = c.a
+    if #a.sub == 0 {
+        set c.sub = 0
+        set c.f = 0.0
+        set c.times = c.times + 1
+        return nil
+    }
+    val last = #a.sub - 1
+    match a.type {
+        "play_once" => {
+            if c.sub < last {
+                set c.f = fl.f32(c.f + c.speed)
+                set c.sub = math.floor(c.f)
+            } else {
+                set c.times = 1
+            }
+        }
+        "looped" => {
+            if c.sub < last {
+                set c.f = fl.f32(c.f + c.speed)
+                set c.sub = math.floor(c.f)
+            } else {
+                set c.sub = 0
+                set c.f = 0.0
+                set c.times = c.times + 1
+            }
+        }
+        "back_forth" => {
+            if !c.rev {
+                if c.sub < last {
+                    set c.f = fl.f32(c.f + c.speed)
+                    set c.sub = math.floor(c.f)
+                } else {
+                    set c.rev = true
+                    if a.frames == 1 {
+                        set c.times = c.times + 1
+                    }
+                }
+            } else {
+                if c.sub > 0 {
+                    set c.f = fl.f32(c.f - c.speed)
+                    set c.sub = math.floor(c.f)
+                } else {
+                    set c.rev = false
+                    set c.times = c.times + 1
+                }
+            }
+        }
+    }
+    ;; as an unsigned short, clamped
+    set c.sub = math.max(0, c.sub)
+    set c.sub = math.min(c.sub, last)
+}
+
+func anim.is_first (c) {
+    (c.sub == 0) && (c.f == c.sub)
+}
+
+func anim.is_last (c) {
+    c.sub == c.a.last@(c.a.total - 1)
+}
+
+;; the frame (of the file) of the cursor
+func anim_cur (c) {
+    if #c.a.sub == 0 => 0 => c.a.sub@(c.sub)
+}
+
+;; Animation::isActiveFrame
+func anim.is_active (c) {
+    val a = c.a
+    ifs {
+        #a.active == 0 => false
+        (a.type == "back_forth") && (c.rev || (c.times > 0)) => false
+        X.xin(anim_cur(c), a.active) => {
+            val cur = anim_cur(c)
+            ifs {
+                (a.active_sub == "end") && (c.sub == a.last@cur) && (c.f == c.sub) => {
+                    if a.type == "play_once" {
+                        set c.triggered = true
+                    }
+                    true
+                }
+                (a.active_sub == "start") && (c.sub == a.first@cur) && (c.f == c.sub) => {
+                    if a.type == "play_once" {
+                        set c.triggered = true
+                    }
+                    true
+                }
+                a.active_sub == "all" => {
+                    if a.type == "play_once" {
+                        set c.triggered = true
+                    }
+                    true
+                }
+                else => false
+            }
+        }
+        (a.type == "play_once") && anim.is_last(c) && !c.triggered => true
+        else => false
+    }
+}
+
+func anim.played (c) {
+    c.times
+}
