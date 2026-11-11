@@ -1,0 +1,232 @@
+;; The hero: Avatar of the original (`flare-engine/src/Avatar.cpp`).
+;;
+;; One task, `Hero`, whose life is the hero in a map. The game awakes it
+;; once per logic frame, at its place in the frame, with `:hero.logic`.
+;; In each frame the hero does what `Avatar::logic` does before and after
+;; its `switch`, and between them emits `:hero.step` to its current
+;; action. An action is a task that awaits steps, and that terminates with
+;; the next action:
+;;
+;;      Avatar::logic                   Hero
+;;      cur_state = ENTITY_STANCE       Stance()
+;;      cur_state = ENTITY_MOVE         Move()
+;;      switch (cur_state) {...}        loop { set act = await Act(...) }
+;;      set_dir_timer                   the task Turning
+;;
+;; `pub` is the hero as the rest of the game sees it: position, direction,
+;; stats, and the state of the original (`state`, for the trace and the
+;; drawing only).
+
+val STATE = [STANCE=0, MOVE=1, POWER=2, SPAWN=3, BLOCK=4, HIT=5, DEAD=6, CRITDEAD=7]
+
+val hero = [
+    steps = [],         ;; the sounds of steps (items/step_sounds.txt)
+]
+
+;; the stats of the hero, as StatBlock::calcBase for level 1 with no items
+;; and no effects: `stat=`, then `stat_per_primary=` times the primary
+;; points above 1 (the class gives its `primary=`)
+func hero.stats (class) {
+    val primary = [physical = 1, mental = 1, offense = 1, defense = 1]
+    loop _, s in ini.load("engine/classes.txt") || [] {
+        val keys = []
+        loop _, kv in s.keys {
+            set keys@(kv@0) = kv@1
+        }
+        if keys.name == class {
+            loop _, kv in s.keys {
+                if kv@0 == "primary" {
+                    val l = parse.list(kv@1)
+                    set primary@(l@0) = primary@(l@0) + parse.int(l@1)
+                }
+            }
+        }
+    }
+    val st = [speed = 0.2, hp = 0, mp = 0, sfx_step = ""]
+    val base = []
+    loop _, s in ini.load("engine/stats.txt") || [] {
+        loop _, kv in s.keys {
+            val k, v = kv@0, kv@1
+            val l = parse.list(v)
+            match k {
+                "stat" => {
+                    set base@(l@0) = parse.float(l@1)
+                }
+                "stat_per_primary" => {
+                    val p = math.max((primary@(l@0) || 1) - 1, 0)
+                    set base@(l@1) = (base@(l@1) || 0) + (p * parse.float(l@2))
+                }
+                "speed" => {
+                    ;; per logic frame, as a float
+                    set st.speed = fl.f32(parse.float(v) / 60)
+                }
+                "sfx_step" => {
+                    set st.sfx_step = v
+                }
+            }
+        }
+    }
+    set st.hp = base.hp || 0
+    set st.mp = base.mp || 0
+    set st.base = base
+    st
+}
+
+;; the sounds of the steps of an id (Avatar::loadStepFX)
+func hero.load_steps (id) {
+    set hero.steps = []
+    var cur = nil
+    loop _, s in ini.load("items/step_sounds.txt") || [] {
+        loop _, kv in s.keys {
+            ifs {
+                kv@0 == "id" => {
+                    set cur = kv@1
+                }
+                (kv@0 == "step") && (cur == id) => {
+                    set hero.steps@+ = fl.snd(ini.locate(kv@1) || "")
+                }
+            }
+        }
+    }
+}
+
+;; Avatar::pressing_move, with the keyboard (mouse_move is off)
+func hero_pressing_move (h) {
+    if h.camera_lock {
+        false
+    } else {
+        fl.pressed(Input.UP) || fl.pressed(Input.DOWN) || fl.pressed(Input.LEFT) || fl.pressed(Input.RIGHT)
+    }
+}
+
+;; the direction of the keys (Avatar::set_direction), or nil
+func hero_key_dir () {
+    var up, down, left, right = fl.pressed(Input.UP), fl.pressed(Input.DOWN), fl.pressed(Input.LEFT), fl.pressed(Input.RIGHT)
+    if !up && !down && !left && !right {
+        set up, down, left, right = fl.pressed(Input.AIM_UP), fl.pressed(Input.AIM_DOWN), fl.pressed(Input.AIM_LEFT), fl.pressed(Input.AIM_RIGHT)
+    }
+    ifs {
+        up && left => 1
+        up && right => 3
+        down && right => 5
+        down && left => 7
+        left => 0
+        up => 2
+        right => 4
+        down => 6
+        else => nil
+    }
+}
+
+;; Entity::move: the hero moves in its direction; false at an obstacle
+func hero_move (h) {
+    val ok, x, y = fl.move(h.x, h.y, h.dir, h.speed, 100, MOVE.NORMAL, true)
+    set h.x = x
+    set h.y = y
+    ok
+}
+
+;; Entity::setAnimation: a new cursor if the name changes
+func hero_anim (h, name) {
+    if h.cur.a.name != name {
+        set h.cur = anim.cursor(anim.get(h.anims, name))
+    }
+}
+
+;; The direction may change at once, and then not again for 6 logic frames
+;; (`set_dir_timer` of 100ms), unless the move keys are released. `pub` is
+;; true while it may change.
+task Turning (h) {
+    set pub = true
+    loop {
+        await :hero.turned
+        set pub = false
+        ;; set_dir_timer.tick() in the prologue of each frame, and reset
+        ;; when the move keys are not pressed
+        loop i in 6 {
+            await :hero.prologue
+            until !hero_pressing_move(h)
+        }
+        set pub = true
+    }
+}
+
+;; Avatar::set_direction
+func hero_turn (h, turning) {
+    if !h.camera_lock && turning.pub {
+        val d = hero_key_dir()
+        if (d != nil) && (d != h.dir) {
+            set h.dir = d
+            emit @(h.task) :hero.turned
+        }
+    }
+}
+
+;; ENTITY_STANCE: until the hero starts to move
+task Stance (h, turning) {
+    set h.state = STATE.STANCE
+    loop {
+        await :hero.step
+        hero_anim(h, "stance")
+        hero_turn(h, turning)
+        until hero_pressing_move(h) && hero_move(h), Move
+    }
+}
+
+;; ENTITY_MOVE: until the keys are released or the hero hits a wall
+task Move (h, turning) {
+    set h.state = STATE.MOVE
+    loop {
+        await :hero.step
+        hero_anim(h, "run")
+        if #hero.steps > 0 {
+            val i = fl.rand() % #hero.steps
+            if anim.is_first(h.cur) || anim.is_active(h.cur) {
+                fl.play(hero.steps@i)
+            }
+        }
+        hero_turn(h, turning)
+        until !hero_pressing_move(h), Stance
+        until !hero_move(h), Stance
+        until h.cur.a.name != "run", Stance
+    }
+}
+
+;; The hero in a map, from `pos`. `st`: the stats of hero.stats.
+task Hero (st, pos) {
+    set pub = [
+        task = task, name = "Bench",
+        x = fl.f32(pos@0), y = fl.f32(pos@1), dir = 6,
+        speed = st.speed, hp = st.hp, mp = st.mp,
+        state = STATE.STANCE,
+        camera_lock = true,     ;; teleport_camera_lock, until the camera is near
+        anims = anim.load("animations/hero.txt"),
+    ]
+    val h = pub
+    set h.cur = anim.cursor(anim.get(h.anims, "stance"))
+    pin turning = spawn Turning(h)
+
+    ;; the actions, one after the other
+    spawn {
+        var act = Stance
+        loop {
+            set act = await act(h, turning)
+        }
+    }
+
+    ;; each logic frame, around the action
+    loop on :hero.logic {
+        fl.col_unblock(h.x, h.y)
+        anim.advance(h.cur)
+        if h.camera_lock {
+            val cx, cy = fl.cam()
+            if math.sqrt(((h.x - cx) * (h.x - cx)) + ((h.y - cy) * (h.y - cy))) < 0.5 {
+                set h.camera_lock = false
+            }
+        }
+        emit @(task) :hero.prologue
+        emit @(task) :hero.step
+        fl.cam_target(h.x, h.y)
+        fl.col_block(h.x, h.y, false)
+    }
+}
