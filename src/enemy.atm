@@ -1,0 +1,215 @@
+;; Enemies: the groups of a map, the categories of EnemyGroupManager, and
+;; the stats of an enemy file (StatBlock::load), as the original.
+;;
+;;      enemy.init()            loads the categories of `enemies/`
+;;      enemy.groups(m)         the groups of a map (Map::loadEnemyGroup)
+;;      enemy.place(groups)     the enemies of the groups, with the draws of
+;;                              MapRenderer::pushEnemyGroup, in order
+;;      enemy.stats(path)       the stats of an enemy file, loaded once
+
+val enemy = [
+    cats = [],          ;; category -> [[type, level, rarity], ...]
+    protos = [],        ;; path -> stats
+]
+
+;; The files of a directory in the mods (ModManager::list): each mod in
+;; order, its files in the order of readdir, a file of a later mod in the
+;; place of the same file of an earlier one. The paths are relative.
+func list_dir (dir) {
+    val ret = []
+    loop _,m in ini.mods {
+        loop _, f in fl.dir(ini.dir ++ "/mods/" ++ m ++ "/" ++ dir, "txt") || [] {
+            val p = dir ++ "/" ++ f
+            ;; as the loop that removes duplicates: the earlier one goes
+            var k = nil
+            loop i, q in ret {
+                if q == p {
+                    set k = i
+                    break
+                }
+            }
+            if k != nil {
+                vector.remove(ret, k)
+            }
+            set ret@+ = p
+        }
+    }
+    ret
+}
+
+func enemy.init () {
+    loop _, path in list_dir("enemies") {
+        val e = [type = path, level = 0, rarity = "common"]
+        var cats = ""
+        loop _, s in ini.load(path) || [] {
+            loop _, kv in s.keys {
+                match kv@0 {
+                    "level" => { set e.level = parse.int(kv@1) }
+                    "rarity" => { set e.rarity = kv@1 }
+                    "categories" => { set cats = kv@1 }
+                }
+            }
+        }
+        loop _, c in parse.list(cats) {
+            until c == ""
+            set enemy.cats@c = enemy.cats@c || []
+            set enemy.cats@c@+ = e
+        }
+    }
+}
+
+;; Math::randBetween and percentChanceF
+func rand_between (lo, hi) {
+    if lo == hi => lo => (lo + (fl.rand() % ((hi - lo) + (if hi > lo => 1 => -1))))
+}
+func percent_f (p) {
+    ;; randBetweenF(0, 100) < p, in floats
+    val r = `:number.float (double)(0.0f + (((float)fl_rand() / (float)2147483647) * (100.0f - 0.0f)))`
+    r < fl.f32(p)
+}
+
+;; EnemyGroupManager::getRandomEnemy
+func enemy_random (cat, lo, hi) {
+    val cs = []
+    loop _, e in enemy.cats@cat || [] {
+        if ((e.level >= lo) && (e.level <= hi)) || ((lo == 0) && (hi == 0)) {
+            val n = match e.rarity {
+                "common" => 6
+                "uncommon" => 3
+                "rare" => 1
+                else => 0
+            }
+            loop _ in n {
+                set cs@+ = e
+            }
+        }
+    }
+    if #cs == 0 => nil => cs@(fl.rand() % #cs)
+}
+
+;; the groups of a map, in the order of the file
+func enemy.groups (m) {
+    val gs = []
+    loop _, s in m.secs {
+        if s.name == "enemy" {
+            val g = [category = "", pos = [0, 0], area = [1, 1], lmin = 0, lmax = 0,
+                     nmin = 1, nmax = 1, chance = 100.0, dir = -1, wander = 4, waypoints = []]
+            loop _, kv in s.keys {
+                val k, v = kv@0, kv@1
+                val l = parse.list(v)
+                match k {
+                    "category" => { set g.category = v }
+                    "level" => {
+                        set g.lmin = math.max(0, parse.int(l@0))
+                        set g.lmax = math.max(math.max(0, parse.int(l@1)), g.lmin)
+                    }
+                    "location" => {
+                        set g.pos = [parse.int(l@0), parse.int(l@1)]
+                        set g.area = [parse.int(l@2), parse.int(l@3)]
+                    }
+                    "number" => {
+                        set g.nmin = math.max(0, parse.int(l@0))
+                        set g.nmax = math.max(math.max(0, parse.int(l@1)), g.nmin)
+                    }
+                    "chance" => { set g.chance = math.min(100.0, math.max(0.0, parse.float(l@0))) }
+                    "direction" => { set g.dir = parse.direction(v) }
+                    "wander_radius" => {
+                        set g.wander = math.max(0, parse.int(l@0))
+                        set g.waypoints = []
+                    }
+                    "waypoints" => {
+                        set g.waypoints = []
+                        var i = 0
+                        loop {
+                            while (l@i != nil) && (l@i != "")
+                            set g.waypoints@+ = [parse.int(l@i) + 0.5, parse.int(l@(i+1)) + 0.5]
+                            set i += 2
+                        }
+                        set g.wander = 0
+                    }
+                }
+            }
+            set gs@+ = g
+        }
+    }
+    gs
+}
+
+;; MapRenderer::enemyGroupPlaceEnemy: true if the position is free
+func enemy_place_one (ret, x, y, g) {
+    if fl.col_valid(x, y, MOVE.NORMAL, COLLIDE.NONE) {
+        val e = enemy_random(g.category, g.lmin, g.lmax)
+        if e {
+            fl.rand()           ;; the constructor of Map_Enemy
+            val dir = if g.dir == -1 => (fl.rand() % 8) => g.dir
+            set ret@+ = [type = e.type, x = x, y = y, dir = dir, wander = g.wander,
+                         waypoints = if (g.area@0 == 1) && (g.area@1 == 1) => g.waypoints => []]
+        }
+        true
+    } else {
+        false
+    }
+}
+
+;; MapRenderer::pushEnemyGroup for each group: the enemies to spawn
+func enemy.place (groups) {
+    val ret = []
+    loop _, g in groups {
+        if percent_f(g.chance) {
+            var n = rand_between(g.nmin, g.nmax)
+            var misses = 5 * g.nmax
+            loop {
+                while (n > 0) && (misses > 0)
+                val x = if g.area@0 == 0 => (g.pos@0 + 0.5) => (g.pos@0 + (fl.rand() % g.area@0) + 0.5)
+                val y = if g.area@1 == 0 => (g.pos@1 + 0.5) => (g.pos@1 + (fl.rand() % g.area@1) + 0.5)
+                if enemy_place_one(ret, x, y, g) {
+                    set n -= 1
+                } else {
+                    set misses -= 1
+                }
+            }
+            ;; then the first free places of the area
+            loop x in (g.pos@0, g.pos@0 + g.area@0 - 1) {
+                loop y in (g.pos@1, g.pos@1 + g.area@1 - 1) {
+                    if (n > 0) && enemy_place_one(ret, x + 0.5, y + 0.5, g) {
+                        set n -= 1
+                    }
+                }
+            }
+        }
+    }
+    ret
+}
+
+;; the stats of an enemy file (StatBlock::load), for what the port uses
+func enemy.stats (path) {
+    if enemy.protos@path {
+        return enemy.protos@path
+    }
+    val st = [path = path, name = "", level = 0, hp = 0, speed = 0.2, base = []]
+    loop _, s in ini.load(path) || [] {
+        loop _, kv in s.keys {
+            val k, v = kv@0, kv@1
+            val l = parse.list(v)
+            match k {
+                "name" => { set st.name = v }
+                "level" => { set st.level = parse.int(v) }
+                "stat" => { set st.base@(l@0) = parse.float(l@1) }
+                "speed" => { set st.speed = fl.f32(parse.float(v) / 60) }
+                "animations" => { set st.animations = v }
+            }
+        }
+    }
+    set st.hp = st.base.hp || 0
+    set enemy.protos@path = st
+    st
+}
+
+;; An enemy in a map, standing (EntityBehavior comes next).
+task Enemy (st, me) {
+    set pub = [
+        name = st.name, x = fl.f32(me.x), y = fl.f32(me.y), dir = me.dir,
+        hp = st.hp, speed = st.speed, state = 0,
+    ]
+    await(false)
+}
