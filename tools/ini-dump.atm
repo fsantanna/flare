@@ -1,0 +1,35 @@
+;; Dumps text files of the mods as `ini.load` reads them, in the format of
+;; FLARE_INI in the patched original (tools/bench/original.patch):
+;;      file <path>
+;;      [<section>]         when a section starts
+;;      <key>=<value>
+;; A line with no `=` is dumped as "=", since FileParser gives it no value.
+;;
+;;      atmos tools/ini-dump.atm <data dir> <mod,mod,...> <list of paths>
+
+include "../src/ini.atm"
+
+val dir, mods, list = ...
+ini.set_mods(dir, string.split(mods, ","))
+
+loop path in io.lines(list) {
+    if #path > 0 {
+        print("file " ++ path)
+        val secs = ini.load(path)
+        if secs == nil {
+            print("none")
+        } else {
+            loop i,s in secs {
+                ;; the first section of a file starts with no header if
+                ;; its keys come before any `[...]`, and a continuation
+                ;; has no header
+                if ((i > 0) || (s.name != "")) && !s.cont {
+                    print("[" ++ s.name ++ "]")
+                }
+                loop _,kv in s.keys {
+                    print(if kv@0 == "" => "=" => (kv@0 ++ "=" ++ kv@1))
+                }
+            }
+        }
+    }
+}
