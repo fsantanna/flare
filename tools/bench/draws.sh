@@ -25,7 +25,8 @@ fi
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/c/flare" "$TMP/d"
-printf 'fullscreen=0\nresolution_w=1280\nresolution_h=720\nrenderer=sdl\nmouse_move=0\nmouse_aim=1\nenable_joystick=0\nlanguage=en\ncombat_text=1\n' \
+# the settings of run.sh: without hwsurface=0 the game opens a dialog and pauses
+printf 'fullscreen=0\nresolution_w=1280\nresolution_h=720\nrenderer=sdl\nhwsurface=0\nvsync=0\nmax_fps=60\ncombat_text=1\nmouse_move=0\nmouse_aim=1\nenable_joystick=0\nlanguage=en\nshow_fps=0\n' \
 	> "$TMP/c/flare/settings.txt"
 HOME="$TMP" XDG_CONFIG_HOME="$TMP/c" XDG_DATA_HOME="$TMP/d" SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
 FLARE_SEED=${FLARE_SEED:-1} FLARE_FAST=1 FLARE_NEWGAME=${FLARE_NEWGAME-0} FLARE_FRAMES=${1:-1} FLARE_BT=1 \
