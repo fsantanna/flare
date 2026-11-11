@@ -1,0 +1,87 @@
+first	stance
+block	play_once	2	12	2	[0]	end	true
+cast	play_once	4	24	4	[1]	end	true
+critdie	play_once	8	48	8	[3]	end	true
+die	play_once	6	24	6	[2]	end	true
+hit	play_once	2	8	2	[0]	end	true
+run	looped	8	48	8	[3]	end	true
+shoot	play_once	4	24	4	[1]	end	true
+spawn	play_once	8	64	8	[3]	end	true
+stance	back_forth	4	32	8	[3]	end	true
+swing	play_once	4	32	4	[1]	end	true
+[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]
+[0, 0, 0, 1, 1, 1, 1, 2, 2, 2]	[0, 1, 1, 2, 2, 3]
+[0, 1955, 519, 77, 166, 32, 149, ]	[0, 731, 1190, 124, 169, 28, 150, ]
+cached	true
+0 stance 1
+1 stance 2
+2 stance 3
+3 stance 4
+4 stance 5
+5 stance 6
+6 stance 7
+7 stance 8
+8 stance 9
+9 stance 10
+10 stance 11
+11 stance 12
+12 stance 13
+13 stance 14
+14 stance 15
+15 stance 16
+16 stance 17
+17 stance 18
+18 stance 19
+19 stance 20
+20 stance 21
+21 stance 22
+22 stance 23
+23 stance 24
+24 stance 25
+25 stance 26
+26 stance 27
+27 stance 28
+28 stance 29
+29 stance 30
+30 stance 31
+31 stance 31
+32 stance 30
+33 stance 29
+34 stance 28
+35 stance 27
+36 stance 26
+37 stance 25
+38 stance 24
+39 stance 23
+40 stance 22
+41 stance 21
+42 stance 20
+43 stance 19
+44 stance 18
+45 stance 17
+46 stance 16
+47 stance 15
+48 stance 14
+49 stance 13
+50 stance 12
+51 stance 11
+52 stance 10
+53 stance 9
+54 stance 8
+55 stance 7
+56 stance 6
+57 stance 5
+58 stance 4
+59 stance 3
+60 stance 2
+61 stance 1
+62 stance 0
+63 stance 0
+64 stance 1
+65 stance 2
+66 stance 3
+67 stance 4
+68 stance 5
+69 stance 6
+flare: frames 70
+shot md5 4362df0f53c0f45214149daab3c60198

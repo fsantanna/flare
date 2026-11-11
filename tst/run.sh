@@ -9,10 +9,12 @@
 #   - parse: the values of the text files (tst/parse.atm);
 #   - engine: images, a text, the generator, the trace, scripted input,
 #     and a screenshot (tst/engine.atm), compared by its checksum;
+#   - anim: an animation set, and a looped animation (tst/anim.atm);
 #   - data: every text file of alpha_demo and fantasycore, and of
-#     empyrean_campaign and fantasycore, read as the original reads them
-#     (the dumps are compared by their size and checksum, which are those
-#     of the original: see tools/compare-ini.sh).
+#     empyrean_campaign and fantasycore, read as the original reads them,
+#     and every animation file loaded (the dumps are compared by their
+#     size and checksum, which are those of the original: see
+#     tools/compare-ini.sh and tools/compare-anim.sh).
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
@@ -50,13 +52,22 @@ FLARE_INPUT=tst/engine.in FLARE_SHOT=20:"$OUT/engine.bmp" \
 echo "shot md5 $(md5sum < "$OUT/engine.bmp" | cut -c1-32)" >> "$OUT/engine.out"
 check engine "$OUT/engine.out"
 
+# animations: a set, and the stance of the zombie as anim.Loop plays it
+FLARE_FRAMES=70 FLARE_FAST=1 FLARE_TRACE=- FLARE_MUTE=1 FLARE_SHOT=40:"$OUT/anim.bmp" \
+	./run.sh tst/anim.atm > "$OUT/anim.out" 2>&1
+echo "shot md5 $(md5sum < "$OUT/anim.bmp" | cut -c1-32)" >> "$OUT/anim.out"
+check anim "$OUT/anim.out"
+
 # data
 for mods in fantasycore,alpha_demo fantasycore,empyrean_campaign; do
 	for m in $(echo "$mods" | tr ',' ' '); do
 		(cd "$DATA/mods/$m" && find . -name '*.txt' | sed 's|^\./||')
 	done | LC_ALL=C sort -u > "$OUT/files.txt"
 	./run.sh tools/ini-dump.atm "$DATA" "default,$mods" "$OUT/files.txt" > "$OUT/dump.txt" 2>&1
-	echo "$(wc -l < "$OUT/files.txt") files, $(wc -l < "$OUT/dump.txt") lines, md5 $(md5sum < "$OUT/dump.txt" | cut -c1-32)"
+	echo "ini: $(wc -l < "$OUT/files.txt") files, $(wc -l < "$OUT/dump.txt") lines, md5 $(md5sum < "$OUT/dump.txt" | cut -c1-32)"
+	grep '^animations/' "$OUT/files.txt" > "$OUT/anims.txt"
+	FLARE_FRAMES=1 FLARE_MUTE=1 ./run.sh tools/anim-dump.atm "$DATA" "default,$mods" "$OUT/anims.txt" > "$OUT/dump.txt" 2>/dev/null
+	echo "anim: $(wc -l < "$OUT/anims.txt") files, $(wc -l < "$OUT/dump.txt") lines, md5 $(md5sum < "$OUT/dump.txt" | cut -c1-32)"
 done > "$OUT/data.out"
 check data "$OUT/data.out"
 
