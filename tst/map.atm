@@ -1,0 +1,31 @@
+;; A map drawn: its layers, with no objects, the camera at the hero of the
+;; map (or at FLARE_POS), as the original with FLARE_ONLYMAP.
+
+include "../engine/engine.atm"
+include "../src/ini.atm"
+include "../src/parse.atm"
+include "../src/map.atm"
+
+val dir = os.getenv("FLARE_DATA")
+ini.set_mods(dir, ini.resolve(dir, ["alpha_demo"]))
+
+val m = map.load(os.getenv("FLARE_MAP") || "maps/frontier_outpost.txt")
+val pos = if os.getenv("FLARE_POS") {
+    val l = parse.list(os.getenv("FLARE_POS"))
+    [parse.float(l@0), parse.float(l@1)]
+} else {
+    m.hero
+}
+print(m.title, m.w, m.h, X.tostring(pos))
+fl.cam_warp(pos@0, pos@1)
+
+spawn {
+    loop on :frame {
+        fl.tset_logic()
+        fl.cam_logic()
+    }
+}
+loop on :draw {
+    fl.ren_clear()
+    fl.map_render()
+}
