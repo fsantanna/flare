@@ -1,0 +1,16 @@
+# env: FLARE_MAP=maps/frontier_outpost.txt FLARE_FRAMES=400 FLARE_DUMP=1 FLARE_RNG=1
+# walk in the 8 directions, into walls, with quick turns
+20 key W
+80 key D
+120 keyup W
+160 key S
+200 keyup D
+230 key A
+260 keyup S
+265 key W
+290 keyup A
+291 keyup W
+300 key D
+301 keyup D
+310 key S
+380 keyup S

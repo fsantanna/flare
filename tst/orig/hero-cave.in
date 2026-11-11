@@ -1,0 +1,20 @@
+# env: FLARE_MAP=maps/cave1.txt FLARE_FRAMES=600 FLARE_DUMP=1 FLARE_RNG=1
+# walk along the walls of a cave, with diagonals that slide
+10 key S
+90 key D
+160 keyup S
+200 key W
+260 keyup D
+262 key A
+330 keyup W
+331 key S
+400 keyup A
+400 keyup S
+410 key D
+412 keyup D
+420 key W
+421 key A
+500 keyup W
+520 keyup A
+540 key Right
+590 keyup Right

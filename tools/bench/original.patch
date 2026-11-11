@@ -37,10 +37,10 @@ index 59cc8c24..024a445a 100644
  	// Traditional way to create an animation.
 diff --git a/src/Bench.h b/src/Bench.h
 new file mode 100644
-index 00000000..63ef6ad0
+index 00000000..540c4663
 --- /dev/null
 +++ b/src/Bench.h
-@@ -0,0 +1,158 @@
+@@ -0,0 +1,166 @@
 +/*
 +Bench: a fixed seed, scripted input, a trace, and a fast mode, for the
 +comparison of Flare with its port to Atmos (fsantanna/flare).
@@ -54,6 +54,7 @@ index 00000000..63ef6ad0
 +	FLARE_INPUT=<file>    scripted input, by logic frame
 +	FLARE_TRACE=<file>    the trace ("-" for stdout)
 +	FLARE_DUMP=1          trace the hero in every frame
++	FLARE_RNG=1           trace the calls to rand() in every frame that has some
 +	FLARE_NEWGAME=<class> skip the title: a new game of this class index
 +	FLARE_MAP=<file>      the first map of the new game
 +	FLARE_POS=<x>,<y>     the position of the hero in it (default: the map's)
@@ -96,7 +97,14 @@ index 00000000..63ef6ad0
 +	return s;
 +}
 +
++// calls to rnd() since the last count
++inline unsigned long& calls() {
++	static unsigned long n = 0;
++	return n;
++}
++
 +inline int rnd() {
++	calls()++;
 +	uint64_t& s = state();
 +	s = s * 6364136223846793005ULL + 1442695040888963407ULL;
 +	return static_cast<int>(s >> 33);
@@ -213,10 +221,10 @@ index 93c1e6a9..b7255837 100644
  	MapRenderer::MapLoot *map_loot = NULL;
  
 diff --git a/src/GameStatePlay.cpp b/src/GameStatePlay.cpp
-index 51044186..4ff3f121 100644
+index 51044186..7deceae8 100644
 --- a/src/GameStatePlay.cpp
 +++ b/src/GameStatePlay.cpp
-@@ -833,6 +833,50 @@ void GameStatePlay::updateActionBar(unsigned index) {
+@@ -833,6 +833,54 @@ void GameStatePlay::updateActionBar(unsigned index) {
  	}
  }
  
@@ -262,12 +270,16 @@ index 51044186..4ff3f121 100644
 +		benchEntity(&entitym->entities[i]->stats);
 +	if (bench::dump())
 +		BENCH_T("hero %.9g %.9g %d %.9g %d", pc->stats.pos.x, pc->stats.pos.y, pc->stats.cur_state, pc->stats.hp, pc->stats.direction);
++	if (bench::env("FLARE_RNG") && bench::calls() > 0) {
++		BENCH_T("rng %lu", bench::calls());
++		bench::calls() = 0;
++	}
 +}
 +
  /**
   * Process all actions for a single frame
   * This includes some message passing between child object
-@@ -905,6 +949,8 @@ void GameStatePlay::logic() {
+@@ -905,6 +953,8 @@ void GameStatePlay::logic() {
  	mapr->enemies_cleared = entitym->isCleared();
  	quests->logic();
  
@@ -276,7 +288,7 @@ index 51044186..4ff3f121 100644
  	pc->checkTransform();
  
  	// change hero powers on transformation
-@@ -1013,6 +1059,12 @@ void GameStatePlay::render() {
+@@ -1013,6 +1063,12 @@ void GameStatePlay::render() {
  	std::vector<Renderable> rens;
  	std::vector<Renderable> rens_dead;
  
