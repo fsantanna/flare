@@ -1,0 +1,3 @@
+# replaces y of mod a
+[second]
+g=7

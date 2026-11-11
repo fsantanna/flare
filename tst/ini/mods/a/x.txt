@@ -1,0 +1,14 @@
+key0 = before any section
+# a comment
+
+[one]
+  a = 1  
+b=x=y
+[empty]
+[two]
+row,with,no,equals
+c=
+INCLUDE inc.txt
+d=4
+[three]
+INCLUDE inc.txt

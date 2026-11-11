@@ -1,0 +1,11 @@
+[tst/ini/mods/a/x.txt, tst/ini/mods/b/x.txt]
+tst/ini/mods/b/y.txt	nil
+nil
+== x.txt
+:Section [cont=false, keys=[[key0, before any section]], name=]
+:Section [cont=false, keys=[[a, 1], [b, x=y]], name=one]
+:Section [cont=false, keys=[[, row,with,no,equals], [c, ], [i, in the include], [d, 4]], name=two]
+:Section [cont=true, keys=[[i, in the include]], name=three]
+:Section [cont=false, keys=[[e, 5]], name=four]
+== y.txt
+:Section [cont=false, keys=[[g, 7]], name=second]

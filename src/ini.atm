@@ -1,0 +1,172 @@
+;; The text files of Flare: INI with sections, read across the mods.
+;;
+;; It replaces `FileParser`, `Parse::getKeyPair`, and the part of
+;; `ModManager` that finds files (`flare-engine/src`).
+;;
+;;      ini.set_mods(dir, [name, ...])  the mods, from the first to the last
+;;      ini.locate(path)                the full path in the last mod, or nil
+;;      ini.list(path)                  the full paths in all mods, in order
+;;      ini.load(path)                  the sections of a file of the mods
+;;
+;; A file is a vector of sections, in order:
+;;
+;;      :Section [name="header", keys=[["width","64"], ["height","64"]], cont=false]
+;;
+;; and the keys of a section are a vector of pairs [key, value], in order,
+;; since a key may repeat (`tileset=`). Both are trimmed. A line with no
+;; `=` has the key "" and the whole line as the value (the rows of a map
+;; layer after `data=`).
+;;
+;; As in `FileParser`:
+;;
+;;  - a line is trimmed, and skipped if empty or if it starts with `#`;
+;;  - `[name]` starts a section, but only one that has keys is kept;
+;;  - keys before any section go to a section with the name "";
+;;  - a file may be in many mods: the last mod whose file does not start
+;;    with `APPEND` is read, then the files of the later mods, each one
+;;    as a new section with the name of the last one;
+;;  - `INCLUDE path` reads the other file there, in the same section;
+;;  - a quirk: if `INCLUDE` comes right after `[name]`, its keys go to a
+;;    section with that name, but `FileParser` does not tell that it
+;;    started: the section has `cont=true`, as a continuation of the
+;;    section before it.
+
+val ini = [
+    dir  = nil,         ;; the directory with the folder `mods`
+    mods = [],          ;; the names of the active mods, in order
+]
+
+;; is the byte a blank of `Parse::trim` (" \f\n\r\t\v")
+val func ini_blank (b) {
+    (b == 32) || ((b >= 9) && (b <= 13))
+}
+
+;; the string with no blanks at both ends
+func ini.trim (s) {
+    var i = 0
+    var j = #s - 1
+    loop {
+        while (i <= j) && ini_blank(string.byte(s, i))
+        set i += 1
+    }
+    loop {
+        while (j >= i) && ini_blank(string.byte(s, j))
+        set j -= 1
+    }
+    if (i == 0) && (j == (#s - 1)) => s => string.sub(s, i, j)
+}
+
+;; does the file exist
+val func ini_exists (path) {
+    val f = io.open(path)
+    if f {
+        io.close(f)
+        true
+    } else {
+        false
+    }
+}
+
+func ini.set_mods (dir, mods) {
+    set ini.dir = dir
+    set ini.mods = mods
+}
+
+;; the full paths of a file in the mods, from the first to the last mod
+func ini.list (path) {
+    val ret = []
+    loop _,m in ini.mods {
+        val full = ini.dir ++ "/mods/" ++ m ++ "/" ++ path
+        if ini_exists(full) {
+            set ret@+ = full
+        }
+    }
+    ret
+}
+
+;; the full path of a file in the last mod that has it, or nil
+func ini.locate (path) {
+    val l = ini.list(path)
+    if #l > 0 => l@# => nil
+}
+
+;; does the file start with `APPEND` (its first line that is not skipped)
+val func ini_append (full) {
+    loop l in io.lines(full) {
+        val t = ini.trim(l)
+        if (#t > 0) && (string.byte(t, 0) != 35) {     ;; 35: '#'
+            break (t == "APPEND")
+        }
+    } || false
+}
+
+;; reads the files of `path` in the mods into the state `st`:
+;;      st.secs     the sections read
+;;      st.name     the name of the current section
+;;      st.cur      the current section, or nil if a new one is pending
+;;      st.cont     if the pending section continues the one before
+func ini_read (st, path) {
+    val fs = ini.list(path)
+    ;; from the end, the first file that does not start with APPEND
+    var first = 0
+    loop i in #fs {
+        val k = #fs - 1 - i
+        if !ini_append(fs@k) {
+            set first = k
+            break
+        }
+    }
+    loop k in (first, #fs - 1) {
+        if k > first {
+            set st.cur = nil        ;; a new file starts a new section
+            set st.cont = false
+        }
+        loop l in io.lines(fs@k) {
+            val t = ini.trim(l)
+            ifs {
+                (#t == 0) => nil
+                string.byte(t, 0) == 35 => nil                  ;; '#'
+                string.byte(t, 0) == 91 => {                    ;; '['
+                    val e = string.find(t, "]")
+                    set st.name = if e => string.sub(t, 1, e - 1) => ""
+                    set st.cur = nil
+                    set st.cont = false
+                }
+                t == "APPEND" => nil
+                string.sub(t, 0, 7) == "INCLUDE " => {
+                    val other = string.sub(t, 8)
+                    if other != path {
+                        if st.cur == nil {
+                            set st.cont = true
+                        }
+                        ini_read(st, other)
+                    }
+                }
+                else => {
+                    if st.cur == nil {
+                        set st.cur = :Section [name=st.name, keys=[], cont=st.cont]
+                        set st.cont = false
+                        set st.secs@+ = st.cur
+                    }
+                    val e = string.find(t, "=")
+                    set st.cur.keys@+ = if e {
+                        [ini.trim(string.sub(t, 0, e - 1)), ini.trim(string.sub(t, e + 1))]
+                    } else {
+                        ["", t]
+                    }
+                }
+            }
+        }
+    }
+}
+
+;; the sections of a file of the mods, or nil if it is in none
+func ini.load (path) {
+    if #ini.list(path) == 0 {
+        nil
+    } else {
+        val st = [secs=[], name="", cur=nil, cont=false]
+        ini_read(st, path)
+        st.secs
+    }
+}

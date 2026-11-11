@@ -1,0 +1,19 @@
+;; The INI reader on small files of two mods (tst/ini/mods): sections,
+;; keys before any section, APPEND across mods, INCLUDE, the quirk of an
+;; INCLUDE right after a header, CR at the end of a line, a file of a
+;; later mod that replaces the earlier one, and a missing file.
+
+include "../src/ini.atm"
+
+ini.set_mods("tst/ini", ["a", "b"])
+
+X.print(ini.list("x.txt"))
+print(ini.locate("y.txt"), ini.locate("none.txt"))
+print(ini.load("none.txt"))
+
+loop _,f in ["x.txt", "y.txt"] {
+    print("== " ++ f)
+    loop _,s in ini.load(f) {
+        X.print(s)
+    }
+}
