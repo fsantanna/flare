@@ -1,0 +1,464 @@
+diff --git a/src/Bench.h b/src/Bench.h
+new file mode 100644
+index 00000000..c176262a
+--- /dev/null
++++ b/src/Bench.h
+@@ -0,0 +1,157 @@
++/*
++Bench: a fixed seed, scripted input, a trace, and a fast mode, for the
++comparison of Flare with its port to Atmos (fsantanna/flare).
++
++It is included before every source file (-include Bench.h), and all is
++driven by environment variables:
++
++	FLARE_SEED=<n>        seed of the generator that replaces rand()
++	FLARE_FAST=1          no frame cap: one logic frame per loop
++	FLARE_FRAMES=<n>      exit after n logic frames
++	FLARE_INPUT=<file>    scripted input, by logic frame
++	FLARE_TRACE=<file>    the trace ("-" for stdout)
++	FLARE_DUMP=1          trace the hero in every frame
++	FLARE_NEWGAME=<class> skip the title: a new game of this class index
++	FLARE_MAP=<file>      the first map of the new game
++	FLARE_SHOT=<n>:<file> save the screen at logic frame n (BMP)
++
++The generator is a 64-bit LCG whose upper 31 bits are the result, from
++0 to RAND_MAX (2^31-1 in glibc), as rand() of the C library.
++*/
++
++#ifndef BENCH_H
++#define BENCH_H
++
++#include <algorithm>
++#include <climits>
++#include <cmath>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <ctime>
++#include <fstream>
++#include <iostream>
++#include <list>
++#include <map>
++#include <queue>
++#include <set>
++#include <sstream>
++#include <stdint.h>
++#include <string>
++#include <vector>
++
++namespace bench {
++
++inline const char* env(const char* name) {
++	const char* v = getenv(name);
++	return (v && *v) ? v : NULL;
++}
++
++inline uint64_t& state() {
++	static uint64_t s = 0;
++	return s;
++}
++
++inline int rnd() {
++	uint64_t& s = state();
++	s = s * 6364136223846793005ULL + 1442695040888963407ULL;
++	return static_cast<int>(s >> 33);
++}
++
++inline void seed(unsigned int x) {
++	const char* e = env("FLARE_SEED");
++	state() = e ? strtoull(e, NULL, 10) : x;
++}
++
++inline unsigned long& frame() {
++	static unsigned long f = 0;
++	return f;
++}
++
++inline FILE* trace() {
++	static FILE* f = NULL;
++	static bool init = false;
++	if (!init) {
++		init = true;
++		const char* e = env("FLARE_TRACE");
++		if (e) f = (strcmp(e, "-") == 0) ? stdout : fopen(e, "w");
++	}
++	return f;
++}
++
++inline bool fast() {
++	return env("FLARE_FAST") != NULL;
++}
++
++inline unsigned long frames() {
++	const char* e = env("FLARE_FRAMES");
++	return e ? strtoul(e, NULL, 10) : 0;
++}
++
++inline bool dump() {
++	return env("FLARE_DUMP") != NULL;
++}
++
++// the logic frame of FLARE_SHOT, or -1
++inline long shotFrame() {
++	const char* e = env("FLARE_SHOT");
++	return e ? strtol(e, NULL, 10) : -1;
++}
++
++inline const char* shotFile() {
++	const char* e = env("FLARE_SHOT");
++	if (!e) return NULL;
++	const char* c = strchr(e, ':');
++	return c ? c + 1 : NULL;
++}
++
++// ids of entities in the trace: the hero is 0, the others are numbered
++// from 1 in the order they are first seen; reset at each map
++inline std::map<const void*, int>& ids() {
++	static std::map<const void*, int> m;
++	return m;
++}
++
++inline int& nextId() {
++	static int n = 1;
++	return n;
++}
++
++inline int id(const void* p, bool hero) {
++	if (hero) return 0;
++	std::map<const void*, int>::iterator it = ids().find(p);
++	if (it != ids().end()) return it->second;
++	int n = nextId()++;
++	ids()[p] = n;
++	return n;
++}
++
++// the number of maps loaded
++inline int& epoch() {
++	static int n = 0;
++	return n;
++}
++
++inline void resetIds() {
++	ids().clear();
++	nextId() = 1;
++	epoch()++;
++}
++
++} // namespace bench
++
++// one line of the trace: the logic frame, then the fields
++#define BENCH_T(...) do { \
++	FILE* bench_f_ = bench::trace(); \
++	if (bench_f_) { \
++		fprintf(bench_f_, "%lu ", bench::frame()); \
++		fprintf(bench_f_, __VA_ARGS__); \
++		fputc('\n', bench_f_); \
++		fflush(bench_f_); \
++	} \
++} while (0)
++
++#define rand() bench::rnd()
++#define srand(x) bench::seed(x)
++
++#endif
+diff --git a/src/EventManager.cpp b/src/EventManager.cpp
+index 93c1e6a9..b7255837 100644
+--- a/src/EventManager.cpp
++++ b/src/EventManager.cpp
+@@ -970,6 +970,8 @@ bool EventManager::executeEventInternal(Event &ev, bool skip_delay) {
+ 		return !ev.keep_after_trigger;
+ 	}
+ 
++	BENCH_T("event %d %d %d %d %d %d", ev.activate_type, ev.location.x, ev.location.y, ev.location.w, ev.location.h, static_cast<int>(ev.components.size()));
++
+ 	EventComponent *ec;
+ 	MapRenderer::MapLoot *map_loot = NULL;
+ 
+diff --git a/src/GameStatePlay.cpp b/src/GameStatePlay.cpp
+index 51044186..963c1518 100644
+--- a/src/GameStatePlay.cpp
++++ b/src/GameStatePlay.cpp
+@@ -833,6 +833,49 @@ void GameStatePlay::updateActionBar(unsigned index) {
+ 	}
+ }
+ 
++// Bench: what changed in an entity since the last frame
++struct BenchSeen {
++	int state;
++	float hp;
++};
++
++static std::map<int, BenchSeen>& benchSeen() {
++	static std::map<int, BenchSeen> m;
++	return m;
++}
++
++static void benchEntity(StatBlock* st) {
++	int id = bench::id(st, st->hero);
++	std::map<int, BenchSeen>::iterator it = benchSeen().find(id);
++	if (it == benchSeen().end()) {
++		BENCH_T("spawn %d %s %d %.9g %.9g %.9g", id, st->name.c_str(), st->cur_state, st->pos.x, st->pos.y, st->hp);
++	}
++	else {
++		if (it->second.state != st->cur_state)
++			BENCH_T("state %d %d %.9g %.9g", id, st->cur_state, st->pos.x, st->pos.y);
++		if (it->second.hp != st->hp)
++			BENCH_T("hp %d %.9g", id, st->hp);
++	}
++	BenchSeen s;
++	s.state = st->cur_state;
++	s.hp = st->hp;
++	benchSeen()[id] = s;
++}
++
++static void benchTrace() {
++	if (!bench::trace()) return;
++	static int epoch = -1;
++	if (epoch != bench::epoch()) {
++		epoch = bench::epoch();
++		benchSeen().clear();
++	}
++	benchEntity(&pc->stats);
++	for (size_t i = 0; i < entitym->entities.size(); ++i)
++		benchEntity(&entitym->entities[i]->stats);
++	if (bench::dump())
++		BENCH_T("hero %.9g %.9g %d %.9g %d", pc->stats.pos.x, pc->stats.pos.y, pc->stats.cur_state, pc->stats.hp, pc->stats.direction);
++}
++
+ /**
+  * Process all actions for a single frame
+  * This includes some message passing between child object
+@@ -905,6 +948,8 @@ void GameStatePlay::logic() {
+ 	mapr->enemies_cleared = entitym->isCleared();
+ 	quests->logic();
+ 
++	benchTrace();
++
+ 	pc->checkTransform();
+ 
+ 	// change hero powers on transformation
+diff --git a/src/GameSwitcher.cpp b/src/GameSwitcher.cpp
+index 4c0cb0b3..01c4cbda 100644
+--- a/src/GameSwitcher.cpp
++++ b/src/GameSwitcher.cpp
+@@ -38,6 +38,11 @@ FLARE.  If not, see http://www.gnu.org/licenses/
+ #include "FontEngine.h"
+ #include "GameStateCutscene.h"
+ #include "GameStateTitle.h"
++#include "GameStatePlay.h"
++#include "Avatar.h"
++#include "MapRenderer.h"
++#include "SaveLoad.h"
++#include "SharedGameResources.h"
+ #include "GameSwitcher.h"
+ #include "InputState.h"
+ #include "MessageEngine.h"
+@@ -72,6 +77,25 @@ GameSwitcher::GameSwitcher()
+ 		currentState = title;
+ 	}
+ 
++	// Bench: skip the title, start a new game as GameStateNew does, with
++	// the first hero option of fantasycore (male, head_short, male01)
++	if (bench::env("FLARE_NEWGAME")) {
++		delete currentState;
++		GameStatePlay* play = new GameStatePlay();
++		pc->stats.gfx_base = "male";
++		pc->stats.gfx_head = "head_short";
++		pc->stats.gfx_portrait = "images/portraits/male01.png";
++		pc->stats.checkGFXPaths();
++		pc->stats.name = "Bench";
++		pc->stats.permadeath = false;
++		save_load->setGameSlot(1);
++		play->resetGame();
++		save_load->loadClass(atoi(bench::env("FLARE_NEWGAME")));
++		if (bench::env("FLARE_MAP"))
++			mapr->teleport_mapname = bench::env("FLARE_MAP");
++		currentState = play;
++	}
++
+ 	label_fps = new WidgetLabel();
+ 	done = false;
+ 	loadMusic();
+diff --git a/src/LootManager.cpp b/src/LootManager.cpp
+index 0caf4e41..ef691fe6 100644
+--- a/src/LootManager.cpp
++++ b/src/LootManager.cpp
+@@ -392,6 +392,8 @@ void LootManager::addLoot(ItemStack stack, const FPoint& pos, bool dropped_by_he
+ 	if (stack.empty() || !items->isValid(stack.item))
+ 		return;
+ 
++	BENCH_T("loot %d %d %.9g %.9g", static_cast<int>(stack.item), stack.quantity, pos.x, pos.y);
++
+ 	Loot ld;
+ 	ld.stack = stack;
+ 	ld.pos.x = pos.x;
+diff --git a/src/Map.cpp b/src/Map.cpp
+index 9a3081f4..8ff3e377 100644
+--- a/src/Map.cpp
++++ b/src/Map.cpp
+@@ -221,6 +221,9 @@ void Map::removeLayer(unsigned index) {
+ }
+ 
+ int Map::load(const std::string& fname, bool load_procgen_cache) {
++	bench::resetIds();
++	BENCH_T("map %s", fname.c_str());
++
+ 	procgen_chunks.clear();
+ 
+ 	clearEvents();
+diff --git a/src/PowerManager.cpp b/src/PowerManager.cpp
+index a7ce102c..5ebc439e 100644
+--- a/src/PowerManager.cpp
++++ b/src/PowerManager.cpp
+@@ -2035,6 +2035,8 @@ bool PowerManager::activate(PowerID power_index, StatBlock *src_stats, const FPo
+ 
+ 	Power* power = powers[power_index];
+ 
++	BENCH_T("power %d %d %.9g %.9g", bench::id(src_stats, src_stats->hero), static_cast<int>(power_index), target.x, target.y);
++
+ 	if (src_stats->hero) {
+ 		if (power->requires_mp > src_stats->mp)
+ 			return false;
+diff --git a/src/SDLSoftwareRenderDevice.cpp b/src/SDLSoftwareRenderDevice.cpp
+index ac8e7f36..2eb51356 100644
+--- a/src/SDLSoftwareRenderDevice.cpp
++++ b/src/SDLSoftwareRenderDevice.cpp
+@@ -518,6 +518,9 @@ void SDLSoftwareRenderDevice::blankScreen() {
+ }
+ 
+ void SDLSoftwareRenderDevice::commitFrame() {
++	// Bench: the screen at a logic frame
++	if (bench::shotFile() && bench::frame() == static_cast<unsigned long>(bench::shotFrame()))
++		SDL_SaveBMP(screen, bench::shotFile());
+ 	SDL_UpdateTexture(texture, NULL, screen->pixels, screen->pitch);
+ 	SDL_RenderClear(renderer);
+ 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+diff --git a/src/main.cpp b/src/main.cpp
+index a3dccedf..046a5d73 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -178,6 +178,86 @@ static float getSecondsElapsed(uint64_t prev_ticks, uint64_t now_ticks) {
+ 	return (static_cast<float>(now_ticks - prev_ticks) / static_cast<float>(SDL_GetPerformanceFrequency()));
+ }
+ 
++// Bench: scripted input, pushed as SDL events before the input is handled
++static void benchInput() {
++	static FILE* f = NULL;
++	static bool init = false;
++	static unsigned long next = 0;
++	static char line[256];
++	static bool pending = false;
++	static int mx = 0, my = 0;
++	if (!init) {
++		init = true;
++		const char* e = bench::env("FLARE_INPUT");
++		if (e) f = fopen(e, "r");
++	}
++	if (!f) return;
++	while (true) {
++		if (!pending) {
++			if (!fgets(line, sizeof(line), f)) { fclose(f); f = NULL; return; }
++			if (line[0] == '#' || line[0] == '\n') continue;
++			next = strtoul(line, NULL, 10);
++			pending = true;
++		}
++		if (next > bench::frame()) return;
++		pending = false;
++		char cmd[32] = "", arg[64] = "";
++		int a = 0, b = 0;
++		if (sscanf(line, "%*u %31s %63s %d", cmd, arg, &b) < 1) continue;
++		a = atoi(arg);
++		SDL_Event ev;
++		memset(&ev, 0, sizeof(ev));
++		if (strcmp(cmd, "move") == 0) {
++			mx = a; my = b;
++			ev.type = SDL_MOUSEMOTION;
++			ev.motion.x = mx; ev.motion.y = my;
++		}
++		else if (strcmp(cmd, "down") == 0 || strcmp(cmd, "up") == 0) {
++			ev.type = (cmd[0] == 'd') ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
++			ev.button.button = static_cast<Uint8>(a);
++			ev.button.state = (cmd[0] == 'd') ? SDL_PRESSED : SDL_RELEASED;
++			ev.button.x = mx; ev.button.y = my;
++		}
++		else if (strcmp(cmd, "key") == 0 || strcmp(cmd, "keyup") == 0) {
++			ev.type = (strcmp(cmd, "key") == 0) ? SDL_KEYDOWN : SDL_KEYUP;
++			ev.key.keysym.scancode = SDL_GetScancodeFromName(arg);
++			ev.key.keysym.sym = SDL_GetKeyFromScancode(ev.key.keysym.scancode);
++			ev.key.state = (ev.type == SDL_KEYDOWN) ? SDL_PRESSED : SDL_RELEASED;
++		}
++		else if (strcmp(cmd, "quit") == 0) {
++			ev.type = SDL_QUIT;
++		}
++		else {
++			continue;
++		}
++		SDL_PushEvent(&ev);
++	}
++}
++
++// Bench: one logic frame, then the frame count and the end of the run
++static bool benchLogic() {
++	SDL_PumpEvents();
++	benchInput();
++	inpt->handle();
++	gswitch->logic();
++	inpt->resetScroll();
++	bench::frame()++;
++	unsigned long n = bench::frames();
++	return gswitch->done || inpt->done || (n > 0 && bench::frame() >= n);
++}
++
++// Bench: no frame cap, one logic frame and one render per loop
++static void benchLoop() {
++	bool done = false;
++	while (!done) {
++		if (!gswitch->isLoadingFrame())
++			done = benchLogic();
++		render_device->blankScreen();
++		gswitch->render();
++		render_device->commitFrame();
++	}
++}
++
+ static void mainLoop () {
+ 	bool done = false;
+ 
+@@ -188,6 +268,11 @@ static void mainLoop () {
+ 
+ 	float last_fps = -1;
+ 
++	if (bench::fast()) {
++		benchLoop();
++		return;
++	}
++
+ 	while ( !done ) {
+ 		int loops = 0;
+ 		uint64_t now_ticks = SDL_GetPerformanceCounter();
+@@ -203,6 +288,7 @@ static void mainLoop () {
+ 			}
+ 
+ 			SDL_PumpEvents();
++			benchInput();
+ 			inpt->handle();
+ 
+ 			// Skip game logic when minimized
+@@ -212,6 +298,9 @@ static void mainLoop () {
+ 
+ 			gswitch->logic();
+ 			inpt->resetScroll();
++			bench::frame()++;
++			if (bench::frames() > 0 && bench::frame() >= bench::frames())
++				inpt->done = true;
+ 
+ 			// Engine done means the user escapes the main game menu.
+ 			// Input done means the user closes the window.
+@@ -444,6 +533,7 @@ soft_reset:
+ 			gswitch->saveUserSettings();
+ 
+ 		cleanup();
++		fprintf(stderr, "bench: frames %lu\n", bench::frame());
+ 	}
+ 
+ 	if (settings->soft_reset) {
