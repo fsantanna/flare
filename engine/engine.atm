@@ -1,0 +1,97 @@
+;; The engine of the port, over `engine/flare.h`: the functions of C as a
+;; table `fl`, and the clock of logic frames.
+;;
+;; The program runs inside the loop of `flare.h`, which emits, once per
+;; logic frame, the input of the frame, then `:frame [n]`, then `:draw`
+;; (see the header of `engine/flare.h`).
+
+```:prelude
+#include "engine/flare.h"
+```
+
+val fl = [
+    ;; the size of the render
+    W = `:number FL_W`,
+    H = `:number FL_H`,
+
+    ;; the logic frames done, and the frames per second of the original
+    frame = func () {
+        `:number FL_FRAME`
+    },
+    FPS = 60,
+
+    ;; the generator of the patched original: from 0 to 2^31-1
+    rand = func () {
+        `:number fl_rand()`
+    },
+
+    ;; a line of the trace, after the logic frame
+    trace = func (s) {
+        `fl_trace(fl_cstr($s));`
+    },
+    tracing = func () {
+        `:boolean (FL_TRACE != NULL)`
+    },
+
+    ;; images: an index, or -1
+    img = func (path) {
+        `:number fl_img_load(fl_cstr($path))`
+    },
+    size = func (i) {
+        val w = `:number ({ FlImg* p = fl_img(fl_int($i)); p ? p->w : 0; })`
+        val h = `:number ({ FlImg* p = fl_img(fl_int($i)); p ? p->h : 0; })`
+        return w, h
+    },
+    ;; fl.draw(img, x, y): the whole image
+    draw = func (i, x, y) {
+        `fl_img_draw(fl_int($i), 0,0,0,0, fl_int($x),fl_int($y), 255, 0xFFFFFF, 0);`
+    },
+    ;; fl.part(img, sx,sy,sw,sh, x,y [,alpha [,color [,blend]]])
+    part = func (i, sx, sy, sw, sh, x, y, a, c, b) {
+        val alpha = if a == nil => 255 => a
+        val color = if c == nil => 0xFFFFFF => c
+        val blend = if b == nil => 0 => b
+        `fl_img_draw(fl_int($i), fl_int($sx),fl_int($sy),fl_int($sw),fl_int($sh), fl_int($x),fl_int($y), fl_int($alpha), fl_int($color), fl_int($blend));`
+    },
+    ;; fl.fill(0xRRGGBBAA, x,y,w,h)
+    fill = func (c, x, y, w, h) {
+        `fl_fill((int64_t)a_dbl($c), fl_int($x),fl_int($y),fl_int($w),fl_int($h));`
+    },
+
+    ;; fonts: an index, or -1
+    font = func (path, size) {
+        `:number fl_font_load(fl_cstr($path), fl_int($size))`
+    },
+    text = func (f, s, x, y, color) {
+        val c = if color == nil => 0xFFFFFF => color
+        `fl_font_draw(fl_int($f), fl_cstr($s), fl_int($x), fl_int($y), fl_int($c));`
+    },
+    text_width = func (f, s) {
+        `:number fl_font_width(fl_int($f), fl_cstr($s))`
+    },
+    text_height = func (f) {
+        `:number fl_font_height(fl_int($f))`
+    },
+
+    ;; sounds: an index, or -1 (also with no audio)
+    snd = func (path) {
+        `:number fl_snd_load(fl_cstr($path))`
+    },
+    play = func (i, vol) {
+        val v = if vol == nil => 128 => vol
+        `fl_snd_play(fl_int($i), fl_int($v));`
+    },
+    music = func (path) {
+        `fl_music(fl_cstr($path));`
+    },
+    music_stop = func () {
+        `fl_music_stop();`
+    },
+]
+
+;; awaits n logic frames
+task Frames (n) {
+    loop _ in n {
+        await :frame
+    }
+}
