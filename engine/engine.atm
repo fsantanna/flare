@@ -9,6 +9,20 @@
 #include "engine/flare.h"
 ```
 
+;; the actions of the input, as `Input::` of the original
+val Input = [
+    CANCEL = 0, ACCEPT = 1, UP = 2, DOWN = 3, LEFT = 4, RIGHT = 5,
+    BAR_1 = 6, BAR_2 = 7, BAR_3 = 8, BAR_4 = 9, BAR_5 = 10, BAR_6 = 11, BAR_7 = 12,
+    BAR_8 = 13, BAR_9 = 14, BAR_0 = 15,
+    CHARACTER = 16, INVENTORY = 17, POWERS = 18, LOG = 19, MAIN1 = 20, MAIN2 = 21,
+    AIM_UP = 32, AIM_DOWN = 33, AIM_LEFT = 34, AIM_RIGHT = 35,
+    CTRL = 40, SHIFT = 41, ALT = 42,
+]
+
+;; the movement and collide types of MapCollision
+val MOVE = [NORMAL = 0, FLYING = 1, INTANGIBLE = 2]
+val COLLIDE = [NONE = 0, ALL = 1, HERO = 2, HAZARD = 3]
+
 val fl = [
     ;; the size of the render
     W = `:number FL_W`,
@@ -149,6 +163,52 @@ val fl = [
         val c = color || 0xFFFFFF
         val b = blend || 0
         `fl_ren_push(fl_int($d), fl_int($img), fl_int($sx), fl_int($sy), fl_int($sw), fl_int($sh), fl_int($ox), fl_int($oy), (float)a_dbl($mx), (float)a_dbl($my), fl_int($prio), fl_int($h), fl_int($a), fl_int($c), fl_int($b));`
+    },
+
+    ;; input: the actions of `Input` (pressing, lock), and the mouse
+    pressing = func (k) {
+        `:boolean FL_PRESSING[fl_int($k)]`
+    },
+    locked = func (k) {
+        `:boolean FL_LOCK[fl_int($k)]`
+    },
+    lock = func (k, v) {
+        val b = if v => 1 => 0
+        `FL_LOCK[fl_int($k)] = fl_int($b);`
+    },
+    ;; pressing and not locked
+    pressed = func (k) {
+        `:boolean (FL_PRESSING[fl_int($k)] && !FL_LOCK[fl_int($k)])`
+    },
+    mouse = func () {
+        return `:number FL_MOUSE_X`, `:number FL_MOUSE_Y`
+    },
+
+    ;; collision: see `engine/collision.h`
+    col_block = func (x, y, ally) {
+        val a = if ally => 1 => 0
+        `fl_col_block((float)a_dbl($x), (float)a_dbl($y), fl_int($a));`
+    },
+    col_unblock = func (x, y) {
+        `fl_col_unblock((float)a_dbl($x), (float)a_dbl($y));`
+    },
+    col_valid = func (x, y, mt, ct) {
+        `:boolean fl_col_valid((float)a_dbl($x), (float)a_dbl($y), fl_int($mt), fl_int($ct))`
+    },
+    col_sight = func (x1, y1, x2, y2) {
+        `:boolean fl_col_sight((float)a_dbl($x1), (float)a_dbl($y1), (float)a_dbl($x2), (float)a_dbl($y2))`
+    },
+    ;; fl.move(x, y, dir, speed, effect_speed, mt, hero): ok, x, y
+    move = func (x, y, dir, speed, eff, mt, hero) {
+        val h = if hero => 1 => 0
+        val ok = `:boolean fl_entity_move((float)a_dbl($x), (float)a_dbl($y), fl_int($dir), (float)a_dbl($speed), (float)a_dbl($eff), fl_int($mt), fl_int($h))`
+        return ok, `:number.float (double)FL_MOVE_X`, `:number.float (double)FL_MOVE_Y`
+    },
+    ;; screen to map, at the camera (as Utils::screenToMap)
+    scr2map = func (x, y) {
+        val p = `:number.float (double)fl_scr2map(fl_int($x), fl_int($y), FL_CAM.x, FL_CAM.y).x`
+        val q = `:number.float (double)fl_scr2map(fl_int($x), fl_int($y), FL_CAM.x, FL_CAM.y).y`
+        return p, q
     },
 
     ;; f32(x): x rounded to 32 bits, as a `float` of the original

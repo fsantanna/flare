@@ -297,6 +297,91 @@ static void fl_music (const char* path) {
 }
 
 #include "engine/map.h"
+#include "engine/collision.h"
+
+///////////////////////////////////////////////////////////////////////////////
+// INPUT, as InputState and SDLInputState of the original
+///////////////////////////////////////////////////////////////////////////////
+
+// the actions of Input:: of the original, in its order
+enum {
+    FL_CANCEL = 0, FL_ACCEPT, FL_UP, FL_DOWN, FL_LEFT, FL_RIGHT,
+    FL_BAR_1, FL_BAR_2, FL_BAR_3, FL_BAR_4, FL_BAR_5, FL_BAR_6, FL_BAR_7, FL_BAR_8, FL_BAR_9, FL_BAR_0,
+    FL_CHARACTER, FL_INVENTORY, FL_POWERS, FL_LOG, FL_MAIN1, FL_MAIN2,
+    FL_EQUIPMENT_SWAP, FL_EQUIPMENT_SWAP_PREV, FL_MINIMAP_MODE, FL_LOOT_TOOLTIP_MODE, FL_ACTIONBAR,
+    FL_MENU_PAGE_NEXT, FL_MENU_PAGE_PREV, FL_MENU_ACTIVATE, FL_PAUSE, FL_CYCLE_MENUS,
+    FL_AIM_UP, FL_AIM_DOWN, FL_AIM_LEFT, FL_AIM_RIGHT,
+    FL_DEVELOPER_MENU, FL_DEVELOPER_CMD_1, FL_DEVELOPER_CMD_2, FL_DEVELOPER_CMD_3,
+    FL_CTRL, FL_SHIFT, FL_ALT, FL_DEL, FL_TEXTEDIT_UP, FL_TEXTEDIT_DOWN,
+    FL_KEY_COUNT
+};
+
+static int FL_PRESSING[FL_KEY_COUNT];
+static int FL_LOCK[FL_KEY_COUNT];
+static int FL_UNPRESS[FL_KEY_COUNT];
+static int FL_MOUSE_X = 0, FL_MOUSE_Y = 0;
+
+// the default bindings of SDLInputState (QWERTY), by scancode
+typedef struct { int action; int scancode; } FlBind;
+static const FlBind FL_KEYS[] = {
+    { FL_CANCEL, SDL_SCANCODE_ESCAPE }, { FL_ACCEPT, SDL_SCANCODE_RETURN }, { FL_ACCEPT, SDL_SCANCODE_SPACE },
+    { FL_UP, SDL_SCANCODE_W }, { FL_UP, SDL_SCANCODE_UP },
+    { FL_DOWN, SDL_SCANCODE_S }, { FL_DOWN, SDL_SCANCODE_DOWN },
+    { FL_LEFT, SDL_SCANCODE_A }, { FL_LEFT, SDL_SCANCODE_LEFT },
+    { FL_RIGHT, SDL_SCANCODE_D }, { FL_RIGHT, SDL_SCANCODE_RIGHT },
+    { FL_BAR_1, SDL_SCANCODE_Q }, { FL_BAR_2, SDL_SCANCODE_E }, { FL_BAR_3, SDL_SCANCODE_R },
+    { FL_BAR_4, SDL_SCANCODE_F }, { FL_BAR_5, SDL_SCANCODE_1 }, { FL_BAR_6, SDL_SCANCODE_2 },
+    { FL_BAR_7, SDL_SCANCODE_3 }, { FL_BAR_8, SDL_SCANCODE_4 }, { FL_BAR_9, SDL_SCANCODE_5 },
+    { FL_BAR_0, SDL_SCANCODE_6 },
+    { FL_CHARACTER, SDL_SCANCODE_C }, { FL_INVENTORY, SDL_SCANCODE_I }, { FL_POWERS, SDL_SCANCODE_P },
+    { FL_LOG, SDL_SCANCODE_L },
+    { FL_MENU_PAGE_NEXT, SDL_SCANCODE_PAGEDOWN }, { FL_MENU_PAGE_PREV, SDL_SCANCODE_PAGEUP },
+    { FL_MENU_ACTIVATE, SDL_SCANCODE_V },
+    { FL_CTRL, SDL_SCANCODE_LCTRL }, { FL_CTRL, SDL_SCANCODE_RCTRL },
+    { FL_SHIFT, SDL_SCANCODE_LSHIFT }, { FL_SHIFT, SDL_SCANCODE_RSHIFT },
+    { FL_ALT, SDL_SCANCODE_LALT }, { FL_ALT, SDL_SCANCODE_RALT },
+    { FL_DEL, SDL_SCANCODE_DELETE }, { FL_DEL, SDL_SCANCODE_BACKSPACE },
+};
+
+// InputState::handle, before the events of a frame: what was released in
+// the frame before is no longer pressed nor locked
+static void fl_input_frame (void) {
+    for (int k=0; k<FL_KEY_COUNT; k++) {
+        if (FL_UNPRESS[k]) {
+            FL_PRESSING[k] = 0;
+            FL_UNPRESS[k] = 0;
+            FL_LOCK[k] = 0;
+        }
+    }
+}
+
+static void fl_input_key (int scancode, int down) {
+    for (size_t i=0; i<sizeof(FL_KEYS)/sizeof(FL_KEYS[0]); i++) {
+        if (FL_KEYS[i].scancode == scancode) {
+            int k = FL_KEYS[i].action;
+            if (down) {
+                FL_PRESSING[k] = 1;
+                FL_UNPRESS[k] = 0;
+            } else {
+                FL_UNPRESS[k] = 1;
+            }
+        }
+    }
+}
+
+static void fl_input_mouse (int x, int y, int button, int down) {
+    FL_MOUSE_X = x;
+    FL_MOUSE_Y = y;
+    int k = (button == SDL_BUTTON_LEFT) ? FL_MAIN1 : (button == SDL_BUTTON_RIGHT) ? FL_MAIN2 : -1;
+    if (k >= 0) {
+        if (down) {
+            FL_PRESSING[k] = 1;
+            FL_UNPRESS[k] = 0;
+        } else {
+            FL_UNPRESS[k] = 1;
+        }
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // DRIVER
@@ -372,14 +457,19 @@ static AStatus fl_script (int* quit) {
         int a = atoi(arg);
         if (!strcmp(cmd, "move")) {
             FL_MX = a; FL_MY = b;
+            FL_MOUSE_X = a; FL_MOUSE_Y = b;
             st = fl_emit("mouse.motion", NULL, FL_MX, FL_MY, -1);
         } else if (!strcmp(cmd, "down")) {
+            fl_input_mouse(FL_MX, FL_MY, a, 1);
             st = fl_emit("mouse.dn", NULL, FL_MX, FL_MY, a);
         } else if (!strcmp(cmd, "up")) {
+            fl_input_mouse(FL_MX, FL_MY, a, 0);
             st = fl_emit("mouse.up", NULL, FL_MX, FL_MY, a);
         } else if (!strcmp(cmd, "key")) {
+            fl_input_key(SDL_GetScancodeFromName(arg), 1);
             st = fl_emit("key.dn", arg, -1, -1, -1);
         } else if (!strcmp(cmd, "keyup")) {
+            fl_input_key(SDL_GetScancodeFromName(arg), 0);
             st = fl_emit("key.up", arg, -1, -1, -1);
         } else if (!strcmp(cmd, "quit")) {
             st = fl_emit("quit", NULL, -1, -1, -1);
@@ -442,6 +532,7 @@ int main (int argc, char** argv) {
     const Uint32 period = 1000 / 60;
     while (st == A_OK && !quit && atm_alive()) {
         Uint32 t0 = SDL_GetTicks();
+        fl_input_frame();
         SDL_Event e;
         while (st == A_OK && SDL_PollEvent(&e)) {
             switch (e.type) {
@@ -450,25 +541,30 @@ int main (int argc, char** argv) {
                     quit = 1;
                     break;
                 case SDL_KEYDOWN:
+                    fl_input_key(e.key.keysym.scancode, 1);
                     if (!e.key.repeat) {
                         st = fl_emit("key.dn", SDL_GetScancodeName(e.key.keysym.scancode), -1, -1, -1);
                     }
                     break;
                 case SDL_KEYUP:
+                    fl_input_key(e.key.keysym.scancode, 0);
                     st = fl_emit("key.up", SDL_GetScancodeName(e.key.keysym.scancode), -1, -1, -1);
                     break;
                 // from the window to the render, as InputState::scaleMouse
                 case SDL_MOUSEMOTION:
-                    st = fl_emit("mouse.motion", NULL, (int)((float)e.motion.x * FL_SCALE),
-                                 (int)((float)e.motion.y * FL_SCALE), -1);
+                    FL_MOUSE_X = (int)((float)e.motion.x * FL_SCALE);
+                    FL_MOUSE_Y = (int)((float)e.motion.y * FL_SCALE);
+                    st = fl_emit("mouse.motion", NULL, FL_MOUSE_X, FL_MOUSE_Y, -1);
                     break;
                 case SDL_MOUSEBUTTONDOWN:
-                    st = fl_emit("mouse.dn", NULL, (int)((float)e.button.x * FL_SCALE),
-                                 (int)((float)e.button.y * FL_SCALE), e.button.button);
+                    fl_input_mouse((int)((float)e.button.x * FL_SCALE), (int)((float)e.button.y * FL_SCALE),
+                                   e.button.button, 1);
+                    st = fl_emit("mouse.dn", NULL, FL_MOUSE_X, FL_MOUSE_Y, e.button.button);
                     break;
                 case SDL_MOUSEBUTTONUP:
-                    st = fl_emit("mouse.up", NULL, (int)((float)e.button.x * FL_SCALE),
-                                 (int)((float)e.button.y * FL_SCALE), e.button.button);
+                    fl_input_mouse((int)((float)e.button.x * FL_SCALE), (int)((float)e.button.y * FL_SCALE),
+                                   e.button.button, 0);
+                    st = fl_emit("mouse.up", NULL, FL_MOUSE_X, FL_MOUSE_Y, e.button.button);
                     break;
             }
         }
