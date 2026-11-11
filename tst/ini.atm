@@ -17,3 +17,9 @@ loop _,f in ["x.txt", "y.txt"] {
         X.print(s)
     }
 }
+
+;; the mods of the original, with their dependencies
+val dir = os.getenv("FLARE_DATA")
+X.print(ini.resolve(dir, ["alpha_demo"]))
+X.print(ini.resolve(dir, ["fantasycore", "empyrean_campaign"]))
+X.print(ini.resolve(dir, ["empyrean_campaign", "centered_statbars"]))

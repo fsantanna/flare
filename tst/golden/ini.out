@@ -9,3 +9,6 @@ nil
 :Section [cont=false, keys=[[e, 5]], name=four]
 == y.txt
 :Section [cont=false, keys=[[g, 7]], name=second]
+[default, fantasycore, alpha_demo]
+[default, fantasycore, empyrean_campaign]
+[default, fantasycore, empyrean_campaign, centered_statbars]

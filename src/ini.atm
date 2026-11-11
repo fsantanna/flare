@@ -4,6 +4,7 @@
 ;; `ModManager` that finds files (`flare-engine/src`).
 ;;
 ;;      ini.set_mods(dir, [name, ...])  the mods, from the first to the last
+;;      ini.resolve(dir, [name, ...])   the mods with their dependencies
 ;;      ini.locate(path)                the full path in the last mod, or nil
 ;;      ini.list(path)                  the full paths in all mods, in order
 ;;      ini.load(path)                  the sections of a file of the mods
@@ -65,6 +66,44 @@ val func ini_exists (path) {
     } else {
         false
     }
+}
+
+;; the value of a key in the file `settings.txt` of a mod, or nil
+val func ini_mod_key (dir, mod, key) {
+    val f = io.open(dir ++ "/mods/" ++ mod ++ "/settings.txt")
+    if f {
+        loop l in io.lines(f) {
+            val t = ini.trim(l)
+            val e = string.find(t, "=")
+            if e && (ini.trim(string.sub(t, 0, e - 1)) == key) {
+                break ini.trim(string.sub(t, e + 1))
+            }
+        }
+    }
+}
+
+;; The active mods, as ModManager::applyDepends orders them: the mod
+;; `default` first, then each given mod after the mods it requires
+;; (`requires=name:min:max,...` in its `settings.txt`), each mod once.
+;; Versions and the game of each mod are not checked.
+func ini.resolve (dir, names) {
+    val ret = ["default"]
+    var ini_add = nil
+    set ini_add = func (name) {
+        if X.nin(name, ret) {
+            val req = ini_mod_key(dir, name, "requires")
+            if req {
+                loop _,r in string.split(req, ",") {
+                    ini_add(ini.trim(string.split(r, ":")@0))
+                }
+            }
+            set ret@+ = name
+        }
+    }
+    loop _,n in names {
+        ini_add(n)
+    }
+    ret
 }
 
 func ini.set_mods (dir, mods) {
