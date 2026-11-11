@@ -16,7 +16,7 @@ val img = fl.img(ini.locate("images/enemies/zombie.png"))
 print("image", img, fl.size(img))
 print("missing", fl.img("none.png"))
 
-val font = fl.font(ini.locate("fonts/BonaNovaSC-Regular.ttf"), 18)
+val font = fl.font(ini.locate("fonts/BonaNovaSC-Regular.ttf"), 18, 0)
 print("font", font, fl.text_width(font, "Flare"), fl.text_height(font))
 
 spawn {

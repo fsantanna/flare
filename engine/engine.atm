@@ -58,13 +58,18 @@ val fl = [
         `fl_fill((int64_t)a_dbl($c), fl_int($x),fl_int($y),fl_int($w),fl_int($h));`
     },
 
-    ;; fonts: an index, or -1
-    font = func (path, size) {
-        `:number fl_font_load(fl_cstr($path), fl_int($size))`
+    ;; fonts: an index, or -1; style: 1 bold, 2 italic, 4 underline
+    font = func (path, size, style) {
+        val st = style || 0
+        `:number fl_font_load(fl_cstr($path), fl_int($size), fl_int($st))`
     },
-    text = func (f, s, x, y, color) {
+    ;; fl.text(font, s, x, y [,color [,justify [,blend]]]): justify 0 left,
+    ;; 1 right, 2 center
+    text = func (f, s, x, y, color, justify, blend) {
         val c = if color == nil => 0xFFFFFF => color
-        `fl_font_draw(fl_int($f), fl_cstr($s), fl_int($x), fl_int($y), fl_int($c));`
+        val j = justify || 0
+        val b = if blend == false => 0 => 1
+        `fl_font_draw(fl_int($f), fl_cstr($s), fl_int($x), fl_int($y), fl_int($j), fl_int($c), fl_int($b));`
     },
     text_width = func (f, s) {
         `:number fl_font_width(fl_int($f), fl_cstr($s))`

@@ -178,8 +178,8 @@ static void fl_fill (int64_t rgba, int x, int y, int w, int h) {
 static TTF_Font* FL_FONTS[FL_FONTS_MAX];
 static int       FL_FONTS_N = 0;
 
-// A font of a path and a size, or -1.
-static int fl_font_load (const char* path, int size) {
+// A font of a path, a size, and a style (TTF_STYLE_*), or -1.
+static int fl_font_load (const char* path, int size, int style) {
     if (FL_FONTS_N == FL_FONTS_MAX) {
         return -1;
     }
@@ -188,6 +188,7 @@ static int fl_font_load (const char* path, int size) {
         fprintf(stderr, "flare : font : %s : %s\n", path, TTF_GetError());
         return -1;
     }
+    TTF_SetFontStyle(f, style);
     FL_FONTS[FL_FONTS_N] = f;
     return FL_FONTS_N++;
 }
@@ -204,18 +205,28 @@ static int fl_font_height (int fi) {
     return (fi >= 0 && fi < FL_FONTS_N) ? TTF_FontLineSkip(FL_FONTS[fi]) : 0;
 }
 
-// Draws a text at x,y (its top-left), with a color 0xRRGGBB.
-static void fl_font_draw (int fi, const char* s, int x, int y, int color) {
+// Draws a text at x,y, justified (0 left, 1 right, 2 center: x is the
+// left, the right, or the center), with a color 0xRRGGBB, blended or
+// solid, as SDLFontEngine::renderInternal: twice, since blending the text
+// with itself makes it clearer.
+static void fl_font_draw (int fi, const char* s, int x, int y, int justify, int color, int blend) {
     if (fi < 0 || fi >= FL_FONTS_N || *s == '\0') {
         return;
     }
+    if (justify == 1) {
+        x -= fl_font_width(fi, s);
+    } else if (justify == 2) {
+        x -= fl_font_width(fi, s) / 2;
+    }
     SDL_Color c = { (color>>16)&0xFF, (color>>8)&0xFF, color&0xFF, 255 };
-    SDL_Surface* sfc = TTF_RenderUTF8_Blended(FL_FONTS[fi], s, c);
+    SDL_Surface* sfc = blend ? TTF_RenderUTF8_Blended(FL_FONTS[fi], s, c)
+                             : TTF_RenderUTF8_Solid(FL_FONTS[fi], s, c);
     if (sfc == NULL) {
         return;
     }
     SDL_Texture* tex = SDL_CreateTextureFromSurface(FL_REN, sfc);
     SDL_Rect dst = { x, y, sfc->w, sfc->h };
+    SDL_RenderCopy(FL_REN, tex, NULL, &dst);
     SDL_RenderCopy(FL_REN, tex, NULL, &dst);
     SDL_DestroyTexture(tex);
     SDL_FreeSurface(sfc);
