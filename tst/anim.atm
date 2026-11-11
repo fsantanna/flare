@@ -1,0 +1,41 @@
+;; Animations: a set of an enemy (compressed frames), and the sub-frames of
+;; the three types, drawn as `anim.Loop` plays them.
+
+include "../engine/engine.atm"
+include "../src/ini.atm"
+include "../src/parse.atm"
+include "../src/anim.atm"
+
+ini.set_mods(os.getenv("FLARE_DATA"), ini.resolve(os.getenv("FLARE_DATA"), ["alpha_demo"]))
+
+val z = anim.load("animations/enemies/zombie.txt")
+print("first", z.first)
+val names = []
+loop k, _ in z.anims {
+    set names@+ = k
+}
+vector.sort(names)
+loop _, n in names {
+    val a = z.anims@n
+    print(n, a.type, a.frames, #a.sub, a.total, X.tostring(a.active), a.active_sub, a.default_active)
+}
+X.print(z.anims.stance.sub)
+X.print(anim_sub(3, 10), anim_sub(4, 6))
+X.print(anim.gfx(z.anims.stance, 0, 0), anim.gfx(z.anims.run, 5, 3))
+print("cached", anim.load("animations/enemies/zombie.txt") == z)
+
+;; the stance (back_forth) of the zombie in its 8 directions
+pin t = spawn anim.Loop(z.anims.stance)
+spawn {
+    loop on :frame {
+        if fl.frame() < 70 {
+            fl.trace("stance " ++ t.pub)
+        }
+    }
+}
+loop on :draw {
+    loop dir in DIRECTIONS {
+        val g = anim.gfx(z.anims.stance, t.pub, dir)
+        fl.part(g@0, g@1, g@2, g@3, g@4, 150 + (dir * 180) - g@5, 400 - g@6)
+    }
+}

@@ -1,0 +1,345 @@
+;; Animations: the files of `animations/`, as `AnimationSet::load` and
+;; `Animation::setup` read them (`flare-engine/src`).
+;;
+;;      anim.load(path)     the set of a file, loaded once:
+;;          :AnimSet [
+;;              anims = [name = :Anim [...]],   ;; by name
+;;              order = [:Anim [...], ...],     ;; in the order of the file
+;;              first = name,                   ;; the animation by default
+;;          ]
+;;      anim.get(set, name) an animation of the set, or the first one
+;;      anim.gfx(a, sub, dir) the frame [img, x, y, w, h, ox, oy] to draw
+;;
+;; An animation:
+;;
+;;      :Anim [
+;;          name, type,         ;; "play_once", "looped", "back_forth"
+;;          frames,             ;; the frames of the file
+;;          sub = [0,0,1,...],  ;; the frame of each logic frame (sub-frame)
+;;          total,              ;; the frames, twice for back_forth
+;;          active = [...],     ;; the active frames (the default: the middle)
+;;          active_sub,         ;; "end", "start", "all"
+;;          default_active,     ;; if `active` is the default
+;;          first = [...], last = [...],    ;; the first and last sub-frame
+;;                                          ;; of each frame
+;;          gfx = [...],        ;; 8 per frame (one per direction):
+;;                              ;; [img, x, y, w, h, ox, oy, id], or nil
+;;                              ;; (id: the id of the image in the file)
+;;          blend, alpha, color,
+;;      ]
+;;
+;; As in the original, the keys of a section carry over to the next ones
+;; (frames, duration, type, ...), but not the active frames.
+
+val DIRECTIONS = 8
+
+val anim = [
+    cache = [],         ;; path -> set
+]
+
+;; Animation::setup: the sub-frames of `frames` frames in `duration`
+;; logic frames, evenly or by Bresenham's line
+func anim_sub (frames, duration) {
+    val sub = []
+    if (frames > 0) && ((duration % frames) == 0) {
+        val div = duration // frames
+        loop i in frames {
+            loop _ in div {
+                set sub@+ = i
+            }
+        }
+    } else {
+        val x1 = duration - 1
+        val y1 = frames - 1
+        val dx = x1
+        val dy = y1
+        var d = (2 * dy) - dx
+        set sub@+ = 0
+        var x = 1
+        var y = 0
+        loop {
+            while x <= x1
+            if d > 0 {
+                set y += 1
+                set sub@+ = y
+                set d += (2 * dy) - (2 * dx)
+            } else {
+                set sub@+ = y
+                set d += 2 * dy
+            }
+            set x += 1
+        }
+    }
+    sub
+}
+
+;; a new animation, as the constructor and Animation::setup
+func anim_new (name, type, st, frames, duration) {
+    val sub = anim_sub(frames, duration)
+    var total = if #sub > 0 => (sub@# + 1) => 0
+    if type == "back_forth" {
+        set total = 2 * total
+    }
+    ;; the first and the last sub-frame of each frame
+    val first = []
+    val last = []
+    loop i in total {
+        set first@i = 0
+        set last@i = #sub - 1
+        loop j in #sub {
+            if sub@j == i {
+                set first@i = j
+                break
+            }
+        }
+        loop k in #sub {
+            val j = #sub - 1 - k
+            if sub@j == i {
+                set last@i = j
+                break
+            }
+        }
+    }
+    :Anim [
+        name = name, type = type, frames = frames, sub = sub, total = total,
+        ;; (total_frame_count-1)/2 of an unsigned short
+        active = [((total - 1) & 0xFFFF) // 2],
+        active_sub = "end", default_active = true,
+        first = first, last = last, gfx = [],
+        blend = st.blend, alpha = st.alpha, color = st.color,
+    ]
+}
+
+;; Animation::setActiveFrames and setActiveSubFrame
+func anim_active (a, frames, sub) {
+    if #frames > 0 {
+        set a.default_active = false
+        if (#frames == 1) && (frames@0 == -1) {
+            set a.active = []
+            loop i in a.total {
+                set a.active@+ = i
+            }
+        } else {
+            set a.active = X.copy(frames)
+        }
+        ;; frames out of bounds: dropped if the last one is there, else
+        ;; the first one becomes the last frame
+        var have_last = X.xin(a.total - 1, a.active)
+        var i = 0
+        loop {
+            while i < #a.active
+            if a.active@i >= a.total {
+                if have_last {
+                    vector.remove(a.active, i)
+                    ;; as `erase` in the loop of the original, the next
+                    ;; element is skipped
+                } else {
+                    set a.active@i = a.total - 1
+                    set have_last = true
+                }
+            }
+            set i += 1
+        }
+        set a.active_sub = if (sub == "start") || (sub == "all") => sub => "end"
+    }
+}
+
+;; Animation::setupUncompressed: frames in a grid, from `position`
+func anim_grid (a, size, offset, position, img, img_id) {
+    loop i in a.frames {
+        loop dir in DIRECTIONS {
+            set a.gfx@((DIRECTIONS * i) + dir) =
+                [img, size@0 * (position + i), size@1 * dir, size@0, size@1, offset@0, offset@1, img_id]
+        }
+    }
+}
+
+func anim.load (path) {
+    if anim.cache@path {
+        return anim.cache@path
+    }
+    val aset = :AnimSet [anims = [], order = [], first = nil]
+    set anim.cache@path = aset
+    val secs = ini.load(path)
+    if secs == nil {
+        return aset
+    }
+
+    ;; the images by id; the first one is used by frames with no id
+    val imgs = []
+    var first_img = nil
+
+    ;; the values that carry over sections
+    val st = [blend = 0, alpha = 255, color = 0xFFFFFF]
+    var name = ""
+    var position = 0
+    var frames = 0
+    var duration = 0
+    var size = [0, 0]
+    var offset = [0, 0]
+    var type = ""
+    var image_id = ""
+    var active = []
+    var active_sub = ""
+    var first_section = true
+    var compressed = false
+    var a = nil         ;; the animation of the current compressed section
+
+    val func finish () {
+        val n = anim_new(name, type, st, frames, duration)
+        anim_grid(n, size, offset, position, imgs@image_id || first_img, image_id)
+        anim_active(n, active, active_sub)
+        set active = []
+        set aset.anims@name = aset.anims@name || n
+        set aset.order@+ = n
+    }
+
+    loop i, s in secs {
+        ;; a new section ends the previous animation, if it was in a grid
+        ;; (the keys before any header do not start a section)
+        if !s.cont && !((i == 0) && (s.name == "")) {
+            if !first_section && !compressed {
+                finish()
+            }
+            set first_section = false
+            set compressed = false
+        }
+        loop _, kv in s.keys {
+            val k, v = kv@0, kv@1
+            if s.name == "" {
+                match k {
+                    "image" => {
+                        val l = parse.list(v)
+                        val img = fl.img(ini.locate(l@0) || l@0)
+                        set imgs@(l@1 || "") = img
+                        if first_img == nil {
+                            set first_img = img
+                        }
+                    }
+                    "render_size" => {
+                        val l = parse.list(v)
+                        set size = [parse.int(l@0), parse.int(l@1)]
+                    }
+                    "render_offset" => {
+                        val l = parse.list(v)
+                        set offset = [parse.int(l@0), parse.int(l@1)]
+                    }
+                    "blend_mode" => {
+                        set st.blend = if parse.list(v)@0 == "add" => 1 => 0
+                    }
+                    "alpha_mod" => {
+                        set st.alpha = parse.int(parse.list(v)@0) & 0xFF
+                    }
+                    "color_mod" => {
+                        set st.color = parse.rgb(v)
+                    }
+                }
+            } else {
+                match k {
+                    "position" => {
+                        set position = parse.int(v) & 0xFFFF
+                    }
+                    "frames" => {
+                        set frames = parse.int(v) & 0xFFFF
+                    }
+                    "duration" => {
+                        set duration = parse.duration(v) & 0xFFFF
+                    }
+                    "type" => {
+                        set type = v
+                    }
+                    "active_frame" => {
+                        val l = parse.list(v)
+                        if l@0 == "all" {
+                            set active = [-1]
+                        } else {
+                            ;; the frames, sorted, with no repetitions
+                            val fs = []
+                            loop _, x in l {
+                                if x == "" {
+                                    break
+                                }
+                                val n = parse.int(x)
+                                if X.nin(n, fs) {
+                                    set fs@+ = n
+                                }
+                            }
+                            vector.sort(fs)
+                            set active = fs
+                        }
+                    }
+                    "active_sub_frame" => {
+                        set active_sub = v
+                    }
+                    "image" => {
+                        set image_id = v
+                    }
+                    "frame" => {
+                        if !compressed {
+                            set a = anim_new(s.name, type, st, frames, duration)
+                            anim_active(a, active, active_sub)
+                            set active = []
+                            set aset.anims@(s.name) = aset.anims@(s.name) || a
+                            set aset.order@+ = a
+                            set compressed = true
+                        }
+                        ;; index, direction, x, y, w, h, ox, oy, image id
+                        val l = parse.list(v)
+                        val idx = parse.int(l@0)
+                        val dir = parse.direction(l@1)
+                        if (idx < a.frames) && (dir < DIRECTIONS) {
+                            val img = imgs@(l@8 || "")
+                            set a.gfx@((DIRECTIONS * idx) + dir) = [
+                                if img == nil => first_img => img,
+                                parse.int(l@2), parse.int(l@3), parse.int(l@4), parse.int(l@5),
+                                parse.int(l@6), parse.int(l@7), l@8 || "",
+                            ]
+                        }
+                    }
+                }
+            }
+            if name == "" {
+                set aset.first = s.name
+            }
+            set name = s.name
+        }
+    }
+    if !compressed {
+        finish()
+    }
+    aset
+}
+
+func anim.get (aset, name) {
+    aset.anims@name || aset.anims@(aset.first)
+}
+
+;; the frame to draw at a sub-frame, in a direction
+func anim.gfx (a, sub, dir) {
+    if #a.sub == 0 => nil => a.gfx@((DIRECTIONS * a.sub@sub) + dir)
+}
+
+;; Plays an animation forever, as `looped` and `back_forth` do, one
+;; sub-frame per logic frame: `pub` is the sub-frame to draw.
+task anim.Loop (a) {
+    set pub = 0
+    if #a.sub > 0 {
+        val last = #a.sub - 1
+        loop {
+            loop i in (1, last) {
+                await :frame
+                set pub = i
+            }
+            await :frame
+            if a.type == "back_forth" {
+                loop i in (1, last) {
+                    await :frame
+                    set pub = last - i
+                }
+                await :frame
+            }
+            set pub = 0
+        }
+    }
+    await(false)
+}
