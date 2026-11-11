@@ -1,0 +1,110 @@
+;; The game screen: GameStatePlay of the original. Its task `Play` runs the
+;; logic frames in the order of `GameStatePlay::logic`, and prints the
+;; trace of the patched original (`doc/fidelity.md`).
+;;
+;; The frame, in order:
+;;      the hero                    pc->logic()
+;;      a hidden draw               EntityManager::handleSpawn: Map_Enemy()
+;;      the map, when it changes    checkTeleport()
+;;      the tiles, the camera       mapr->logic()
+;;      the trace                   benchTrace()
+
+val play = [
+    seen = nil,         ;; what the trace saw in the last frame
+]
+
+func play.f (x) {
+    string.format("%.9g", x)
+}
+
+;; the trace of the end of a frame, as benchTrace of the patch
+func play.trace (h) {
+    if fl.tracing() {
+        val s = play.seen
+        ifs {
+            s == nil => {
+                fl.trace("spawn 0 " ++ h.name ++ " " ++ h.state ++ " " ++ play.f(h.x) ++ " " ++ play.f(h.y) ++ " " ++ play.f(h.hp))
+            }
+            else => {
+                if s.state != h.state {
+                    fl.trace("state 0 " ++ h.state ++ " " ++ play.f(h.x) ++ " " ++ play.f(h.y))
+                }
+                if h.hp < s.hp {
+                    fl.trace("hit 0 " ++ play.f(h.hp))
+                }
+            }
+        }
+        set play.seen = [state = h.state, hp = h.hp]
+        if os.getenv("FLARE_DUMP") {
+            fl.trace("hero " ++ play.f(h.x) ++ " " ++ play.f(h.y) ++ " " ++ h.state ++ " " ++ play.f(h.hp) ++ " " ++ h.dir)
+        }
+    }
+    if os.getenv("FLARE_RNG") {
+        val n = fl.rand_calls()
+        if n > 0 {
+            fl.trace("rng " ++ n)
+        }
+    }
+}
+
+;; the hidden draws of a map loaded (EntityManager::handleNewMap): a
+;; Map_Enemy, and getRandomNeighbor of the tiles around the hero
+func play.new_map_draws (x, y) {
+    fl.rand()
+    var n = 0
+    loop i in (-1, 1) {
+        loop j in (-1, 1) {
+            if (i != 0) || (j != 0) {
+                if fl.col_valid(math.floor(x) + i + 0.5, math.floor(y) + j + 0.5, MOVE.NORMAL, COLLIDE.ALL) {
+                    set n += 1
+                }
+            }
+        }
+    }
+    if n > 0 {
+        fl.rand()
+    }
+}
+
+;; A new game in a map, at a position (or at the hero of the map).
+task Play (path, pos, class) {
+    val st = hero.stats(class)
+    hero.load_steps(st.sfx_step)
+
+    ;; GameStatePlay(): the hidden draw of its handleNewMap
+    fl.rand()
+
+    ;; frame 0: the hidden draw of the frame, then the map
+    await :frame
+    fl.rand()
+    fl.trace("map " ++ path)
+    val m = map.load(path)
+    val p = pos || m.hero
+    play.new_map_draws(p@0, p@1)
+    fl.cam_warp(p@0, p@1)
+    pin h = spawn Hero(st, p)
+    fl.col_block(h.pub.x, h.pub.y, false)
+    fl.tset_logic()
+    fl.cam_logic()
+    play.trace(h.pub)
+
+    spawn {
+        loop on :frame {
+            emit @h :hero.logic
+            fl.rand()                       ;; handleSpawn: Map_Enemy()
+            fl.tset_logic()
+            fl.cam_logic()
+            play.trace(h.pub)
+        }
+    }
+
+    loop on :draw {
+        fl.ren_clear()
+        val hp = h.pub
+        val g = anim.gfx(hp.cur.a, hp.cur.sub, hp.dir)
+        if g {
+            fl.ren(false, g@0, g@1, g@2, g@3, g@4, g@5, g@6, hp.x, hp.y, 0, true)
+        }
+        fl.map_render()
+    }
+}

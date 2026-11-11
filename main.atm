@@ -1,0 +1,26 @@
+;; Flare in Atmos: the game.
+;;
+;; For now, a new game of the first class in a map, as the patched
+;; original with FLARE_NEWGAME=0: FLARE_MAP (default: the first map of the
+;; alpha demo), FLARE_POS (default: the hero of the map).
+
+include "engine/engine.atm"
+include "src/ini.atm"
+include "src/parse.atm"
+include "src/anim.atm"
+include "src/font.atm"
+include "src/map.atm"
+include "src/hero.atm"
+include "src/play.atm"
+
+val dir = os.getenv("FLARE_DATA")
+ini.set_mods(dir, ini.resolve(dir, ["alpha_demo"]))
+font.init()
+
+val pos = if os.getenv("FLARE_POS") {
+    val l = parse.list(os.getenv("FLARE_POS"))
+    [parse.float(l@0), parse.float(l@1)]
+} else {
+    nil
+}
+await Play(os.getenv("FLARE_MAP") || "maps/frontier_outpost.txt", pos, "Brute")
