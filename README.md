@@ -64,6 +64,12 @@ In respect of the
       maps of `alpha_demo` give the same pixels as the original
       (`tools/compare-map.sh`). Parallax layers and the fog of war, used
       only by the Empyrean Campaign, are left for F9.
+- [x] F4: the hero (`src/hero.atm`, `src/play.atm`, `engine/collision.h`):
+      the input, moving, the collision, and the camera, with the same
+      trace as the original, frame by frame, on scripted runs in the
+      first map (`tools/compare.sh`). The path finding is used only by
+      enemies and by moving with the mouse: it comes with the enemies, in
+      F5.
 
 ## Tests
 
