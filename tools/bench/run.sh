@@ -52,9 +52,11 @@ if [ "$FLARE_TRACE" = "-" ]; then
 	export FLARE_TRACE="$OUT"
 fi
 
+RC=0
 "$ORIG/flare-engine/build/flare" --data-path="$ORIG/data" \
-	--no-audio --renderer=sdl $MODS "$@" 1>&2
+	--no-audio --renderer=sdl $MODS "$@" 1>&2 || RC=$?
 
-if [ -n "$OUT" ]; then
+if [ -n "$OUT" ] && [ -f "$OUT" ]; then
 	cat "$OUT"
 fi
+exit $RC
