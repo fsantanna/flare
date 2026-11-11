@@ -37,10 +37,10 @@ index 59cc8c24..024a445a 100644
  	// Traditional way to create an animation.
 diff --git a/src/Bench.h b/src/Bench.h
 new file mode 100644
-index 00000000..c176262a
+index 00000000..63ef6ad0
 --- /dev/null
 +++ b/src/Bench.h
-@@ -0,0 +1,157 @@
+@@ -0,0 +1,158 @@
 +/*
 +Bench: a fixed seed, scripted input, a trace, and a fast mode, for the
 +comparison of Flare with its port to Atmos (fsantanna/flare).
@@ -56,6 +56,7 @@ index 00000000..c176262a
 +	FLARE_DUMP=1          trace the hero in every frame
 +	FLARE_NEWGAME=<class> skip the title: a new game of this class index
 +	FLARE_MAP=<file>      the first map of the new game
++	FLARE_POS=<x>,<y>     the position of the hero in it (default: the map's)
 +	FLARE_SHOT=<n>:<file> save the screen at logic frame n (BMP)
 +
 +The generator is a 64-bit LCG whose upper 31 bits are the result, from
@@ -212,7 +213,7 @@ index 93c1e6a9..b7255837 100644
  	MapRenderer::MapLoot *map_loot = NULL;
  
 diff --git a/src/GameStatePlay.cpp b/src/GameStatePlay.cpp
-index 51044186..6576f11a 100644
+index 51044186..4ff3f121 100644
 --- a/src/GameStatePlay.cpp
 +++ b/src/GameStatePlay.cpp
 @@ -833,6 +833,50 @@ void GameStatePlay::updateActionBar(unsigned index) {
@@ -275,8 +276,21 @@ index 51044186..6576f11a 100644
  	pc->checkTransform();
  
  	// change hero powers on transformation
+@@ -1013,6 +1059,12 @@ void GameStatePlay::render() {
+ 	std::vector<Renderable> rens;
+ 	std::vector<Renderable> rens_dead;
+ 
++	// Bench: only the layers of the map, with no objects and no menus
++	if (bench::env("FLARE_ONLYMAP")) {
++		mapr->render(rens, rens_dead);
++		return;
++	}
++
+ 	pc->addRenders(rens);
+ 
+ 	entitym->addRenders(rens, rens_dead);
 diff --git a/src/GameSwitcher.cpp b/src/GameSwitcher.cpp
-index 4c0cb0b3..01c4cbda 100644
+index 4c0cb0b3..1edd8e3d 100644
 --- a/src/GameSwitcher.cpp
 +++ b/src/GameSwitcher.cpp
 @@ -38,6 +38,11 @@ FLARE.  If not, see http://www.gnu.org/licenses/
@@ -291,7 +305,7 @@ index 4c0cb0b3..01c4cbda 100644
  #include "GameSwitcher.h"
  #include "InputState.h"
  #include "MessageEngine.h"
-@@ -72,6 +77,25 @@ GameSwitcher::GameSwitcher()
+@@ -72,6 +77,36 @@ GameSwitcher::GameSwitcher()
  		currentState = title;
  	}
  
@@ -309,14 +323,34 @@ index 4c0cb0b3..01c4cbda 100644
 +		save_load->setGameSlot(1);
 +		play->resetGame();
 +		save_load->loadClass(atoi(bench::env("FLARE_NEWGAME")));
-+		if (bench::env("FLARE_MAP"))
++		if (bench::env("FLARE_MAP")) {
++			// at the position of the hero of the map
 +			mapr->teleport_mapname = bench::env("FLARE_MAP");
++			mapr->teleport_destination.x = -1;
++			mapr->teleport_destination.y = -1;
++		}
++		// or at a given position
++		if (bench::env("FLARE_POS")) {
++			float x = -1, y = -1;
++			sscanf(bench::env("FLARE_POS"), "%f,%f", &x, &y);
++			mapr->teleport_destination.x = x;
++			mapr->teleport_destination.y = y;
++		}
 +		currentState = play;
 +	}
 +
  	label_fps = new WidgetLabel();
  	done = false;
  	loadMusic();
+@@ -333,6 +368,8 @@ void GameSwitcher::render() {
+ 	}
+ 
+ 	currentState->render();
++	if (bench::env("FLARE_ONLYMAP")) // Bench: no tooltips and no cursor
++		return;
+ 	tooltipm->render();
+ 	curs->render();
+ }
 diff --git a/src/LootManager.cpp b/src/LootManager.cpp
 index 0caf4e41..ef691fe6 100644
 --- a/src/LootManager.cpp

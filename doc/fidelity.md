@@ -23,7 +23,9 @@ The patch adds `src/Bench.h`, included before every source file
 | `FLARE_TRACE=<file>` | the trace (`-` for stdout) |
 | `FLARE_DUMP=1` | also the hero in every frame |
 | `FLARE_NEWGAME=<i>` | skip the title: a new game of class i (`run.sh`: 0) |
-| `FLARE_MAP=<file>` | the first map of that game, instead of `maps/spawn.txt` |
+| `FLARE_MAP=<file>` | the first map of that game, instead of `maps/spawn.txt`, with the hero at its `hero_pos` |
+| `FLARE_POS=<x>,<y>` | the position of the hero in that map |
+| `FLARE_ONLYMAP=1` | draw only the layers of the map: no objects, menus, texts, nor cursor |
 | `FLARE_SHOT=<n>:<file>` | save the screen at logic frame n, as BMP |
 | `FLARE_INI=<list>` | do not play: dump each file of the list as `FileParser` reads it across the mods, to the trace |
 | `FLARE_ANIM=<list>` | do not play: dump each animation file of the list as `AnimationSet` loads it, to the trace |
@@ -93,7 +95,7 @@ same trace.
 | Run | What |
 |-----|------|
 | `walk` | the first map: walk with W and D, one attack in the air |
-| `fight` | `cave_of_living_bones1`: walk to an antlion, attack it until the hero dies |
+| `fight` | `cave_of_living_bones1`, next to an antlion: attack it until the hero dies |
 
 ## Differences
 
