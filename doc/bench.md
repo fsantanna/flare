@@ -29,3 +29,20 @@ Only measured numbers. Each table says when and how it was measured.
   enemies alive in the run.
 - Size of the patched binary: 2235736 bytes (2220736 unpatched).
 - Build of the original: 43 s of wall time with `make -j4`.
+
+## The INI reader of the port (F1, 2026-11-11)
+
+- `ini.load` of `src/ini.atm`, CPU time by `os.clock()` around the call,
+  build of `./run.sh` (`-O2`), one run each.
+- The rows of a map layer stay as strings: converting them to numbers is
+  not measured here.
+
+| File | Bytes | Sections | Keys | CPU s |
+|------|-------|----------|------|-------|
+| `alpha_demo/maps/frontier_plains.txt` (the largest map) | 448925 | 77 | 1137 | 0.006 |
+| `alpha_demo/maps/averguard_complex.txt` | | 125 | 956 | 0.003 |
+| `alpha_demo/maps/cave1.txt` | | 101 | 701 | 0.002 |
+| `empyrean_campaign/maps/iron_labyrinth_f2.txt` (the largest there) | 270838 | 8 | 689 | 0.005 |
+
+- `tools/ini-dump.atm` over the 624 text files of `alpha_demo` and
+  `fantasycore`: 1.10 s of wall time, with the build of the program.
