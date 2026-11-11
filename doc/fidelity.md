@@ -25,6 +25,7 @@ The patch adds `src/Bench.h`, included before every source file
 | `FLARE_NEWGAME=<i>` | skip the title: a new game of class i (`run.sh`: 0) |
 | `FLARE_MAP=<file>` | the first map of that game, instead of `maps/spawn.txt` |
 | `FLARE_SHOT=<n>:<file>` | save the screen at logic frame n, as BMP |
+| `FLARE_INI=<list>` | do not play: dump each file of the list as `FileParser` reads it across the mods, to the trace |
 
 ## The generator
 

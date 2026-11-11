@@ -335,10 +335,18 @@ index ac8e7f36..2eb51356 100644
  	SDL_RenderClear(renderer);
  	SDL_RenderCopy(renderer, texture, NULL, NULL);
 diff --git a/src/main.cpp b/src/main.cpp
-index a3dccedf..046a5d73 100644
+index a3dccedf..f25b3ba9 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -178,6 +178,86 @@ static float getSecondsElapsed(uint64_t prev_ticks, uint64_t now_ticks) {
+@@ -29,6 +29,7 @@ FLARE.  If not, see http://www.gnu.org/licenses/
+ #include "CombatText.h"
+ #include "DeviceList.h"
+ #include "EngineSettings.h"
++#include "FileParser.h"
+ #include "GameSwitcher.h"
+ #include "InputState.h"
+ #include "MessageEngine.h"
+@@ -178,6 +179,114 @@ static float getSecondsElapsed(uint64_t prev_ticks, uint64_t now_ticks) {
  	return (static_cast<float>(now_ticks - prev_ticks) / static_cast<float>(SDL_GetPerformanceFrequency()));
  }
  
@@ -398,6 +406,34 @@ index a3dccedf..046a5d73 100644
 +	}
 +}
 +
++// Bench: each file of the list FLARE_INI, as FileParser reads it across
++// the mods, to the trace: "file <path>", then "[<section>]" when a new
++// section starts, then "<key>=<value>"
++static void benchIni() {
++	FILE* list = fopen(bench::env("FLARE_INI"), "r");
++	FILE* out = bench::trace();
++	if (!list || !out) return;
++	char line[1024];
++	while (fgets(line, sizeof(line), list)) {
++		std::string path = Parse::trim(line);
++		if (path.empty()) continue;
++		fprintf(out, "file %s\n", path.c_str());
++		FileParser fp;
++		if (!fp.open(path, FileParser::MOD_FILE, FileParser::ERROR_NONE)) {
++			fprintf(out, "none\n");
++			continue;
++		}
++		while (fp.next()) {
++			if (fp.new_section)
++				fprintf(out, "[%s]\n", fp.section.c_str());
++			fprintf(out, "%s=%s\n", fp.key.c_str(), fp.val.c_str());
++		}
++		fp.close();
++	}
++	fclose(list);
++	fflush(out);
++}
++
 +// Bench: one logic frame, then the frame count and the end of the run
 +static bool benchLogic() {
 +	SDL_PumpEvents();
@@ -425,7 +461,7 @@ index a3dccedf..046a5d73 100644
  static void mainLoop () {
  	bool done = false;
  
-@@ -188,6 +268,11 @@ static void mainLoop () {
+@@ -188,6 +297,11 @@ static void mainLoop () {
  
  	float last_fps = -1;
  
@@ -437,7 +473,7 @@ index a3dccedf..046a5d73 100644
  	while ( !done ) {
  		int loops = 0;
  		uint64_t now_ticks = SDL_GetPerformanceCounter();
-@@ -203,6 +288,7 @@ static void mainLoop () {
+@@ -203,6 +317,7 @@ static void mainLoop () {
  			}
  
  			SDL_PumpEvents();
@@ -445,7 +481,7 @@ index a3dccedf..046a5d73 100644
  			inpt->handle();
  
  			// Skip game logic when minimized
-@@ -212,6 +298,9 @@ static void mainLoop () {
+@@ -212,6 +327,9 @@ static void mainLoop () {
  
  			gswitch->logic();
  			inpt->resetScroll();
@@ -455,7 +491,18 @@ index a3dccedf..046a5d73 100644
  
  			// Engine done means the user escapes the main game menu.
  			// Input done means the user closes the window.
-@@ -444,6 +533,7 @@ soft_reset:
+@@ -437,13 +555,17 @@ soft_reset:
+ 		if (debug_event)
+ 			inpt->enableEventLog();
+ 
+-		mainLoop();
++		if (bench::env("FLARE_INI"))
++			benchIni();
++		else
++			mainLoop();
+ #endif
+ 
+ 		if (gswitch)
  			gswitch->saveUserSettings();
  
  		cleanup();
