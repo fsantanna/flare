@@ -51,6 +51,14 @@ In respect of the
       patched, and measured in the container: `tools/bench/` and
       `tst/orig/` (`tools/bench/test.sh`), `doc/fidelity.md`,
       `doc/bench.md`.
+- [x] F1: the INI reader and the mods (`src/ini.atm`): all text files
+      of `alpha_demo` and `fantasycore` (and of `empyrean_campaign`)
+      read exactly as the original reads them (`tools/compare-ini.sh`).
+
+## Tests
+
+    tst/run.sh               # the tests of the port, with no screen
+    ASAN=1 tst/run.sh        # the same, with the address sanitizer
 
 ## The original, for comparison
 
