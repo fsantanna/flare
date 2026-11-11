@@ -1,0 +1,4 @@
+# The scripted runs of tst/orig that the port plays, compared by
+# tools/compare.sh with the stored traces of the original.
+hero-walk
+hero-cliff

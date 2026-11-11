@@ -12,6 +12,8 @@
 #   - anim: an animation set, and a looped animation (tst/anim.atm);
 #   - font: the styles and colors of the fonts (tst/font.atm);
 #   - map: maps drawn, with their animated tiles (tst/map.atm);
+#   - runs: the game on the scripted runs of tst/runs.txt, whose traces
+#     must be those of the original (tools/compare.sh);
 #   - data: every text file of alpha_demo and fantasycore, and of
 #     empyrean_campaign and fantasycore, read as the original reads them,
 #     and every animation file loaded (the dumps are compared by their
@@ -75,6 +77,11 @@ for m in frontier_outpost cave1; do
 	echo "$m shot md5 $(md5sum < "$OUT/map.bmp" | cut -c1-32)" >> "$OUT/map.out"
 done
 check map "$OUT/map.out"
+
+# runs: the game on the scripted runs of tst/runs.txt, against the traces
+# of the original
+tools/compare.sh $(grep -v '^#' tst/runs.txt) > "$OUT/runs.out" 2>&1
+check runs "$OUT/runs.out"
 
 # data
 for mods in fantasycore,alpha_demo fantasycore,empyrean_campaign; do
