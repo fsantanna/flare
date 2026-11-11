@@ -47,5 +47,16 @@ In respect of the
 
 ## Milestones
 
-- [ ] F0: repository, licenses, this readme; the original built,
-      patched, and measured in the container.
+- [x] F0: repository, licenses, this readme; the original built,
+      patched, and measured in the container: `tools/bench/` and
+      `tst/orig/` (`tools/bench/test.sh`), `doc/fidelity.md`,
+      `doc/bench.md`.
+
+## The original, for comparison
+
+    tools/bench/setup.sh     # clone, patch, and build it in ../flare-orig
+    tools/bench/test.sh      # its scripted runs against the stored traces
+    tools/bench/measure.sh   # its baseline
+
+Building it needs cmake, g++, and the development files of SDL2,
+SDL2_image, SDL2_mixer, and SDL2_ttf.
