@@ -10,7 +10,8 @@
 ;;      the trace                   benchTrace()
 
 val play = [
-    seen = nil,         ;; what the trace saw in the last frame
+    seen = nil,         ;; what the trace saw in the last frame: the hero
+    seen_es = [],       ;; and the enemies, by id
 ]
 
 func play.f (x) {
@@ -18,7 +19,7 @@ func play.f (x) {
 }
 
 ;; the trace of the end of a frame, as benchTrace of the patch
-func play.trace (h) {
+func play.trace (h, es) {
     if fl.tracing() {
         val s = play.seen
         ifs {
@@ -35,6 +36,23 @@ func play.trace (h) {
             }
         }
         set play.seen = [state = h.state, hp = h.hp]
+        ;; the enemies, in order, as the entities of EntityManager
+        loop i, e in es {
+            val id = i + 1
+            val p = e.pub
+            val s2 = play.seen_es@id
+            if s2 == nil {
+                fl.trace("spawn " ++ id ++ " " ++ p.name ++ " " ++ p.state ++ " " ++ play.f(p.x) ++ " " ++ play.f(p.y) ++ " " ++ play.f(p.hp))
+            } else {
+                if s2.state != p.state {
+                    fl.trace("state " ++ id ++ " " ++ p.state ++ " " ++ play.f(p.x) ++ " " ++ play.f(p.y))
+                }
+                if p.hp < s2.hp {
+                    fl.trace("hit " ++ id ++ " " ++ play.f(p.hp))
+                }
+            }
+            set play.seen_es@id = [state = p.state, hp = p.hp]
+        }
         if os.getenv("FLARE_DUMP") {
             fl.trace("hero " ++ play.f(h.x) ++ " " ++ play.f(h.y) ++ " " ++ h.state ++ " " ++ play.f(h.hp) ++ " " ++ h.dir)
         }
@@ -49,8 +67,10 @@ func play.trace (h) {
 
 ;; the hidden draws of a map loaded (EntityManager::handleNewMap): a
 ;; Map_Enemy, and getRandomNeighbor of the tiles around the hero
-func play.new_map_draws (x, y) {
-    fl.rand()
+func play.new_map_draws (x, y, skip) {
+    if !skip {
+        fl.rand()
+    }
     var n = 0
     loop i in (-1, 1) {
         loop j in (-1, 1) {
@@ -80,13 +100,24 @@ task Play (path, pos, class) {
     fl.trace("map " ++ path)
     val m = map.load(path)
     val p = pos || m.hero
-    play.new_map_draws(p@0, p@1)
+    ;; MapRenderer::load: the groups of enemies
+    val placed = enemy.place(enemy.groups(m))
+    ;; EntityManager::handleNewMap: its Map_Enemy, the enemies, the neighbor
+    fl.rand()
+    pin es = tasks()
+    pin ens = []                ;; the enemies in order, as EntityManager
+    loop _, me in placed {
+        val t = spawn @es Enemy(enemy.stats(me.type), me)
+        set ens@+ = t
+        fl.col_block(me.x, me.y, false)
+    }
+    play.new_map_draws(p@0, p@1, true)
     fl.cam_warp(p@0, p@1)
     pin h = spawn Hero(st, p)
     fl.col_block(h.pub.x, h.pub.y, false)
     fl.tset_logic()
     fl.cam_logic()
-    play.trace(h.pub)
+    play.trace(h.pub, ens)
 
     spawn {
         loop on :frame {
@@ -94,7 +125,7 @@ task Play (path, pos, class) {
             fl.rand()                       ;; handleSpawn: Map_Enemy()
             fl.tset_logic()
             fl.cam_logic()
-            play.trace(h.pub)
+            play.trace(h.pub, ens)
         }
     }
 
