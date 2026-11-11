@@ -175,10 +175,10 @@ index 93c1e6a9..b7255837 100644
  	MapRenderer::MapLoot *map_loot = NULL;
  
 diff --git a/src/GameStatePlay.cpp b/src/GameStatePlay.cpp
-index 51044186..963c1518 100644
+index 51044186..6576f11a 100644
 --- a/src/GameStatePlay.cpp
 +++ b/src/GameStatePlay.cpp
-@@ -833,6 +833,49 @@ void GameStatePlay::updateActionBar(unsigned index) {
+@@ -833,6 +833,50 @@ void GameStatePlay::updateActionBar(unsigned index) {
  	}
  }
  
@@ -202,8 +202,9 @@ index 51044186..963c1518 100644
 +	else {
 +		if (it->second.state != st->cur_state)
 +			BENCH_T("state %d %d %.9g %.9g", id, st->cur_state, st->pos.x, st->pos.y);
-+		if (it->second.hp != st->hp)
-+			BENCH_T("hp %d %.9g", id, st->hp);
++		// a loss of hp (regeneration is in the dump of the hero)
++		if (st->hp < it->second.hp)
++			BENCH_T("hit %d %.9g", id, st->hp);
 +	}
 +	BenchSeen s;
 +	s.state = st->cur_state;
@@ -228,7 +229,7 @@ index 51044186..963c1518 100644
  /**
   * Process all actions for a single frame
   * This includes some message passing between child object
-@@ -905,6 +948,8 @@ void GameStatePlay::logic() {
+@@ -905,6 +949,8 @@ void GameStatePlay::logic() {
  	mapr->enemies_cleared = entitym->isCleared();
  	quests->logic();
  
