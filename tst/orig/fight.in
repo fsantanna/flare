@@ -1,0 +1,7 @@
+# env: FLARE_MAP=maps/cave_of_living_bones1.txt FLARE_FRAMES=900
+# walk up toward the antlions, then hold the attack toward the antlion that comes
+10 key W
+130 keyup W
+140 move 950 540
+140 down 1
+700 up 1

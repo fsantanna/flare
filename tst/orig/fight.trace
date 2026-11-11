@@ -1,0 +1,181 @@
+0 map maps/cave_of_living_bones1.txt
+0 event 4 29 7 1 1 1
+0 event 4 38 13 1 1 1
+0 event 4 72 34 1 1 1
+0 event 4 73 66 1 1 1
+0 event 4 45 32 1 1 1
+0 event 4 61 41 1 1 1
+0 event 4 38 59 1 1 1
+0 event 4 44 48 1 1 1
+0 event 4 23 56 1 1 1
+0 event 4 36 82 1 1 1
+0 event 4 48 79 1 1 1
+0 event 4 0 0 1 1 1
+0 spawn 0 Bench 0 0 0 90
+0 spawn 1 Antlion Slasher 0 19.5 40.5 105
+0 spawn 2 Antlion Blinker 0 23.5 44.5 90
+0 spawn 3 Antlion Blinker 0 22.5 38.5 90
+0 spawn 4 Antlion Blinker 0 27.5 75.5 90
+0 spawn 5 Antlion Blinker 0 26.5 74.5 90
+0 spawn 6 Antlion Blinker 0 28.5 70.5 90
+0 spawn 7 Antlion Hatchling 0 46.5 63.5 40
+0 spawn 8 Antlion Hatchling 0 53.5 60.5 40
+0 spawn 9 Antlion Hatchling 0 53.5 53.5 40
+0 spawn 10 Antlion Hatchling 0 49.5 64.5 40
+0 spawn 11 Antlion Hatchling 0 55.5 63.5 40
+0 spawn 12 Antlion Hatchling 0 53.5 64.5 40
+0 spawn 13 Antlion Hatchling 0 56.5 56.5 40
+0 spawn 14 Antlion Hatchling 0 53.5 53.5 40
+0 spawn 15 Antlion Hatchling 0 49.5 64.5 40
+0 spawn 16 Antlion Hatchling 0 53.5 55.5 40
+0 spawn 17 Antlion Hatchling 0 56.5 59.5 40
+0 spawn 18 Antlion Hatchling 0 50.5 51.5 40
+0 spawn 19 Antlion Hatchling 0 51.5 64.5 40
+0 spawn 20 Antlion Hatchling 0 54.5 55.5 40
+0 spawn 21 Antlion Hatchling 0 54.5 63.5 40
+0 spawn 22 Antlion Hatchling 0 54.5 59.5 40
+0 spawn 23 Antlion Hatchling 0 50.5 61.5 40
+0 spawn 24 Antlion Hatchling 0 46.5 61.5 40
+0 spawn 25 Antlion Hatchling 0 51.5 59.5 40
+0 spawn 26 Antlion Slasher 0 76.5 73.5 105
+0 spawn 27 Antlion Blinker 0 76.5 74.5 90
+0 spawn 28 Antlion Blinker 0 80.5 75.5 90
+0 spawn 29 Antlion Slasher 0 79.5 76.5 105
+0 spawn 30 Antlion Slasher 0 60.5 32.5 105
+0 spawn 31 Antlion Slasher 0 63.5 35.5 105
+0 spawn 32 Antlion Blinker 0 60.5 35.5 90
+0 spawn 33 Skeletal Occultist 0 33.5 16.5 160
+0 spawn 34 Skeletal Knight 0 42.5 17.5 200
+0 spawn 35 Skeletal Occultist 0 47.5 17.5 160
+0 spawn 36 Skeletal Knight 0 47.5 19.5 200
+0 spawn 37 Antlion Freezer 0 55.5 59.5 140
+0 spawn 38 Antlion Spitter 0 27.5 45.5 140
+0 spawn 39 Antlion Freezer 0 22.5 45.5 140
+0 spawn 40 Antlion Burster 0 60.5 62.5 130
+0 spawn 41 Antlion Blinker 0 38.5 40.5 90
+0 spawn 42 Antlion Burster 0 45.5 81.5 130
+0 spawn 43 Antlion Freezer 0 85.5 76.5 140
+0 spawn 44 Antlion Spitter 0 19.5 65.5 140
+0 spawn 45 Antlion Blinker 0 18.5 24.5 90
+0 spawn 46 Antlion Slasher 0 46.5 19.5 105
+0 spawn 47 Antlion Freezer 0 45.5 36.5 140
+0 spawn 48 Antlion Freezer 0 65.5 65.5 140
+0 spawn 49 Antlion Spitter 0 72.5 56.5 140
+0 spawn 50 Antlion Freezer 0 26.5 44.5 140
+0 spawn 51 Antlion Spitter 0 21.5 40.5 140
+0 spawn 52 Antlion Burster 0 59.5 28.5 130
+10 power 45 132 18.5 24.5
+10 state 0 1 16.4292889 20.4292889
+11 state 45 1 18.5 24.5
+32 state 0 0 15 20
+48 state 45 2 16.5554543 22.5554543
+59 power 45 15 15 20
+71 state 45 0 16.5 20.5
+72 state 45 1 16.416666 20.5
+140 state 0 2 15 20
+151 power 0 1 16 20.5589256
+163 state 0 0 15 20
+168 state 0 2 15 20
+179 power 0 1 16 20.7946281
+191 state 0 0 15 20
+196 state 0 2 15 20
+207 power 0 1 17.130209 21.119791
+219 state 0 0 15 20
+224 state 0 2 15 20
+235 power 0 1 16 20.6767769
+247 state 0 0 15 20
+252 state 0 2 15 20
+263 power 0 1 16 20.4410744
+275 state 0 0 15 20
+280 state 0 2 15 20
+291 power 0 1 16 20.2053719
+303 state 0 0 15 20
+308 state 0 2 15 20
+319 power 0 1 16 20.0875206
+331 state 0 0 15 20
+336 state 0 2 15 20
+347 power 0 1 16 20.3232231
+359 state 0 0 15 20
+364 state 0 2 15 20
+375 power 0 1 16 20.5589256
+387 state 0 0 15 20
+392 state 0 2 15 20
+403 power 0 1 16 20.7946281
+415 state 0 0 15 20
+420 state 0 2 15 20
+431 power 0 1 17.130209 21.119791
+431 state 45 5 16 20.3232231
+431 hit 45 67
+439 state 45 0 16 20.3232231
+440 state 45 1 16 20.2642975
+443 state 0 0 15 20
+446 state 45 0 16 20
+448 state 0 2 15 20
+448 state 45 1 16 20.0589256
+459 power 0 1 16 20
+471 state 0 0 15 20
+476 state 0 2 15 20
+487 power 0 1 16 20.2357025
+499 state 0 0 15 20
+504 state 0 2 15 20
+515 power 0 1 16 20.471405
+527 state 0 0 15 20
+532 state 0 2 15 20
+543 power 0 1 17.130209 21.119791
+543 state 45 5 16 20
+543 hit 45 46
+551 state 45 0 16 20
+552 state 45 1 16 20.0589256
+555 state 0 0 15 20
+560 state 0 2 15 20
+571 power 0 1 16 20.471405
+578 state 45 2 15.528595 21.2475471
+583 state 0 0 15 20
+588 state 0 2 15 20
+589 power 45 15 15 20
+599 power 0 1 17.130209 21.119791
+601 state 45 0 16.5 20.5
+602 state 45 1 16.416666 20.5
+611 state 0 0 15 20
+616 state 0 2 15 20
+627 power 0 1 16 20.7946281
+629 state 45 0 15.4107437 21.0892563
+630 state 45 2 15.4107437 21.0892563
+637 power 45 41 15 20
+639 state 0 0 15 20
+644 state 0 2 15 20
+645 state 45 0 15.4107437 21.0892563
+655 power 0 1 17.130209 21.119791
+666 state 45 2 15.4107437 21.0892563
+667 state 0 0 15 20
+672 state 0 2 15 20
+673 power 45 1 15 20
+673 state 0 5 15 20
+673 hit 0 61
+681 state 45 0 15.4107437 21.0892563
+682 state 0 0 15 20
+696 state 0 2 15 20
+702 state 45 2 15.4107437 21.0892563
+707 power 0 1 17.130209 21.119791
+709 power 45 1 15 20
+709 state 0 5 15 20
+709 hit 0 48.6999664
+717 state 45 0 15.4107437 21.0892563
+718 state 0 0 15 20
+737 state 45 2 15.4107437 21.0892563
+744 power 45 1 15 20
+752 state 45 0 15.4107437 21.0892563
+774 state 45 2 15.4107437 21.0892563
+781 power 45 1 15 20
+789 state 45 0 15.4107437 21.0892563
+810 state 45 2 15.4107437 21.0892563
+817 power 45 41 15 20
+817 state 0 5 15 20
+817 hit 0 33.7998657
+825 state 45 0 15.4107437 21.0892563
+851 state 45 2 15.4107437 21.0892563
+858 power 45 1 15 20
+858 state 0 6 15 20
+858 hit 0 0
+866 state 45 0 15.4107437 21.0892563
+867 state 45 1 15.4696693 21.1481819
