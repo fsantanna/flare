@@ -4,6 +4,7 @@ rand	908834774	1093944153	1392341196
 image	0	3370	1788
 missing	-1
 font	0	49	22
+sound	0	0	-1
 5 mouse.motion 100 200
 6 mouse.dn 100 200
 7 mouse.up 100 200

@@ -47,7 +47,7 @@ for t in ini parse; do
 done
 
 # engine
-FLARE_FRAMES=30 FLARE_FAST=1 FLARE_SEED=1 FLARE_TRACE=- FLARE_MUTE=1 \
+FLARE_FRAMES=30 FLARE_FAST=1 FLARE_SEED=1 FLARE_TRACE=- \
 FLARE_INPUT=tst/engine.in FLARE_SHOT=20:"$OUT/engine.bmp" \
 	./run.sh tst/engine.atm > "$OUT/engine.out" 2>&1
 echo "shot md5 $(md5sum < "$OUT/engine.bmp" | cut -c1-32)" >> "$OUT/engine.out"

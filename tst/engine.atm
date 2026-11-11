@@ -27,9 +27,13 @@ spawn {
     }
 }
 
+val snd = fl.snd(ini.locate("soundfx/inventory/inventory_coins.ogg"))
+print("sound", snd, fl.snd(ini.locate("soundfx/inventory/inventory_coins.ogg")), fl.snd("none.ogg"))
+
 spawn {
     await Frames(10)
     fl.trace("ten frames")
+    fl.play(snd)
 }
 
 loop on :draw {
