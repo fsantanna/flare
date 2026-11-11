@@ -54,6 +54,11 @@ In respect of the
 - [x] F1: the INI reader and the mods (`src/ini.atm`): all text files
       of `alpha_demo` and `fantasycore` (and of `empyrean_campaign`)
       read exactly as the original reads them (`tools/compare-ini.sh`).
+- [x] F2: the engine (`engine/flare.h`, `engine/engine.atm`): window,
+      images, fonts, sounds, and the test mode with no screen, with the
+      same variables, generator, and input as the patched original;
+      animations (`src/anim.atm`) loaded exactly as the original loads
+      them (`tools/compare-anim.sh`).
 
 ## Tests
 
