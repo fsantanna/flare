@@ -55,6 +55,9 @@ func play.trace (h, es) {
                 }
             }
             set play.seen_es@id = [state = p.state, hp = p.hp]
+            if os.getenv("FLARE_DUMPE") && (id == parse.int(os.getenv("FLARE_DUMPE"))) {
+                fl.trace(string.format("ent %d %.9g %.9g %d %.9g %d", id, p.x, p.y, p.state, p.hp, p.dir))
+            }
         }
         if os.getenv("FLARE_DUMP") {
             fl.trace("hero " ++ play.f(h.x) ++ " " ++ play.f(h.y) ++ " " ++ h.state ++ " " ++ play.f(h.hp) ++ " " ++ h.dir)

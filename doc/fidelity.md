@@ -22,6 +22,7 @@ The patch adds `src/Bench.h`, included before every source file
 | `FLARE_INPUT=<file>` | scripted input, by logic frame |
 | `FLARE_TRACE=<file>` | the trace (`-` for stdout) |
 | `FLARE_DUMP=1` | also the hero in every frame |
+| `FLARE_DUMPE=<id>` | also the entity of this id in every frame |
 | `FLARE_RNG=1` | also the calls to `rand()` in each frame that has some |
 | `FLARE_NEWGAME=<i>` | skip the title: a new game of class i (`run.sh`: 0) |
 | `FLARE_MAP=<file>` | the first map of that game, instead of `maps/spawn.txt`, with the hero at its `hero_pos` |
@@ -75,6 +76,7 @@ the order they are first seen, again from 1 at each map.
 | `<f> power <id> <power> <x> <y>` | it asks to activate a power, at a target |
 | `<f> loot <item> <quantity> <x> <y>` | loot is put on the ground |
 | `<f> hero <x> <y> <state> <hp> <direction>` | with `FLARE_DUMP`, every frame |
+| `<f> ent <id> <x> <y> <state> <hp> <direction>` | with `FLARE_DUMPE`, every frame |
 | `<f> rng <n>` | with `FLARE_RNG`, the calls to `rand()` in the frame, if any |
 
 The states are those of `StatBlock`: 0 stance, 1 move, 2 power, 3
