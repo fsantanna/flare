@@ -578,6 +578,12 @@ task Enemy (st, me) {
         set e.powers@+ = [type = p.type, id = p.id, chance = p.chance, cd = timer(0)]
     }
     set e.cur = anim.cursor(anim.get(e.anims, ""))
+    ;; EntityManager::loadEntity: with no cooldown_hit in its file, the
+    ;; cooldown of a hit is the duration of the hit animation, from full
+    if !st.set_by_file.cooldown_hit {
+        val hd = #anim.get(e.anims, "hit").sub
+        set e.cooldown_hit = [cur = hd, dur = hd]
+    }
 
     spawn {
         var next = [act = me.state || "stance"]
