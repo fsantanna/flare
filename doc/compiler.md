@@ -33,3 +33,21 @@ meanwhile.
 - Meanwhile: `if h.next { break h.next.act }`.
 - What would help: the manual saying so, or the values evaluated only
   on a break.
+
+## Pinned values cannot reach the tables of a module
+
+- Not a bug: the rule of the manual (`invalid escape : pinned value`).
+  Three shapes the port wanted, and what it does instead:
+  - The tasks of the pool of the enemies in a field of the global `play`,
+    for the other modules to walk them in order. Meanwhile: `pin ens = []`
+    next to the pool, passed as an argument (`play.trace`, `play.focus`,
+    `play_spawns`, `hazards_logic`).
+  - The hero, the enemies, and the hazards of a map as context of
+    `combat`, set once per map. Meanwhile: arguments of `hazards_logic`.
+  - A task in its own `pub` (`task = task`), to reach the task from its
+    `pub`. Meanwhile: who emits keeps the task from the walk of the pool.
+- The error gives only the line of the escape; finding what escaped took
+  a while when the pin and the escaping `set` are far apart.
+- What would help: a binding of a module field for the lifetime of a
+  block, weak references to tasks, a task allowed in its own `pub`, or
+  the error naming the destination. Sent to the ceu-atmos session.
