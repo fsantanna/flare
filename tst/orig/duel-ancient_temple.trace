@@ -1,0 +1,1985 @@
+0 map maps/ancient_temple.txt
+0 spawn 0 Bench 0 80.5 38.5 90
+0 spawn 1 Cursed Grave 0 79.5 37.5 300
+0 spawn 2 Cursed Grave 0 74.5 42.5 300
+0 spawn 3 Cursed Grave 0 84.5 42.5 300
+0 spawn 4 Cursed Grave 0 75.5 38.5 300
+0 spawn 5 Cursed Grave 0 83.5 38.5 300
+0 spawn 6 Venom Wyvern 0 5.5 74.5 70
+0 spawn 7 Venom Wyvern 0 5.5 78.5 70
+0 spawn 8 Skeletal Archer 0 5.5 76.5 75
+0 spawn 9 Rotting Zombie 0 52.5 71.5 25
+0 spawn 10 Skeleton 0 52.5 72.5 50
+0 spawn 11 Rotting Zombie 0 43.5 70.5 25
+0 spawn 12 Skeleton 0 45.5 70.5 50
+0 spawn 13 Zombie 0 24.5 86.5 40
+0 spawn 14 Skeleton 0 22.5 82.5 50
+0 spawn 15 Skeleton 0 13.5 82.5 50
+0 spawn 16 Skeleton 0 10.5 72.5 50
+0 spawn 17 Venom Wyvern 0 24.5 40.5 70
+0 spawn 18 Venom Wyvern 0 26.5 37.5 70
+0 spawn 19 Zombie 0 39.5 32.5 40
+0 spawn 20 Skeleton 0 45.5 32.5 50
+0 spawn 21 Skeleton 0 38.5 37.5 50
+0 spawn 22 Venom Wyvern 0 14.5 26.5 70
+0 spawn 23 Venom Wyvern 0 14.5 28.5 70
+0 spawn 24 Venom Wyvern 0 12.5 26.5 70
+0 spawn 25 Venom Wyvern 0 10.5 11.5 70
+0 spawn 26 Venom Wyvern 0 21.5 14.5 70
+0 spawn 27 Venom Wyvern 0 40.5 10.5 70
+0 spawn 28 Venom Wyvern 0 41.5 19.5 70
+0 spawn 29 Venom Wyvern 0 39.5 17.5 70
+0 spawn 30 Zombie Brute 0 60.5 14.5 100
+0 spawn 31 Zombie Brute 0 59.5 13.5 100
+0 spawn 32 Rotting Zombie 0 57.5 13.5 25
+0 spawn 33 Rotting Zombie 0 76.5 15.5 25
+0 spawn 34 Zombie 0 77.5 15.5 40
+0 spawn 35 Skeleton 0 75.5 15.5 50
+0 spawn 36 Skeleton 0 93.5 22.5 50
+0 spawn 37 Skeleton 0 92.5 22.5 50
+0 spawn 38 Rotting Zombie 0 81.5 61.5 25
+0 spawn 39 Rotting Zombie 0 80.5 70.5 25
+0 spawn 40 Skeleton 0 79.5 71.5 50
+0 spawn 41 Zombie 0 82.5 71.5 40
+0 spawn 42 Skeletal Archer 0 77.5 87.5 75
+0 spawn 43 Skeletal Archer 0 72.5 85.5 75
+0 spawn 44 Zombie 0 74.5 86.5 40
+0 spawn 45 Zombie 0 72.5 85.5 40
+0 spawn 46 Rotting Zombie 0 66.5 73.5 25
+0 rng 348
+1 rng 6
+2 rng 6
+3 rng 6
+4 rng 6
+5 rng 6
+6 rng 6
+7 rng 6
+8 rng 6
+9 rng 6
+10 rng 6
+11 rng 6
+12 rng 6
+13 rng 6
+14 rng 6
+15 rng 6
+16 rng 6
+17 rng 6
+18 rng 6
+19 rng 6
+20 state 0 2 80.5 38.5
+20 rng 7
+21 rng 6
+22 rng 6
+23 rng 6
+24 rng 6
+25 rng 6
+26 rng 6
+27 rng 6
+28 rng 6
+29 rng 6
+30 rng 6
+31 power 0 1 79.5 37.5
+31 state 1 5 79.5 37.5
+31 hit 1 255
+31 rng 11
+32 rng 6
+33 rng 6
+34 rng 6
+35 rng 6
+36 rng 6
+37 rng 6
+38 rng 6
+39 state 1 0 79.5 37.5
+39 rng 6
+40 rng 6
+41 rng 6
+42 rng 6
+43 state 0 0 80.5 38.5
+43 rng 6
+44 rng 6
+45 rng 6
+46 rng 6
+47 rng 6
+48 state 0 2 80.5 38.5
+48 rng 7
+49 rng 6
+50 rng 6
+51 rng 6
+52 rng 6
+53 rng 6
+54 rng 6
+55 rng 6
+56 rng 6
+57 rng 6
+58 rng 6
+59 power 0 1 79.5 37.5
+59 rng 9
+60 rng 6
+61 rng 6
+62 rng 6
+63 rng 6
+64 rng 6
+65 rng 6
+66 rng 6
+67 rng 6
+68 rng 6
+69 rng 6
+70 rng 6
+71 state 0 0 80.5 38.5
+71 rng 6
+72 rng 6
+73 rng 6
+74 rng 6
+75 rng 6
+76 state 0 2 80.5 38.5
+76 rng 7
+77 rng 6
+78 rng 6
+79 rng 6
+80 rng 6
+81 rng 6
+82 rng 6
+83 rng 6
+84 rng 6
+85 rng 6
+86 rng 6
+87 power 0 1 79.5 37.5
+87 state 1 5 79.5 37.5
+87 hit 1 234
+87 rng 11
+88 rng 6
+89 rng 6
+90 rng 6
+91 rng 6
+92 rng 6
+93 rng 6
+94 rng 6
+95 state 1 0 79.5 37.5
+95 rng 6
+96 rng 6
+97 rng 6
+98 rng 6
+99 state 0 0 80.5 38.5
+99 rng 6
+100 rng 6
+101 rng 6
+102 rng 6
+103 rng 6
+104 state 0 2 80.5 38.5
+104 rng 7
+105 rng 6
+106 rng 6
+107 rng 6
+108 rng 6
+109 rng 6
+110 rng 6
+111 rng 6
+112 rng 6
+113 rng 6
+114 rng 6
+115 power 0 1 79.5 37.5
+115 state 1 5 79.5 37.5
+115 hit 1 200
+115 rng 11
+116 rng 6
+117 rng 6
+118 rng 6
+119 rng 6
+120 rng 6
+121 rng 6
+122 rng 6
+123 state 1 0 79.5 37.5
+123 rng 6
+124 rng 6
+125 rng 6
+126 rng 6
+127 state 0 0 80.5 38.5
+127 rng 6
+128 rng 6
+129 rng 6
+130 rng 6
+131 rng 6
+132 state 0 2 80.5 38.5
+132 rng 7
+133 rng 6
+134 rng 6
+135 rng 6
+136 rng 6
+137 rng 6
+138 rng 6
+139 rng 6
+140 rng 6
+141 rng 6
+142 rng 6
+143 power 0 1 79.5 37.5
+143 state 1 5 79.5 37.5
+143 hit 1 171
+143 rng 11
+144 rng 6
+145 rng 6
+146 rng 6
+147 rng 6
+148 rng 6
+149 rng 6
+150 rng 6
+151 state 1 0 79.5 37.5
+151 rng 6
+152 rng 6
+153 rng 6
+154 rng 6
+155 state 0 0 80.5 38.5
+155 rng 6
+156 rng 6
+157 rng 6
+158 rng 6
+159 rng 6
+160 state 0 2 80.5 38.5
+160 rng 7
+161 rng 6
+162 rng 6
+163 rng 6
+164 rng 6
+165 rng 6
+166 rng 6
+167 rng 6
+168 rng 6
+169 rng 6
+170 rng 6
+171 power 0 1 79.5 37.5
+171 rng 9
+172 rng 6
+173 rng 6
+174 rng 6
+175 rng 6
+176 rng 6
+177 rng 6
+178 rng 6
+179 rng 6
+180 state 1 2 79.5 37.5
+180 state 2 2 74.5 42.5
+180 state 3 2 84.5 42.5
+180 state 4 2 75.5 38.5
+180 state 5 2 83.5 38.5
+180 rng 17
+181 rng 1
+182 rng 1
+183 state 0 0 80.5 38.5
+183 rng 1
+184 rng 1
+185 rng 1
+186 rng 1
+187 rng 1
+188 state 0 2 80.5 38.5
+188 rng 2
+189 rng 1
+190 rng 1
+191 rng 1
+192 rng 1
+193 rng 1
+194 rng 1
+195 power 1 137 80.5 38.5
+195 power 2 137 80.5 38.5
+195 power 3 137 80.5 38.5
+195 power 4 137 80.5 38.5
+195 power 5 137 80.5 38.5
+195 rng 11
+196 power 47 132 80.5 36.5
+196 power 48 132 75.5 41.5
+196 power 49 132 83.5 41.5
+196 power 50 132 74.5 39.5
+196 power 51 132 82.5 37.5
+196 spawn 47 Rotting Zombie 3 80.5 36.5 25
+196 spawn 48 Rotting Zombie 3 75.5 41.5 25
+196 spawn 49 Rotting Zombie 3 83.5 41.5 25
+196 spawn 50 Rotting Zombie 3 74.5 39.5 25
+196 spawn 51 Rotting Zombie 3 82.5 37.5 25
+196 rng 16
+197 rng 1
+198 rng 1
+199 power 0 1 79.5 37.5
+199 state 1 5 79.5 37.5
+199 hit 1 124
+199 rng 6
+200 rng 1
+201 rng 1
+202 rng 1
+203 rng 1
+204 rng 1
+205 rng 1
+206 rng 1
+207 state 1 0 79.5 37.5
+207 rng 1
+208 rng 1
+209 rng 1
+210 rng 1
+211 state 0 0 80.5 38.5
+211 state 2 0 74.5 42.5
+211 state 3 0 84.5 42.5
+211 state 4 0 75.5 38.5
+211 state 5 0 83.5 38.5
+211 rng 1
+212 rng 6
+213 rng 6
+214 rng 6
+215 rng 6
+216 state 0 2 80.5 38.5
+216 rng 7
+217 rng 6
+218 rng 6
+219 rng 6
+220 rng 6
+221 rng 6
+222 rng 6
+223 rng 6
+224 rng 6
+225 rng 6
+226 rng 6
+227 power 0 1 79.5 37.5
+227 state 1 5 79.5 37.5
+227 hit 1 75
+227 rng 11
+228 rng 6
+229 rng 6
+230 rng 6
+231 rng 6
+232 rng 6
+233 rng 6
+234 rng 6
+235 state 1 0 79.5 37.5
+235 rng 6
+236 rng 6
+237 rng 6
+238 rng 6
+239 state 0 0 80.5 38.5
+239 rng 6
+240 rng 6
+241 rng 6
+242 rng 6
+243 rng 6
+244 state 0 2 80.5 38.5
+244 rng 7
+245 rng 6
+246 rng 6
+247 rng 6
+248 rng 6
+249 rng 6
+250 rng 6
+251 rng 6
+252 rng 6
+253 rng 6
+254 rng 6
+255 power 0 1 79.5 37.5
+255 rng 9
+256 rng 6
+257 rng 6
+258 rng 6
+259 state 47 0 80.5 36.5
+259 state 48 0 75.5 41.5
+259 state 49 0 83.5 41.5
+259 state 50 0 74.5 39.5
+259 state 51 0 82.5 37.5
+259 rng 6
+260 rng 13
+261 state 47 1 80.5 36.5250015
+261 rng 13
+262 rng 11
+263 rng 11
+264 rng 11
+265 rng 11
+266 rng 11
+267 state 0 0 80.5 38.5
+267 rng 11
+268 rng 11
+269 rng 11
+270 rng 11
+271 state 48 1 75.5176773 41.4823227
+271 rng 11
+272 state 0 2 80.5 38.5
+272 rng 11
+273 rng 10
+274 rng 10
+275 rng 10
+276 rng 10
+277 rng 10
+278 rng 10
+279 state 50 1 74.5250015 39.5
+279 rng 10
+280 rng 9
+281 rng 9
+282 rng 9
+283 power 0 1 79.5 37.5
+283 state 1 5 79.5 37.5
+283 hit 1 30
+283 rng 14
+284 rng 9
+285 rng 9
+286 rng 9
+287 rng 9
+288 rng 9
+289 rng 9
+290 rng 9
+291 state 1 0 79.5 37.5
+291 state 49 1 83.4823227 41.4823227
+291 rng 9
+292 rng 8
+293 rng 8
+294 state 51 1 82.4823227 37.5176773
+294 rng 8
+295 state 0 0 80.5 38.5
+295 rng 6
+296 state 47 0 80.5 37.3750534
+296 rng 7
+297 rng 7
+298 rng 7
+299 rng 7
+300 state 0 2 80.5 38.5
+300 rng 8
+301 rng 7
+302 rng 7
+303 rng 7
+304 rng 7
+305 rng 7
+306 rng 7
+307 rng 7
+308 rng 7
+309 rng 7
+310 rng 7
+311 power 0 1 79.5 37.5
+311 state 1 6 79.5 37.5
+311 hit 1 0
+311 rng 13
+312 state 47 6 80.5 37.3750534
+312 hit 47 0
+312 rng 8
+313 rng 6
+314 rng 6
+315 rng 6
+316 rng 6
+317 rng 6
+318 rng 6
+319 rng 6
+320 rng 6
+321 rng 6
+322 rng 6
+323 state 0 0 80.5 38.5
+323 rng 6
+324 rng 6
+325 rng 6
+326 rng 6
+327 rng 6
+328 state 0 2 80.5 38.5
+328 rng 7
+329 rng 6
+330 rng 6
+331 rng 6
+332 rng 6
+333 rng 6
+334 rng 6
+335 rng 6
+336 rng 6
+337 rng 6
+338 rng 6
+339 power 0 1 80.4583359 38.4583321
+339 rng 6
+340 rng 6
+341 rng 6
+342 rng 6
+343 state 51 0 81.4580307 37.9419327
+343 rng 7
+344 rng 7
+345 rng 7
+346 rng 7
+347 rng 7
+348 rng 7
+349 rng 7
+350 rng 7
+351 state 0 0 80.5 38.5
+351 rng 7
+352 rng 7
+353 rng 7
+354 rng 7
+355 rng 7
+356 state 0 2 80.5 38.5
+356 rng 8
+357 rng 7
+358 rng 7
+359 rng 7
+360 rng 7
+361 rng 7
+362 rng 7
+363 rng 7
+364 rng 8
+365 rng 7
+366 rng 7
+367 power 0 1 80.4583359 38.4583321
+367 rng 7
+368 rng 7
+369 rng 7
+370 rng 7
+371 rng 7
+372 rng 7
+373 rng 7
+374 rng 7
+375 rng 7
+376 rng 7
+377 rng 7
+378 rng 7
+379 state 0 0 80.5 38.5
+379 rng 7
+380 rng 7
+381 rng 7
+382 rng 7
+383 rng 7
+384 state 0 2 80.5 38.5
+384 rng 8
+385 state 51 2 81.4580307 37.9419327
+385 rng 9
+386 rng 6
+387 rng 6
+388 rng 7
+389 rng 6
+390 rng 6
+391 state 2 2 74.5 42.5
+391 state 3 2 84.5 42.5
+391 state 4 2 75.5 38.5
+391 state 5 2 83.5 38.5
+391 rng 14
+392 rng 1
+393 rng 1
+394 rng 1
+395 power 0 1 80.4583359 38.4583321
+395 rng 1
+396 rng 1
+397 rng 1
+398 rng 1
+399 rng 1
+400 power 51 1 80.5 38.5
+400 rng 4
+401 rng 1
+402 rng 1
+403 rng 1
+404 rng 1
+405 rng 1
+406 power 2 137 80.5 38.5
+406 power 3 137 80.5 38.5
+406 power 4 137 80.5 38.5
+406 power 5 137 80.5 38.5
+406 rng 9
+407 power 52 132 75.5 41.5
+407 power 53 132 84.5 41.5
+407 power 54 132 74.5 38.5
+407 power 55 132 82.5 39.5
+407 state 0 0 80.5 38.5
+407 spawn 52 Rotting Zombie 3 75.5 41.5 25
+407 spawn 53 Rotting Zombie 3 84.5 41.5 25
+407 spawn 54 Rotting Zombie 3 74.5 38.5 25
+407 spawn 55 Rotting Zombie 3 82.5 39.5 25
+407 rng 17
+408 rng 1
+409 rng 1
+410 rng 1
+411 rng 1
+412 state 0 2 80.5 38.5
+412 rng 2
+413 rng 1
+414 rng 1
+415 rng 1
+416 state 49 0 81.2903366 39.2903366
+416 state 51 0 81.4580307 37.9419327
+416 rng 2
+417 rng 2
+418 rng 2
+419 rng 2
+420 rng 2
+421 rng 2
+422 state 2 0 74.5 42.5
+422 state 3 0 84.5 42.5
+422 state 4 0 75.5 38.5
+422 state 5 0 83.5 38.5
+422 rng 2
+423 power 0 1 80.4583359 38.4583321
+423 rng 7
+424 rng 7
+425 rng 7
+426 rng 7
+427 rng 7
+428 rng 7
+429 rng 7
+430 rng 7
+431 rng 11
+432 rng 7
+433 rng 7
+434 rng 7
+435 state 0 0 80.5 38.5
+435 rng 7
+436 rng 7
+437 rng 7
+438 rng 7
+439 rng 7
+440 state 0 2 80.5 38.5
+440 rng 8
+441 rng 7
+442 rng 7
+443 rng 7
+444 rng 7
+445 rng 7
+446 rng 7
+447 rng 7
+448 rng 7
+449 rng 7
+450 rng 7
+451 power 0 1 80.4583359 38.4583321
+451 rng 7
+452 rng 7
+453 rng 7
+454 rng 7
+455 rng 11
+456 rng 7
+457 rng 7
+458 rng 7
+459 rng 7
+460 rng 7
+461 rng 7
+462 rng 7
+463 state 0 0 80.5 38.5
+463 rng 7
+464 rng 7
+465 rng 7
+466 rng 8
+467 rng 8
+468 state 0 2 80.5 38.5
+468 rng 9
+469 rng 8
+470 state 49 2 81.2903366 39.2903366
+470 state 52 0 75.5 41.5
+470 state 53 0 84.5 41.5
+470 state 54 0 74.5 38.5
+470 state 55 0 82.5 39.5
+470 rng 10
+471 rng 12
+472 rng 12
+473 state 48 0 79.5175934 39.0074997
+473 rng 13
+474 rng 13
+475 state 53 1 84.4823227 41.4823227
+475 rng 13
+476 rng 12
+477 state 54 1 74.5176773 38.5176773
+477 rng 12
+478 rng 11
+479 power 0 1 80.4583359 38.4583321
+479 rng 15
+480 rng 11
+481 rng 11
+482 rng 11
+483 rng 11
+484 rng 12
+485 power 49 1 80.5 38.5
+485 rng 14
+486 rng 11
+487 rng 11
+488 rng 11
+489 rng 11
+490 rng 11
+491 state 0 0 80.5 38.5
+491 rng 11
+492 rng 11
+493 rng 11
+494 state 50 0 79.385437 38.6514893
+494 rng 12
+495 state 55 1 82.4823227 39.4823227
+495 rng 12
+496 state 0 2 80.5 38.5
+496 rng 11
+497 rng 10
+498 rng 10
+499 rng 10
+500 rng 10
+501 state 49 0 81.2903366 39.2903366
+501 rng 10
+502 rng 10
+503 rng 14
+504 rng 10
+505 rng 10
+506 rng 10
+507 power 0 1 80.4583359 38.4583321
+507 state 50 6 79.385437 38.6514893
+507 hit 50 0
+507 rng 13
+508 rng 10
+509 rng 9
+510 rng 9
+511 rng 9
+512 rng 9
+513 rng 9
+514 rng 9
+515 rng 9
+516 rng 9
+517 rng 9
+518 rng 9
+519 state 0 0 80.5 38.5
+519 rng 9
+520 rng 9
+521 rng 9
+522 rng 9
+523 rng 9
+524 state 0 2 80.5 38.5
+524 rng 10
+525 rng 9
+526 rng 9
+527 rng 11
+528 rng 9
+529 state 52 1 75.5176773 41.4823227
+529 rng 9
+530 rng 8
+531 rng 8
+532 rng 9
+533 state 48 2 79.5175934 39.0074997
+533 rng 10
+534 rng 7
+535 power 0 1 80.4583359 38.4583321
+535 rng 7
+536 rng 7
+537 rng 7
+538 rng 7
+539 rng 7
+540 rng 7
+541 rng 7
+542 rng 7
+543 state 55 0 81.5343018 38.9343262
+543 rng 8
+544 rng 8
+545 rng 8
+546 rng 8
+547 state 0 0 80.5 38.5
+547 rng 8
+548 power 48 1 80.5 38.5
+548 rng 11
+549 rng 8
+550 rng 8
+551 rng 11
+552 state 0 2 80.5 38.5
+552 rng 10
+553 rng 9
+554 rng 9
+555 state 55 2 81.5343018 38.9343262
+555 rng 11
+556 rng 9
+557 rng 8
+558 rng 8
+559 rng 8
+560 rng 8
+561 rng 8
+562 rng 8
+563 power 0 1 80.4583359 38.4583321
+563 rng 8
+564 state 48 0 79.5175934 39.0074997
+564 rng 8
+565 rng 8
+566 state 49 2 81.2903366 39.2903366
+566 rng 10
+567 rng 7
+568 rng 7
+569 rng 7
+570 power 55 1 80.5 38.5
+570 rng 10
+571 rng 7
+572 rng 7
+573 rng 7
+574 rng 7
+575 state 0 0 80.5 38.5
+575 rng 9
+576 rng 7
+577 rng 7
+578 rng 7
+579 rng 7
+580 state 0 2 80.5 38.5
+580 rng 9
+581 power 49 1 80.5 38.5
+581 state 0 5 80.5 38.5
+581 hit 0 77
+581 rng 12
+582 rng 7
+583 rng 7
+584 rng 7
+585 rng 7
+586 state 55 0 81.5343018 38.9343262
+586 rng 7
+587 rng 7
+588 rng 7
+589 rng 7
+590 state 0 0 80.5 38.5
+590 rng 7
+591 rng 7
+592 rng 7
+593 rng 7
+594 rng 7
+595 rng 7
+596 rng 7
+597 state 49 0 81.2903366 39.2903366
+597 rng 7
+598 rng 7
+599 rng 9
+600 rng 7
+601 rng 7
+602 state 2 2 74.5 42.5
+602 state 3 2 84.5 42.5
+602 state 4 2 75.5 38.5
+602 state 5 2 83.5 38.5
+602 rng 15
+603 rng 2
+604 state 0 2 80.5 38.5
+604 rng 4
+605 rng 2
+606 rng 2
+607 rng 2
+608 rng 2
+609 rng 2
+610 rng 2
+611 rng 2
+612 rng 2
+613 rng 2
+614 rng 3
+615 power 0 1 80.4583359 38.4583321
+615 rng 3
+616 rng 3
+617 power 2 137 80.5 38.5
+617 power 3 137 80.5 38.5
+617 power 4 137 80.5 38.5
+617 power 5 137 80.5 38.5
+617 rng 11
+618 power 56 132 75.5 43.5
+618 power 57 132 85.5 43.5
+618 power 58 132 76.5 37.5
+618 power 59 132 82.5 37.5
+618 spawn 56 Rotting Zombie 3 75.5 43.5 25
+618 spawn 57 Rotting Zombie 3 85.5 43.5 25
+618 spawn 58 Rotting Zombie 3 76.5 37.5 25
+618 spawn 59 Rotting Zombie 3 82.5 37.5 25
+618 rng 18
+619 rng 3
+620 rng 3
+621 rng 3
+622 rng 3
+623 rng 5
+624 rng 3
+625 rng 3
+626 rng 3
+627 state 0 0 80.5 38.5
+627 rng 3
+628 rng 4
+629 rng 3
+630 rng 3
+631 rng 3
+632 state 0 2 80.5 38.5
+632 rng 4
+633 state 2 0 74.5 42.5
+633 state 3 0 84.5 42.5
+633 state 4 0 75.5 38.5
+633 state 5 0 83.5 38.5
+633 rng 3
+634 rng 8
+635 rng 8
+636 rng 9
+637 rng 9
+638 rng 9
+639 rng 9
+640 rng 9
+641 rng 9
+642 rng 12
+643 power 0 1 80.4583359 38.4583321
+643 rng 9
+644 rng 9
+645 rng 9
+646 rng 9
+647 rng 12
+648 rng 10
+649 rng 10
+650 rng 10
+651 rng 10
+652 rng 11
+653 rng 10
+654 rng 10
+655 state 0 0 80.5 38.5
+655 rng 10
+656 state 48 2 79.5175934 39.0074997
+656 rng 12
+657 rng 9
+658 rng 9
+659 rng 9
+660 state 0 2 80.5 38.5
+660 rng 10
+661 rng 9
+662 rng 9
+663 rng 9
+664 state 53 0 80.9321594 39.5219421
+664 rng 10
+665 rng 10
+666 rng 13
+667 rng 10
+668 rng 10
+669 rng 10
+670 rng 10
+671 power 0 1 80.4583359 38.4583321
+671 power 48 1 80.5 38.5
+671 state 0 5 80.5 38.5
+671 hit 0 65.7502594
+671 rng 15
+672 rng 10
+673 rng 10
+674 rng 10
+675 rng 10
+676 rng 11
+677 rng 10
+678 rng 10
+679 rng 10
+680 state 0 0 80.5 38.5
+680 rng 10
+681 state 56 0 75.5 43.5
+681 state 57 0 85.5 43.5
+681 state 58 0 76.5 37.5
+681 state 59 0 82.5 37.5
+681 rng 10
+682 state 49 2 81.2903366 39.2903366
+682 rng 17
+683 rng 14
+684 state 0 2 80.5 38.5
+684 rng 15
+685 rng 14
+686 rng 14
+687 state 48 0 79.5175934 39.0074997
+687 rng 14
+688 rng 14
+689 rng 14
+690 rng 18
+691 rng 14
+692 rng 14
+693 rng 14
+694 rng 14
+695 power 0 1 80.4583359 38.4583321
+695 rng 15
+696 rng 14
+697 power 49 1 80.5 38.5
+697 rng 17
+698 state 54 0 79.4613724 38.9065781
+698 rng 15
+699 state 53 2 80.9321594 39.5219421
+699 state 58 1 76.5250015 37.5
+699 rng 17
+700 rng 15
+701 rng 13
+702 rng 13
+703 state 54 2 79.4613724 38.9065781
+703 rng 15
+704 state 57 1 85.4823227 43.4823227
+704 state 59 1 82.4823227 37.4823227
+704 rng 12
+705 rng 9
+706 state 56 1 75.5176773 43.4823227
+706 rng 9
+707 state 0 0 80.5 38.5
+707 rng 8
+708 rng 8
+709 rng 8
+710 rng 8
+711 rng 8
+712 state 0 2 80.5 38.5
+712 rng 9
+713 state 49 0 81.2903366 39.2903366
+713 rng 8
+714 power 53 1 80.5 38.5
+714 rng 15
+715 rng 8
+716 rng 8
+717 rng 8
+718 power 54 1 80.5 38.5
+718 rng 11
+719 rng 9
+720 rng 8
+721 rng 8
+722 rng 8
+723 power 0 1 80.9321594 39.5219421
+723 state 53 7 80.9321594 39.5219421
+723 hit 53 0
+723 rng 16
+724 rng 13
+725 rng 10
+726 rng 10
+727 rng 10
+728 rng 10
+729 rng 10
+730 rng 10
+731 rng 10
+732 rng 10
+733 rng 10
+734 state 54 0 79.4613724 38.9065781
+734 rng 10
+735 state 0 0 80.5 38.5
+735 rng 10
+736 rng 10
+737 state 48 2 79.5175934 39.0074997
+737 rng 13
+738 rng 14
+739 rng 10
+740 state 0 2 80.5 38.5
+740 rng 11
+741 rng 10
+742 rng 10
+743 rng 11
+744 rng 10
+745 rng 10
+746 rng 10
+747 rng 10
+748 rng 12
+749 rng 10
+750 rng 10
+751 power 0 1 80.4583359 38.4583321
+751 state 52 5 78.999115 38.1271973
+751 hit 52 6
+751 rng 15
+752 power 48 1 80.5 38.5
+752 rng 11
+753 rng 8
+754 rng 8
+755 rng 8
+756 rng 8
+757 rng 8
+758 rng 8
+759 state 52 0 78.999115 38.1271973
+759 rng 8
+760 rng 10
+761 rng 10
+762 rng 14
+763 state 0 0 80.5 38.5
+763 rng 11
+764 rng 11
+765 rng 11
+766 state 52 1 78.999115 38.10952
+766 rng 11
+767 rng 10
+768 state 0 2 80.5 38.5
+768 state 48 0 79.5175934 39.0074997
+768 rng 10
+769 rng 9
+770 rng 9
+771 rng 9
+772 rng 11
+773 rng 9
+774 rng 9
+775 rng 9
+776 rng 9
+777 rng 9
+778 rng 9
+779 power 0 1 80.4583359 38.4583321
+779 rng 12
+780 rng 9
+781 rng 9
+782 rng 9
+783 rng 9
+784 rng 10
+785 rng 10
+786 rng 13
+787 rng 10
+788 rng 10
+789 rng 10
+790 rng 10
+791 state 0 0 80.5 38.5
+791 rng 11
+792 rng 10
+793 rng 10
+794 rng 10
+795 rng 10
+796 state 0 2 80.5 38.5
+796 rng 13
+797 rng 10
+798 rng 10
+799 rng 10
+800 rng 10
+801 rng 10
+802 rng 10
+803 rng 10
+804 rng 10
+805 rng 10
+806 rng 10
+807 power 0 1 80.4583359 38.4583321
+807 rng 16
+808 rng 10
+809 rng 10
+810 rng 13
+811 rng 10
+812 rng 10
+813 state 2 2 74.5 42.5
+813 state 3 2 84.5 42.5
+813 state 4 2 75.5 38.5
+813 state 5 2 83.5 38.5
+813 state 59 0 80.9369659 37.4775009
+813 rng 19
+814 rng 6
+815 state 49 2 81.2903366 39.2903366
+815 rng 9
+816 rng 5
+817 rng 5
+818 rng 6
+819 state 0 0 80.5 38.5
+819 rng 6
+820 rng 8
+821 rng 6
+822 rng 6
+823 rng 6
+824 state 0 2 80.5 38.5
+824 rng 7
+825 rng 6
+826 rng 6
+827 state 54 2 79.4613724 38.9065781
+827 rng 8
+828 power 2 137 80.5 38.5
+828 power 3 137 80.5 38.5
+828 power 4 137 80.5 38.5
+828 power 5 137 80.5 38.5
+828 rng 13
+829 power 60 132 73.5 41.5
+829 power 61 132 84.5 43.5
+829 power 62 132 74.5 37.5
+829 power 63 132 82.5 37.5
+829 state 58 0 79.6110382 37.8358688
+829 spawn 60 Rotting Zombie 3 73.5 41.5 25
+829 spawn 61 Rotting Zombie 3 84.5 43.5 25
+829 spawn 62 Rotting Zombie 3 74.5 37.5 25
+829 spawn 63 Rotting Zombie 3 82.5 37.5 25
+829 rng 22
+830 power 49 1 80.5 38.5
+830 state 48 2 79.5175934 39.0074997
+830 rng 11
+831 rng 5
+832 rng 5
+833 rng 5
+834 rng 8
+835 power 0 1 79.5226517 37.7474823
+835 state 52 6 78.999115 37.7382965
+835 hit 52 0
+835 rng 8
+836 rng 6
+837 rng 5
+838 rng 5
+839 rng 5
+840 rng 5
+841 rng 5
+842 power 54 1 80.5 38.5
+842 rng 8
+843 rng 5
+844 state 2 0 74.5 42.5
+844 state 3 0 84.5 42.5
+844 state 4 0 75.5 38.5
+844 state 5 0 83.5 38.5
+844 rng 7
+845 power 48 1 80.5 38.5
+845 rng 13
+846 state 49 0 81.2903366 39.2903366
+846 rng 10
+847 state 0 0 80.5 38.5
+847 rng 10
+848 rng 10
+849 rng 10
+850 rng 10
+851 rng 10
+852 state 0 2 80.5 38.5
+852 rng 11
+853 rng 14
+854 rng 10
+855 rng 10
+856 rng 10
+857 rng 10
+858 state 54 0 79.4613724 38.9065781
+858 rng 13
+859 state 51 2 81.4580307 37.9419327
+859 rng 12
+860 rng 9
+861 state 48 0 79.5175934 39.0074997
+861 rng 9
+862 rng 9
+863 power 0 1 79.6110382 37.8358688
+863 state 58 6 79.6110382 37.8358688
+863 hit 58 0
+863 rng 12
+864 rng 9
+865 rng 8
+866 rng 8
+867 rng 8
+868 rng 10
+869 rng 8
+870 rng 8
+871 rng 8
+872 rng 8
+873 rng 8
+874 power 51 1 80.5 38.5
+874 state 0 5 80.5 38.5
+874 hit 0 57.6980667
+874 rng 13
+875 rng 8
+876 rng 8
+877 rng 12
+878 rng 8
+879 rng 8
+880 rng 8
+881 rng 8
+882 rng 10
+883 state 0 0 80.5 38.5
+883 rng 8
+884 state 0 2 80.5 38.5
+884 state 59 2 80.9369659 37.4775009
+884 rng 11
+885 rng 7
+886 rng 7
+887 rng 7
+888 rng 7
+889 rng 7
+890 state 51 0 81.4580307 37.9419327
+890 rng 7
+891 rng 7
+892 state 60 0 73.5 41.5
+892 state 61 0 84.5 43.5
+892 state 62 0 74.5 37.5
+892 state 63 0 82.5 37.5
+892 rng 9
+893 rng 12
+894 rng 12
+895 power 0 1 80.4583359 38.4583321
+895 rng 12
+896 rng 13
+897 rng 13
+898 rng 13
+899 power 59 1 80.5 38.5
+899 state 0 5 80.5 38.5
+899 hit 0 49.1841545
+899 rng 18
+900 rng 13
+901 state 63 1 82.5 37.5250015
+901 rng 17
+902 rng 11
+903 rng 11
+904 rng 11
+905 rng 11
+906 rng 13
+907 rng 11
+908 state 0 0 80.5 38.5
+908 rng 12
+909 state 0 2 80.5 38.5
+909 rng 13
+910 state 62 1 74.5250015 37.5
+910 rng 12
+911 rng 12
+912 rng 12
+913 rng 12
+914 state 61 1 84.4823227 43.4823227
+914 rng 12
+915 state 59 0 80.9369659 37.4775009
+915 rng 11
+916 rng 13
+917 rng 11
+918 rng 11
+919 rng 11
+920 power 0 1 80.4583359 38.4583321
+920 rng 11
+921 rng 11
+922 rng 11
+923 rng 11
+924 rng 11
+925 rng 15
+926 rng 11
+927 rng 11
+928 rng 11
+929 rng 11
+930 rng 13
+931 rng 11
+932 state 0 0 80.5 38.5
+932 rng 11
+933 rng 11
+934 rng 11
+935 rng 11
+936 rng 11
+937 state 0 2 80.5 38.5
+937 rng 12
+938 rng 11
+939 rng 11
+940 rng 14
+941 rng 12
+942 rng 12
+943 rng 12
+944 state 60 1 73.5176773 41.4823227
+944 rng 12
+945 rng 11
+946 rng 11
+947 rng 11
+948 power 0 1 80.4583359 38.4583321
+948 rng 11
+949 rng 15
+950 rng 11
+951 rng 11
+952 state 55 2 81.5343018 38.9343262
+952 rng 13
+953 rng 10
+954 rng 11
+955 rng 10
+956 rng 10
+957 state 49 2 81.2903366 39.2903366
+957 rng 12
+958 state 51 2 81.4580307 37.9419327
+958 rng 11
+959 rng 8
+960 state 0 0 80.5 38.5
+960 rng 8
+961 rng 8
+962 rng 8
+963 rng 8
+964 rng 10
+965 state 0 2 80.5 38.5
+965 rng 10
+966 rng 9
+967 power 55 1 80.5 38.5
+967 state 0 5 80.5 38.5
+967 hit 0 39.5063133
+967 rng 14
+968 rng 9
+969 rng 9
+970 state 56 0 80.0597534 39.5292664
+970 rng 10
+971 state 56 2 80.0597534 39.5292664
+971 rng 12
+972 power 49 1 80.5 38.5
+972 rng 12
+973 power 51 1 80.5 38.5
+973 rng 16
+974 rng 9
+975 rng 9
+976 state 0 0 80.5 38.5
+976 rng 9
+977 rng 9
+978 rng 10
+979 rng 9
+980 state 59 2 80.9369659 37.4775009
+980 rng 11
+981 rng 8
+982 rng 8
+983 state 55 0 81.5343018 38.9343262
+983 rng 8
+984 rng 8
+985 rng 8
+986 power 56 1 80.5 38.5
+986 rng 11
+987 rng 8
+988 state 49 0 81.2903366 39.2903366
+988 rng 10
+989 state 0 2 80.5 38.5
+989 state 51 0 81.4580307 37.9419327
+989 rng 9
+990 rng 8
+991 rng 8
+992 rng 8
+993 rng 8
+994 rng 8
+995 power 59 1 80.5 38.5
+995 state 0 5 80.5 38.5
+995 hit 0 33.0507317
+995 rng 13
+996 rng 8
+997 rng 12
+998 rng 8
+999 rng 8
+1000 rng 8
+1001 rng 8
+1002 state 56 0 80.0597534 39.5292664
+1002 rng 9
+1003 rng 8
+1004 state 0 0 80.5 38.5
+1004 rng 8
+1005 rng 8
+1006 rng 8
+1007 rng 8
+1008 rng 8
+1009 rng 8
+1010 state 48 2 79.5175934 39.0074997
+1010 rng 10
+1011 state 59 0 80.9369659 37.4775009
+1011 rng 7
+1012 rng 9
+1013 state 0 2 80.5 38.5
+1013 rng 8
+1014 rng 7
+1015 rng 7
+1016 rng 7
+1017 rng 7
+1018 rng 7
+1019 rng 7
+1020 rng 7
+1021 rng 11
+1022 rng 7
+1023 rng 7
+1024 power 0 1 80.4583359 38.4583321
+1024 state 2 2 74.5 42.5
+1024 state 3 2 84.5 42.5
+1024 state 4 2 75.5 38.5
+1024 state 5 2 83.5 38.5
+1024 rng 15
+1025 power 48 1 80.5 38.5
+1025 rng 5
+1026 rng 3
+1027 rng 2
+1028 rng 2
+1029 rng 2
+1030 rng 2
+1031 rng 2
+1032 rng 2
+1033 rng 3
+1034 rng 3
+1035 rng 3
+1036 state 0 0 80.5 38.5
+1036 rng 5
+1037 rng 3
+1038 rng 4
+1039 power 2 137 80.5 38.5
+1039 power 3 137 80.5 38.5
+1039 power 4 137 80.5 38.5
+1039 power 5 137 80.5 38.5
+1039 rng 13
+1040 power 64 132 74.5 43.5
+1040 power 65 132 84.5 43.5
+1040 power 66 132 76.5 39.5
+1040 power 67 132 84.5 39.5
+1040 spawn 64 Rotting Zombie 3 74.5 43.5 25
+1040 spawn 65 Rotting Zombie 3 84.5 43.5 25
+1040 spawn 66 Rotting Zombie 3 76.5 39.5 25
+1040 spawn 67 Rotting Zombie 3 84.5 39.5 25
+1040 rng 21
+1041 state 0 2 80.5 38.5
+1041 state 48 0 79.5175934 39.0074997
+1041 rng 6
+1042 rng 5
+1043 rng 5
+1044 rng 5
+1045 rng 9
+1046 rng 5
+1047 rng 5
+1048 rng 5
+1049 rng 5
+1050 rng 6
+1051 rng 5
+1052 power 0 1 80.4583359 38.4583321
+1052 rng 6
+1053 rng 6
+1054 rng 6
+1055 state 2 0 74.5 42.5
+1055 state 3 0 84.5 42.5
+1055 state 4 0 75.5 38.5
+1055 state 5 0 83.5 38.5
+1055 rng 6
+1056 rng 11
+1057 rng 11
+1058 state 54 2 79.4613724 38.9065781
+1058 rng 13
+1059 rng 10
+1060 rng 12
+1061 rng 11
+1062 rng 11
+1063 rng 11
+1064 state 0 0 80.5 38.5
+1064 rng 15
+1065 rng 11
+1066 rng 11
+1067 state 56 2 80.0597534 39.5292664
+1067 rng 13
+1068 rng 10
+1069 state 0 2 80.5 38.5
+1069 rng 15
+1070 state 55 2 81.5343018 38.9343262
+1070 rng 12
+1071 rng 9
+1072 rng 9
+1073 power 54 1 80.5 38.5
+1073 rng 12
+1074 rng 10
+1075 rng 9
+1076 rng 9
+1077 rng 9
+1078 rng 9
+1079 rng 9
+1080 power 0 1 80.4583359 38.4583321
+1080 rng 9
+1081 rng 9
+1082 power 56 1 80.5 38.5
+1082 state 0 5 80.5 38.5
+1082 hit 0 24.7423172
+1082 rng 14
+1083 state 49 2 81.2903366 39.2903366
+1083 rng 11
+1084 rng 10
+1085 power 55 1 80.5 38.5
+1085 rng 11
+1086 rng 8
+1087 rng 8
+1088 rng 12
+1089 state 54 0 79.4613724 38.9065781
+1089 rng 8
+1090 rng 8
+1091 state 0 0 80.5 38.5
+1091 rng 9
+1092 rng 9
+1093 state 0 2 80.5 38.5
+1093 rng 14
+1094 rng 9
+1095 state 59 2 80.9369659 37.4775009
+1095 rng 11
+1096 rng 8
+1097 rng 8
+1098 power 49 1 80.5 38.5
+1098 state 0 5 80.5 38.5
+1098 hit 0 14.0534134
+1098 state 56 0 80.0597534 39.5292664
+1098 rng 14
+1099 rng 8
+1100 rng 8
+1101 state 55 0 81.5343018 38.9343262
+1101 rng 8
+1102 rng 8
+1103 state 64 0 74.5 43.5
+1103 state 65 0 84.5 43.5
+1103 state 66 0 76.5 39.5
+1103 state 67 0 84.5 39.5
+1103 rng 8
+1104 rng 12
+1105 rng 12
+1106 rng 12
+1107 state 0 0 80.5 38.5
+1107 rng 12
+1108 rng 14
+1109 state 67 1 84.4823227 39.4823227
+1109 rng 12
+1110 power 59 1 80.5 38.5
+1110 rng 14
+1111 rng 11
+1112 rng 15
+1113 rng 11
+1114 state 49 0 81.2903366 39.2903366
+1114 state 64 1 74.5176773 43.4823227
+1114 rng 11
+1115 rng 10
+1116 rng 10
+1117 state 0 2 80.5 38.5
+1117 rng 15
+1118 rng 10
+1119 rng 10
+1120 state 65 1 84.4823227 43.4823227
+1120 rng 10
+1121 rng 9
+1122 rng 10
+1123 rng 9
+1124 rng 9
+1125 rng 9
+1126 state 59 0 80.9369659 37.4775009
+1126 rng 9
+1127 rng 9
+1128 power 0 1 80.4583359 38.4583321
+1128 rng 9
+1129 rng 9
+1130 rng 9
+1131 rng 9
+1132 rng 11
+1133 rng 9
+1134 state 66 1 76.5176773 39.4823227
+1134 rng 9
+1135 rng 8
+1136 rng 12
+1137 rng 8
+1138 state 62 0 78.9993973 39.9925003
+1138 rng 8
+1139 rng 11
+1140 state 0 0 80.5 38.5
+1140 rng 11
+1141 rng 15
+1142 rng 11
+1143 rng 11
+1144 state 51 2 81.4580307 37.9419327
+1144 rng 13
+1145 state 0 2 80.5 38.5
+1145 rng 11
+1146 rng 11
+1147 rng 10
+1148 rng 11
+1149 rng 11
+1150 rng 11
+1151 rng 12
+1152 rng 12
+1153 rng 12
+1154 rng 12
+1155 rng 12
+1156 power 0 1 80.4583359 38.4583321
+1156 rng 14
+1157 rng 12
+1158 rng 12
+1159 power 51 1 80.5 38.5
+1159 rng 15
+1160 rng 16
+1161 rng 12
+1162 rng 12
+1163 rng 12
+1164 rng 13
+1165 rng 17
+1166 state 48 2 79.5175934 39.0074997
+1166 rng 15
+1167 state 56 2 80.0597534 39.5292664
+1167 rng 14
+1168 state 0 0 80.5 38.5
+1168 state 62 1 78.9993973 39.9674988
+1168 rng 11
+1169 rng 9
+1170 rng 10
+1171 rng 9
+1172 rng 9
+1173 state 0 2 80.5 38.5
+1173 rng 10
+1174 rng 9
+1175 state 51 0 81.4580307 37.9419327
+1175 rng 9
+1176 rng 10
+1177 rng 10
+1178 rng 10
+1179 rng 10
+1180 rng 12
+1181 power 48 1 80.5 38.5
+1181 state 0 5 80.5 38.5
+1181 hit 0 2.66730404
+1181 rng 15
+1182 power 56 1 80.5 38.5
+1182 state 0 6 80.5 38.5
+1182 hit 0 0
+1182 state 59 2 80.9369659 37.4775009
+1182 rng 15
+1183 state 57 0 77.5039444 40.4242554
+1183 state 60 0 77.9996262 39.5757446
+1183 state 61 0 80.6287766 40.3181915
+1183 state 62 0 78.9993973 39.6174774
+1183 state 63 0 78.9771805 41.1667023
+1183 state 64 0 75.7197342 42.2802658
+1183 state 65 0 83.3863297 42.3863297
+1183 state 66 0 77.4922791 38.998024
+1183 state 67 0 83.016098 39
+1183 rng 2
+1184 rng 1
+1185 rng 1
+1186 rng 1
+1187 rng 1
+1188 rng 1
+1189 rng 1
+1190 rng 1
+1191 rng 1
+1192 rng 1
+1193 rng 1
+1194 rng 1
+1195 rng 1
+1196 rng 1
+1197 power 59 1 80.5 38.5
+1197 state 48 0 79.5175934 39.0074997
+1197 rng 1
+1198 state 56 0 80.0597534 39.5292664
+1198 rng 1
+1199 rng 1
+1200 rng 1
+1201 rng 1
+1202 rng 1
+1203 rng 1
+1204 rng 1
+1205 rng 1
+1206 rng 1
+1207 rng 1
+1208 rng 1
+1209 rng 1
+1210 rng 1
+1211 rng 1
+1212 rng 1
+1213 state 59 0 80.9369659 37.4775009
+1213 rng 1
+1214 rng 1
+1215 rng 1
+1216 rng 1
+1217 rng 1
+1218 rng 1
+1219 rng 1
+1220 rng 1
+1221 rng 1
+1222 rng 1
+1223 rng 1
+1224 rng 1
+1225 rng 1
+1226 rng 1
+1227 rng 1
+1228 rng 1
+1229 rng 1
+1230 rng 1
+1231 rng 1
+1232 rng 1
+1233 rng 1
+1234 rng 1
+1235 rng 1
+1236 rng 1
+1237 rng 1
+1238 rng 1
+1239 rng 1
+1240 rng 1
+1241 rng 1
+1242 rng 1
+1243 rng 1
+1244 rng 1
+1245 rng 1
+1246 rng 1
+1247 rng 1
+1248 rng 1
+1249 rng 1
+1250 rng 1
+1251 rng 1
+1252 rng 1
+1253 rng 1
+1254 rng 1
+1255 rng 1
+1256 rng 1
+1257 rng 1
+1258 rng 1
+1259 rng 1
+1260 rng 1
+1261 rng 1
+1262 rng 1
+1263 rng 1
+1264 rng 1
+1265 rng 1
+1266 rng 1
+1267 rng 1
+1268 rng 1
+1269 rng 1
+1270 rng 1
+1271 rng 1
+1272 rng 1
+1273 rng 1
+1274 rng 1
+1275 rng 1
+1276 rng 1
+1277 rng 1
+1278 rng 1
+1279 rng 1
+1280 rng 1
+1281 rng 1
+1282 rng 1
+1283 rng 1
+1284 rng 1
+1285 rng 1
+1286 rng 1
+1287 rng 1
+1288 rng 1
+1289 rng 1
+1290 rng 1
+1291 rng 1
+1292 rng 1
+1293 rng 1
+1294 rng 1
+1295 rng 1
+1296 rng 1
+1297 rng 1
+1298 rng 1
+1299 rng 1
+1300 rng 1
+1301 rng 1
+1302 rng 1
+1303 rng 1
+1304 rng 1
+1305 rng 1
+1306 rng 1
+1307 rng 1
+1308 rng 1
+1309 rng 1
+1310 rng 1
+1311 rng 1
+1312 rng 1
+1313 rng 1
+1314 rng 1
+1315 rng 1
+1316 rng 1
+1317 rng 1
+1318 rng 1
+1319 rng 1
+1320 rng 1
+1321 rng 1
+1322 rng 1
+1323 rng 1
+1324 rng 1
+1325 rng 1
+1326 rng 1
+1327 rng 1
+1328 rng 1
+1329 rng 1
+1330 rng 1
+1331 rng 1
+1332 rng 1
+1333 rng 1
+1334 rng 1
+1335 rng 1
+1336 rng 1
+1337 rng 1
+1338 rng 1
+1339 rng 1
+1340 rng 1
+1341 rng 1
+1342 rng 1
+1343 rng 1
+1344 rng 1
+1345 rng 1
+1346 rng 1
+1347 rng 1
+1348 rng 1
+1349 rng 1
+1350 rng 1
+1351 rng 1
+1352 rng 1
+1353 rng 1
+1354 rng 1
+1355 rng 1
+1356 rng 1
+1357 rng 1
+1358 rng 1
+1359 rng 1
+1360 rng 1
+1361 rng 1
+1362 rng 1
+1363 rng 1
+1364 rng 1
+1365 rng 1
+1366 rng 1
+1367 rng 1
+1368 rng 1
+1369 rng 1
+1370 rng 1
+1371 rng 1
+1372 rng 1
+1373 rng 1
+1374 rng 1
+1375 rng 1
+1376 rng 1
+1377 rng 1
+1378 rng 1
+1379 rng 1
+1380 rng 1
+1381 rng 1
+1382 rng 1
+1383 rng 1
+1384 rng 1
+1385 rng 1
+1386 rng 1
+1387 rng 1
+1388 rng 1
+1389 rng 1
+1390 rng 1
+1391 rng 1
+1392 rng 1
+1393 rng 1
+1394 rng 1
+1395 rng 1
+1396 rng 1
+1397 rng 1
+1398 rng 1
+1399 rng 1
+1400 rng 1
+1401 rng 1
+1402 rng 1
+1403 rng 1
+1404 rng 1
+1405 rng 1
+1406 rng 1
+1407 rng 1
+1408 rng 1
+1409 rng 1
+1410 rng 1
+1411 rng 1
+1412 rng 1
+1413 rng 1
+1414 rng 1
+1415 rng 1
+1416 rng 1
+1417 rng 1
+1418 rng 1
+1419 rng 1
+1420 rng 1
+1421 rng 1
+1422 rng 1
+1423 rng 1
+1424 rng 1
+1425 rng 1
+1426 rng 1
+1427 rng 1
+1428 rng 1
+1429 rng 1
+1430 rng 1
+1431 rng 1
+1432 rng 1
+1433 rng 1
+1434 rng 1
+1435 rng 1
+1436 rng 1
+1437 rng 1
+1438 rng 1
+1439 rng 1
+1440 rng 1
+1441 rng 1
+1442 rng 1
+1443 rng 1
+1444 rng 1
+1445 rng 1
+1446 rng 1
+1447 rng 1
+1448 rng 1
+1449 rng 1
+1450 rng 1
+1451 rng 1
+1452 rng 1
+1453 rng 1
+1454 rng 1
+1455 rng 1
+1456 rng 1
+1457 rng 1
+1458 rng 1
+1459 rng 1
+1460 rng 1
+1461 rng 1
+1462 rng 1
+1463 rng 1
+1464 rng 1
+1465 rng 1
+1466 rng 1
+1467 rng 1
+1468 rng 1
+1469 rng 1
+1470 rng 1
+1471 rng 1
+1472 rng 1
+1473 rng 1
+1474 rng 1
+1475 rng 1
+1476 rng 1
+1477 rng 1
+1478 rng 1
+1479 rng 1
+1480 rng 1
+1481 rng 1
+1482 rng 1
+1483 rng 1
+1484 rng 1
+1485 rng 1
+1486 rng 1
+1487 rng 1
+1488 rng 1
+1489 rng 1
+1490 rng 1
+1491 rng 1
+1492 rng 1
+1493 rng 1
+1494 rng 1
+1495 rng 1
+1496 rng 1
+1497 rng 1
+1498 rng 1
+1499 rng 1

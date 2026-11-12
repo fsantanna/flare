@@ -1,0 +1,5 @@
+# env: FLARE_MAP=maps/ydrakka_pass.txt FLARE_POS=131.5,55.5 FLARE_FRAMES=1500 FLARE_RNG=1
+# next to the first enemy of the map: attack it (up-left), until the end
+20 move 853 380
+20 down 1
+1480 up 1

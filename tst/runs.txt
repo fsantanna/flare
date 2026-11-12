@@ -15,3 +15,15 @@ stand-mineshaft_longsword
 stand-river_encampment
 stand-white_wind
 stand-ydrakka_pass
+duel-ancient_temple
+duel-averguard_academy
+duel-averguard_prison
+duel-brothers_lair_atrium
+duel-brothers_lair_fire_hall
+duel-cave_of_living_bones2
+duel-goblin_warrens
+duel-lost_mines1
+duel-mineshaft_longsword
+duel-river_encampment
+duel-white_wind
+duel-ydrakka_pass

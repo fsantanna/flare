@@ -1,0 +1,1787 @@
+0 map maps/ydrakka_pass.txt
+0 event 4 48 48 1 1 1
+0 event 4 232 49 1 1 1
+0 event 4 203 52 1 1 1
+0 event 4 179 23 1 1 1
+0 event 4 168 34 1 1 1
+0 event 4 143 27 1 1 1
+0 event 4 119 31 1 1 1
+0 event 4 100 43 1 1 1
+0 event 4 28 68 1 1 1
+0 event 4 5 77 1 1 1
+0 event 4 32 48 1 1 1
+0 event 4 78 60 1 1 1
+0 event 4 61 54 1 1 1
+0 event 4 46 35 1 1 1
+0 event 4 63 36 1 1 1
+0 event 4 79 26 1 1 1
+0 event 4 0 0 1 1 1
+0 event 4 83 39 1 1 1
+0 event 4 29 80 1 1 1
+0 event 4 51 27 1 1 1
+0 event 4 97 38 1 1 1
+0 event 4 99 50 1 1 1
+0 event 4 106 65 1 1 1
+0 spawn 0 Bench 0 131.5 55.5 90
+0 spawn 1 Goblin Spearman Elite 0 130.5 54.5 100
+0 spawn 2 Goblin Spearman Elite 0 127.5 57.5 100
+0 spawn 3 Goblin Charger 0 20.5 82.5 50
+0 spawn 4 Goblin Spearman 0 8.5 77.5 60
+0 spawn 5 Goblin Spearman 0 28.5 69.5 60
+0 spawn 6 Goblin Spearman 0 23.5 68.5 60
+0 spawn 7 Goblin Charger 0 76.5 55.5 50
+0 spawn 8 Goblin Spearman 0 57.5 71.5 60
+0 spawn 9 Goblin Charger 0 59.5 72.5 50
+0 spawn 10 Goblin Charger 0 112.5 56.5 50
+0 spawn 11 Goblin Charger 0 130.5 60.5 50
+0 spawn 12 Goblin Charger 0 114.5 61.5 50
+0 spawn 13 Goblin Spearman 0 127.5 56.5 60
+0 spawn 14 Antlion Hatchling 0 48.5 44.5 40
+0 spawn 15 Antlion Hatchling 0 71.5 31.5 40
+0 spawn 16 Antlion Hatchling 0 66.5 39.5 40
+0 spawn 17 Antlion Hatchling 0 71.5 28.5 40
+0 spawn 18 Antlion Hatchling 0 57.5 36.5 40
+0 spawn 19 Antlion Hatchling 0 68.5 34.5 40
+0 spawn 20 Antlion Hatchling 0 61.5 35.5 40
+0 spawn 21 Antlion Hatchling 0 53.5 38.5 40
+0 spawn 22 Antlion Hatchling 0 54.5 36.5 40
+0 spawn 23 Antlion Hatchling 0 58.5 42.5 40
+0 spawn 24 Antlion Hatchling 0 54.5 43.5 40
+0 spawn 25 Antlion Hatchling 0 75.5 28.5 40
+0 spawn 26 Antlion Hatchling 0 51.5 41.5 40
+0 spawn 27 Antlion Hatchling 0 51.5 34.5 40
+0 spawn 28 Antlion Hatchling 0 62.5 32.5 40
+0 spawn 29 Antlion Hatchling 0 55.5 29.5 40
+0 spawn 30 Antlion 0 146.5 28.5 70
+0 spawn 31 Antlion 0 151.5 39.5 70
+0 spawn 32 Antlion Hatchling 0 124.5 38.5 40
+0 spawn 33 Antlion Hatchling 0 114.5 36.5 40
+0 spawn 34 Antlion 0 124.5 39.5 70
+0 spawn 35 Antlion 0 129.5 28.5 70
+0 spawn 36 Antlion Hatchling 0 144.5 41.5 40
+0 spawn 37 Antlion 0 142.5 42.5 70
+0 spawn 38 Antlion Hatchling 0 116.5 32.5 40
+0 spawn 39 Antlion Hatchling 0 132.5 31.5 40
+0 spawn 40 Antlion Hatchling 0 142.5 26.5 40
+0 spawn 41 Antlion Hatchling 0 112.5 44.5 40
+0 spawn 42 Antlion 0 125.5 31.5 70
+0 spawn 43 Antlion Hatchling 0 116.5 31.5 40
+0 spawn 44 Antlion Hatchling 0 138.5 29.5 40
+0 spawn 45 Antlion Hatchling 0 126.5 32.5 40
+0 spawn 46 Antlion 0 130.5 41.5 70
+0 spawn 47 Antlion 0 131.5 41.5 70
+0 spawn 48 Antlion Blinker 0 202.5 49.5 90
+0 spawn 49 Antlion Blinker 0 192.5 56.5 90
+0 spawn 50 Antlion Blinker 0 182.5 53.5 90
+0 spawn 51 Antlion 0 195.5 65.5 70
+0 spawn 52 Antlion Slasher 0 208.5 74.5 105
+0 spawn 53 Antlion 0 188.5 29.5 70
+0 spawn 54 Antlion Slasher 0 203.5 43.5 105
+0 spawn 55 Antlion Blinker 0 183.5 32.5 90
+0 spawn 56 Antlion Hatchling 0 184.5 59.5 40
+0 spawn 57 Antlion Hatchling 0 194.5 61.5 40
+0 spawn 58 Antlion 0 188.5 36.5 70
+0 spawn 59 Antlion Blinker 0 206.5 43.5 90
+0 spawn 60 Antlion Slasher 0 184.5 35.5 105
+0 spawn 61 Antlion Hatchling 0 199.5 47.5 40
+0 spawn 62 Antlion Hatchling 0 203.5 61.5 40
+0 spawn 63 Antlion 0 207.5 61.5 70
+0 spawn 64 Antlion Hatchling 0 181.5 46.5 40
+0 spawn 65 Antlion Blinker 0 200.5 34.5 90
+0 spawn 66 Antlion Hatchling 0 206.5 63.5 40
+0 spawn 67 Antlion 0 237.5 60.5 70
+0 spawn 68 Antlion 0 213.5 54.5 70
+0 spawn 69 Antlion Hatchling 0 235.5 60.5 40
+0 spawn 70 Antlion Hatchling 0 224.5 59.5 40
+0 spawn 71 Antlion 0 233.5 7.5 70
+0 spawn 72 Antlion Hatchling 0 230.5 5.5 40
+0 spawn 73 Antlion 0 222.5 11.5 70
+0 spawn 74 Antlion 0 228.5 12.5 70
+0 spawn 75 Antlion 0 228.5 26.5 70
+0 spawn 76 Antlion 0 223.5 30.5 70
+0 rng 568
+1 power 1 132 130.5 54.5
+1 power 2 132 127.5 57.5
+1 power 11 132 130.5 60.5
+1 power 13 132 127.5 56.5
+1 state 2 1 127.5 57.5
+1 rng 32
+2 state 1 1 130.541245 54.5412483
+2 rng 9
+3 rng 6
+4 rng 4
+5 rng 3
+6 state 1 0 130.664978 54.6649933
+6 rng 3
+7 rng 3
+8 state 13 1 127.523567 56.476429
+8 rng 3
+9 rng 2
+10 rng 2
+11 rng 2
+12 rng 2
+13 state 11 1 130.5 60.4166679
+13 rng 2
+14 rng 1
+15 rng 1
+16 rng 1
+17 rng 1
+18 rng 1
+19 rng 2
+20 state 0 2 131.5 55.5
+20 rng 2
+21 rng 1
+22 rng 1
+23 rng 1
+24 rng 1
+25 rng 1
+26 rng 1
+27 rng 1
+28 rng 2
+29 rng 1
+30 rng 1
+31 power 0 1 130.664978 54.6649933
+31 state 1 5 130.664978 54.6649933
+31 hit 1 68
+31 rng 6
+32 rng 1
+33 rng 1
+34 rng 1
+35 rng 1
+36 rng 1
+37 rng 1
+38 rng 1
+39 state 1 0 130.664978 54.6649933
+39 rng 1
+40 rng 1
+41 rng 1
+42 rng 1
+43 state 0 0 131.5 55.5
+43 rng 1
+44 rng 1
+45 rng 1
+46 rng 1
+47 rng 1
+48 state 0 2 131.5 55.5
+48 rng 2
+49 rng 1
+50 state 2 2 129.770264 56.4225235
+50 rng 6
+51 rng 3
+52 rng 3
+53 rng 3
+54 rng 3
+55 rng 3
+56 rng 3
+57 rng 3
+58 rng 3
+59 power 0 1 130.664978 54.6649933
+59 rng 6
+60 rng 3
+61 power 2 32 131.5 55.5
+61 rng 4
+62 rng 3
+63 state 11 2 131.148224 56.6018677
+63 rng 7
+64 rng 3
+65 state 0 5 131.5 55.5
+65 hit 0 72
+65 rng 9
+66 rng 3
+67 rng 3
+68 rng 3
+69 rng 3
+70 state 13 2 129.132172 55.4628754
+70 rng 5
+71 rng 2
+72 rng 2
+73 state 2 0 129.770264 56.4225235
+73 rng 2
+74 power 11 1 131.5 55.5
+74 hit 0 60.1750259
+74 rng 9
+75 state 0 0 131.5 55.5
+75 rng 4
+76 state 0 2 131.5 55.5
+76 rng 5
+77 rng 4
+78 state 2 1 129.811508 56.3812752
+78 rng 4
+79 rng 2
+80 state 11 0 131.148224 56.6018677
+80 rng 2
+81 power 13 32 131.5 55.5
+81 rng 3
+82 rng 2
+83 rng 2
+84 rng 2
+85 rng 2
+86 rng 2
+87 power 0 1 130.664978 54.6649933
+87 rng 5
+88 state 0 5 131.5 55.5
+88 hit 0 49.4472351
+88 rng 8
+89 rng 2
+90 rng 2
+91 rng 2
+92 state 1 2 130.664978 54.6649933
+92 rng 4
+93 state 2 0 130.457291 55.968792
+93 state 13 0 129.132172 55.4628754
+93 rng 1
+94 rng 3
+95 rng 3
+96 rng 3
+97 state 0 0 131.5 55.5
+97 rng 3
+98 rng 3
+99 state 13 1 129.165512 55.4628754
+99 rng 3
+100 state 0 2 131.5 55.5
+100 rng 3
+101 rng 1
+102 rng 1
+103 power 1 1 131.5 55.5
+103 rng 4
+104 rng 1
+105 rng 1
+106 rng 1
+107 rng 1
+108 rng 1
+109 state 1 0 130.664978 54.6649933
+109 rng 1
+110 rng 1
+111 power 0 1 130.664978 54.6649933
+111 state 1 5 130.664978 54.6649933
+111 hit 1 63
+111 rng 6
+112 rng 1
+113 rng 1
+114 rng 1
+115 rng 1
+116 rng 1
+117 rng 1
+118 rng 1
+119 state 1 0 130.664978 54.6649933
+119 rng 1
+120 state 11 2 131.148224 56.6018677
+120 rng 5
+121 rng 1
+122 rng 1
+123 state 0 0 131.5 55.5
+123 rng 2
+124 rng 3
+125 rng 2
+126 rng 2
+127 rng 2
+128 state 0 2 131.5 55.5
+128 rng 3
+129 rng 2
+130 rng 2
+131 power 11 5 131.5 55.5
+131 rng 5
+132 rng 2
+133 rng 2
+134 rng 2
+135 rng 2
+136 rng 2
+137 state 11 0 131.148224 56.6018677
+137 rng 2
+138 rng 2
+139 power 0 1 130.664978 54.6649933
+139 state 1 5 130.664978 54.6649933
+139 hit 1 40
+139 rng 7
+140 rng 2
+141 rng 2
+142 rng 2
+143 rng 3
+144 rng 3
+145 rng 3
+146 rng 3
+147 state 1 0 130.664978 54.6649933
+147 rng 3
+148 rng 4
+149 rng 3
+150 rng 3
+151 state 0 0 131.5 55.5
+151 rng 3
+152 rng 3
+153 state 2 2 130.457291 55.968792
+153 rng 5
+154 rng 2
+155 rng 2
+156 state 0 2 131.5 55.5
+156 rng 3
+157 rng 2
+158 rng 2
+159 state 1 2 130.664978 54.6649933
+159 rng 5
+160 rng 2
+161 rng 2
+162 state 13 0 130.627151 56.2642899
+162 rng 2
+163 rng 2
+164 power 2 1 131.5 55.5
+164 rng 5
+165 rng 2
+166 rng 2
+167 power 0 1 130.664978 54.6649933
+167 state 1 5 130.664978 54.6649933
+167 hit 1 11
+167 rng 7
+168 rng 2
+169 rng 2
+170 state 2 0 130.457291 55.968792
+170 rng 2
+171 rng 2
+172 rng 2
+173 rng 2
+174 rng 2
+175 state 1 0 130.664978 54.6649933
+175 rng 2
+176 rng 2
+177 rng 4
+178 rng 4
+179 state 0 0 131.5 55.5
+179 rng 4
+180 rng 4
+181 rng 4
+182 state 11 2 131.148224 56.6018677
+182 rng 6
+183 rng 2
+184 state 0 2 131.5 55.5
+184 rng 3
+185 rng 2
+186 rng 2
+187 rng 2
+188 rng 2
+189 rng 2
+190 rng 2
+191 rng 2
+192 rng 2
+193 power 11 1 131.5 55.5
+193 rng 5
+194 rng 2
+195 power 0 1 130.664978 54.6649933
+195 rng 5
+196 rng 2
+197 rng 2
+198 rng 2
+199 state 11 0 131.148224 56.6018677
+199 rng 2
+200 rng 2
+201 rng 2
+202 rng 2
+203 rng 2
+204 rng 2
+205 rng 2
+206 rng 2
+207 state 0 0 131.5 55.5
+207 rng 2
+208 rng 2
+209 rng 2
+210 state 13 2 130.627151 56.2642899
+210 rng 4
+211 rng 1
+212 state 0 2 131.5 55.5
+212 rng 2
+213 rng 1
+214 rng 1
+215 rng 1
+216 rng 1
+217 rng 2
+218 rng 2
+219 rng 2
+220 rng 3
+221 power 13 1 131.5 55.5
+221 state 0 5 131.5 55.5
+221 hit 0 30.0332222
+221 rng 8
+222 state 1 2 130.664978 54.6649933
+222 rng 5
+223 rng 2
+224 rng 2
+225 state 2 2 130.457291 55.968792
+225 rng 4
+226 rng 1
+227 state 13 0 130.627151 56.2642899
+227 rng 1
+228 rng 1
+229 rng 1
+230 state 0 0 131.5 55.5
+230 rng 1
+231 rng 1
+232 rng 1
+233 power 1 1 131.5 55.5
+233 rng 4
+234 rng 1
+235 rng 1
+236 power 2 1 131.5 55.5
+236 state 0 5 131.5 55.5
+236 hit 0 11.3248749
+236 rng 7
+237 rng 1
+238 rng 1
+239 state 1 0 130.664978 54.6649933
+239 rng 3
+240 rng 3
+241 rng 3
+242 state 2 0 130.457291 55.968792
+242 rng 3
+243 rng 3
+244 rng 3
+245 state 0 0 131.5 55.5
+245 rng 3
+246 rng 3
+247 rng 3
+248 rng 3
+249 rng 3
+250 rng 3
+251 rng 3
+252 rng 3
+253 rng 3
+254 rng 3
+255 state 11 2 131.148224 56.6018677
+255 rng 5
+256 rng 1
+257 rng 1
+258 rng 1
+259 rng 1
+260 state 0 2 131.5 55.5
+260 rng 2
+261 rng 1
+262 rng 1
+263 rng 1
+264 rng 1
+265 rng 1
+266 power 11 1 131.5 55.5
+266 state 0 6 131.5 55.5
+266 hit 0 0
+266 rng 4
+267 state 1 1 130.706223 54.7062416
+267 state 2 1 130.416046 55.9788322
+267 state 13 1 130.650726 56.2407188
+267 rng 3
+268 rng 2
+269 rng 1
+270 rng 1
+271 rng 1
+272 state 11 0 131.148224 56.6018677
+272 rng 1
+273 state 11 1 131.148224 56.5185356
+273 rng 1
+274 rng 1
+275 rng 1
+276 rng 1
+277 rng 1
+278 rng 1
+279 rng 1
+280 rng 1
+281 rng 1
+282 rng 1
+283 rng 1
+284 rng 1
+285 rng 2
+286 rng 1
+287 rng 1
+288 rng 1
+289 rng 1
+290 rng 1
+291 rng 1
+292 rng 2
+293 rng 1
+294 rng 1
+295 rng 1
+296 rng 1
+297 rng 1
+298 rng 1
+299 rng 1
+300 rng 1
+301 rng 1
+302 rng 1
+303 rng 1
+304 rng 1
+305 rng 1
+306 rng 1
+307 rng 1
+308 rng 1
+309 rng 1
+310 rng 1
+311 rng 1
+312 rng 1
+313 rng 1
+314 rng 1
+315 rng 3
+316 state 11 0 133.5 58.5
+316 rng 2
+317 rng 1
+318 rng 1
+319 rng 1
+320 rng 1
+321 rng 1
+322 rng 1
+323 rng 1
+324 rng 1
+325 rng 1
+326 rng 1
+327 rng 1
+328 rng 1
+329 rng 1
+330 rng 1
+331 rng 1
+332 rng 1
+333 rng 1
+334 rng 1
+335 rng 1
+336 rng 1
+337 rng 1
+338 rng 1
+339 rng 1
+340 rng 1
+341 rng 1
+342 rng 1
+343 rng 1
+344 rng 1
+345 rng 1
+346 rng 1
+347 rng 1
+348 rng 3
+349 state 1 0 126.5 54.5
+349 rng 1
+350 rng 1
+351 rng 1
+352 rng 1
+353 rng 1
+354 rng 1
+355 rng 1
+356 rng 1
+357 rng 1
+358 rng 1
+359 rng 1
+360 rng 1
+361 rng 1
+362 rng 1
+363 rng 1
+364 rng 1
+365 rng 1
+366 rng 1
+367 rng 1
+368 rng 1
+369 rng 1
+370 rng 1
+371 rng 1
+372 rng 1
+373 rng 1
+374 rng 1
+375 state 11 1 133.416672 58.5
+375 rng 1
+376 rng 1
+377 rng 1
+378 rng 1
+379 rng 1
+380 rng 1
+381 rng 1
+382 rng 1
+383 rng 1
+384 rng 1
+385 rng 1
+386 rng 1
+387 rng 3
+388 state 13 0 128.5 53.5
+388 rng 1
+389 rng 1
+390 rng 1
+391 rng 1
+392 rng 1
+393 rng 1
+394 rng 1
+395 rng 1
+396 rng 1
+397 rng 3
+398 state 2 0 124.5 59.5
+398 rng 1
+399 rng 1
+400 rng 1
+401 rng 1
+402 rng 1
+403 rng 1
+404 rng 1
+405 rng 1
+406 rng 1
+407 rng 1
+408 state 1 1 126.558334 54.5
+408 rng 1
+409 rng 1
+410 rng 3
+411 state 11 0 130.5 58.5
+411 rng 1
+412 rng 1
+413 rng 1
+414 rng 1
+415 rng 1
+416 rng 1
+417 rng 1
+418 rng 1
+419 rng 1
+420 rng 1
+421 rng 1
+422 rng 1
+423 rng 1
+424 rng 1
+425 rng 1
+426 rng 1
+427 rng 1
+428 rng 1
+429 rng 1
+430 rng 1
+431 rng 1
+432 rng 1
+433 rng 1
+434 rng 1
+435 rng 1
+436 rng 1
+437 rng 1
+438 rng 1
+439 rng 1
+440 rng 1
+441 rng 1
+442 rng 1
+443 rng 1
+444 rng 1
+445 rng 1
+446 rng 1
+447 state 13 1 128.53334 53.5
+447 rng 1
+448 rng 1
+449 rng 1
+450 rng 1
+451 rng 1
+452 rng 1
+453 rng 1
+454 rng 1
+455 rng 1
+456 rng 1
+457 state 2 1 124.5 59.4416656
+457 rng 1
+458 rng 1
+459 rng 1
+460 rng 1
+461 rng 1
+462 rng 1
+463 rng 1
+464 rng 1
+465 rng 1
+466 rng 1
+467 rng 1
+468 rng 1
+469 rng 1
+470 state 11 1 130.5 58.4166679
+470 rng 1
+471 rng 1
+472 rng 1
+473 rng 3
+474 state 2 0 124.5 58.5
+474 rng 1
+475 rng 3
+476 state 13 0 129.5 53.5
+476 rng 1
+477 rng 1
+478 rng 1
+479 rng 1
+480 rng 1
+481 rng 3
+482 state 11 0 130.5 57.5
+482 rng 1
+483 rng 1
+484 rng 1
+485 rng 1
+486 rng 1
+487 rng 1
+488 rng 1
+489 rng 1
+490 rng 1
+491 rng 1
+492 rng 1
+493 rng 2
+494 rng 1
+495 rng 1
+496 rng 1
+497 rng 1
+498 rng 1
+499 rng 1
+500 rng 1
+501 rng 1
+502 rng 1
+503 rng 1
+504 rng 1
+505 rng 1
+506 rng 1
+507 rng 1
+508 rng 1
+509 rng 1
+510 rng 1
+511 rng 1
+512 rng 1
+513 rng 1
+514 rng 1
+515 rng 1
+516 rng 1
+517 rng 1
+518 rng 1
+519 rng 1
+520 rng 1
+521 rng 1
+522 rng 1
+523 rng 1
+524 rng 1
+525 rng 1
+526 rng 1
+527 rng 1
+528 rng 1
+529 rng 1
+530 rng 1
+531 rng 1
+532 rng 1
+533 state 2 1 124.541245 58.4587517
+533 rng 1
+534 rng 1
+535 state 13 1 129.476425 53.523571
+535 rng 1
+536 rng 1
+537 rng 1
+538 rng 1
+539 rng 1
+540 rng 1
+541 state 11 1 130.558929 57.5589256
+541 rng 1
+542 rng 1
+543 rng 1
+544 rng 1
+545 rng 1
+546 rng 1
+547 rng 1
+548 rng 1
+549 rng 1
+550 rng 1
+551 rng 1
+552 rng 1
+553 rng 1
+554 rng 1
+555 rng 1
+556 rng 1
+557 rng 1
+558 rng 1
+559 rng 1
+560 rng 1
+561 rng 1
+562 rng 1
+563 rng 1
+564 rng 1
+565 rng 3
+566 state 1 0 134.5 57.5
+566 rng 1
+567 rng 1
+568 rng 1
+569 rng 1
+570 rng 1
+571 rng 1
+572 rng 1
+573 rng 1
+574 rng 3
+575 state 11 0 132.5 59.5
+575 rng 1
+576 rng 3
+577 state 13 0 128.5 54.5
+577 rng 1
+578 rng 1
+579 rng 1
+580 rng 1
+581 rng 1
+582 rng 1
+583 rng 1
+584 rng 1
+585 rng 1
+586 rng 1
+587 rng 1
+588 rng 1
+589 rng 1
+590 rng 1
+591 rng 1
+592 rng 1
+593 rng 1
+594 rng 1
+595 rng 1
+596 rng 1
+597 rng 1
+598 rng 1
+599 rng 1
+600 rng 1
+601 rng 1
+602 rng 1
+603 rng 1
+604 rng 1
+605 rng 1
+606 rng 1
+607 rng 1
+608 rng 1
+609 rng 1
+610 rng 1
+611 rng 1
+612 rng 1
+613 rng 1
+614 rng 1
+615 rng 1
+616 rng 1
+617 rng 1
+618 rng 1
+619 rng 1
+620 rng 1
+621 rng 3
+622 state 2 0 128.5 55.5
+622 rng 1
+623 rng 1
+624 rng 1
+625 state 1 1 134.5 57.4416656
+625 rng 1
+626 rng 1
+627 rng 1
+628 rng 1
+629 rng 1
+630 rng 1
+631 rng 1
+632 rng 1
+633 rng 1
+634 state 11 1 132.416672 59.5
+634 rng 1
+635 rng 1
+636 state 13 1 128.5 54.5
+636 rng 4
+637 state 13 0 128.5 54.5
+637 rng 1
+638 rng 1
+639 rng 1
+640 rng 1
+641 rng 1
+642 rng 1
+643 rng 1
+644 rng 1
+645 rng 1
+646 rng 1
+647 rng 1
+648 rng 1
+649 rng 1
+650 rng 1
+651 rng 1
+652 rng 1
+653 rng 1
+654 rng 1
+655 rng 1
+656 rng 1
+657 rng 1
+658 rng 1
+659 rng 1
+660 rng 1
+661 rng 1
+662 rng 1
+663 rng 1
+664 rng 1
+665 rng 1
+666 rng 1
+667 rng 1
+668 rng 1
+669 rng 3
+670 state 11 0 129.5 59.5
+670 rng 1
+671 rng 1
+672 rng 1
+673 rng 1
+674 rng 1
+675 rng 1
+676 rng 1
+677 rng 1
+678 rng 1
+679 rng 1
+680 rng 1
+681 state 2 1 128.458755 55.4587517
+681 rng 1
+682 rng 1
+683 rng 1
+684 rng 1
+685 rng 1
+686 rng 1
+687 rng 1
+688 rng 1
+689 rng 1
+690 rng 1
+691 rng 1
+692 rng 1
+693 rng 1
+694 rng 1
+695 rng 1
+696 state 13 1 128.476425 54.523571
+696 rng 2
+697 rng 1
+698 rng 1
+699 rng 1
+700 rng 1
+701 rng 1
+702 rng 1
+703 rng 1
+704 rng 3
+705 state 2 0 127.5 54.5
+705 rng 1
+706 rng 1
+707 rng 1
+708 rng 1
+709 rng 1
+710 rng 1
+711 rng 1
+712 rng 1
+713 rng 1
+714 rng 1
+715 rng 1
+716 rng 1
+717 rng 1
+718 rng 1
+719 rng 1
+720 rng 1
+721 rng 1
+722 rng 1
+723 rng 1
+724 rng 1
+725 rng 1
+726 rng 1
+727 rng 1
+728 rng 1
+729 state 11 1 129.5 59.5833321
+729 rng 1
+730 rng 1
+731 rng 1
+732 rng 1
+733 rng 1
+734 rng 3
+735 state 1 0 133.5 51.5
+735 rng 1
+736 rng 1
+737 rng 1
+738 rng 1
+739 rng 1
+740 rng 1
+741 rng 1
+742 rng 1
+743 rng 1
+744 rng 1
+745 rng 1
+746 rng 1
+747 rng 1
+748 rng 1
+749 rng 1
+750 rng 1
+751 rng 1
+752 rng 1
+753 rng 1
+754 rng 1
+755 rng 1
+756 rng 1
+757 rng 1
+758 rng 1
+759 rng 1
+760 rng 1
+761 rng 1
+762 rng 1
+763 rng 1
+764 state 2 1 127.5 54.5
+764 rng 4
+765 state 2 0 127.5 54.5
+765 rng 1
+766 rng 1
+767 rng 1
+768 rng 1
+769 rng 1
+770 rng 1
+771 rng 1
+772 rng 1
+773 rng 1
+774 rng 1
+775 rng 1
+776 rng 1
+777 rng 1
+778 rng 1
+779 rng 1
+780 rng 1
+781 rng 1
+782 rng 1
+783 rng 1
+784 rng 1
+785 rng 1
+786 rng 1
+787 rng 1
+788 rng 3
+789 state 11 0 129.5 64.5
+789 rng 1
+790 rng 1
+791 rng 1
+792 rng 1
+793 rng 1
+794 state 1 1 133.5 51.4416656
+794 rng 1
+795 rng 1
+796 rng 1
+797 rng 1
+798 rng 1
+799 rng 1
+800 rng 1
+801 rng 1
+802 rng 1
+803 rng 1
+804 rng 1
+805 rng 1
+806 rng 1
+807 rng 1
+808 rng 1
+809 rng 1
+810 rng 3
+811 state 1 0 133.5 50.5
+811 rng 1
+812 rng 1
+813 rng 1
+814 rng 1
+815 rng 1
+816 rng 1
+817 rng 1
+818 rng 1
+819 rng 1
+820 rng 1
+821 rng 1
+822 rng 1
+823 rng 1
+824 state 2 1 127.5 54.5
+824 rng 4
+825 state 2 0 127.5 54.5
+825 rng 1
+826 rng 1
+827 rng 1
+828 rng 1
+829 rng 1
+830 rng 1
+831 rng 1
+832 rng 1
+833 rng 1
+834 rng 1
+835 rng 1
+836 rng 1
+837 rng 1
+838 rng 1
+839 rng 1
+840 rng 1
+841 rng 1
+842 rng 1
+843 rng 1
+844 rng 1
+845 rng 1
+846 rng 1
+847 rng 1
+848 state 11 1 129.5 64.4166641
+848 rng 1
+849 rng 1
+850 rng 1
+851 rng 1
+852 rng 1
+853 rng 1
+854 rng 1
+855 rng 1
+856 rng 1
+857 rng 1
+858 rng 1
+859 rng 1
+860 rng 1
+861 rng 1
+862 rng 1
+863 rng 1
+864 rng 1
+865 rng 3
+866 state 13 0 124.5 58.5
+866 rng 1
+867 rng 1
+868 rng 1
+869 rng 1
+870 state 1 1 133.458755 50.5412483
+870 rng 1
+871 rng 1
+872 rng 1
+873 rng 1
+874 rng 1
+875 rng 1
+876 rng 1
+877 rng 1
+878 rng 1
+879 rng 1
+880 rng 1
+881 rng 1
+882 rng 1
+883 rng 1
+884 state 2 1 127.5 54.5583344
+884 rng 1
+885 rng 1
+886 rng 1
+887 rng 1
+888 rng 1
+889 rng 1
+890 rng 1
+891 rng 1
+892 rng 1
+893 rng 3
+894 state 1 0 132.5 51.5
+894 rng 1
+895 rng 1
+896 rng 1
+897 rng 1
+898 rng 1
+899 rng 1
+900 rng 1
+901 rng 1
+902 rng 1
+903 rng 1
+904 rng 1
+905 rng 1
+906 rng 1
+907 rng 1
+908 rng 1
+909 rng 1
+910 rng 1
+911 rng 1
+912 rng 1
+913 rng 1
+914 rng 1
+915 rng 1
+916 rng 1
+917 rng 1
+918 rng 1
+919 rng 1
+920 rng 1
+921 rng 1
+922 rng 1
+923 rng 3
+924 state 11 0 128.5 58.5
+924 rng 1
+925 state 13 1 124.533333 58.5
+925 rng 1
+926 rng 1
+927 rng 1
+928 rng 1
+929 rng 1
+930 rng 1
+931 rng 1
+932 rng 1
+933 rng 1
+934 rng 1
+935 rng 1
+936 rng 1
+937 rng 1
+938 rng 1
+939 rng 1
+940 rng 1
+941 rng 1
+942 rng 1
+943 rng 1
+944 rng 1
+945 rng 1
+946 rng 1
+947 rng 1
+948 rng 1
+949 rng 2
+950 rng 1
+951 rng 1
+952 rng 1
+953 state 1 1 132.5 51.5583344
+953 rng 1
+954 rng 1
+955 rng 1
+956 rng 1
+957 rng 1
+958 rng 3
+959 state 2 0 126.5 58.5
+959 rng 1
+960 rng 1
+961 rng 1
+962 rng 1
+963 rng 1
+964 rng 1
+965 rng 1
+966 rng 1
+967 rng 1
+968 rng 1
+969 rng 1
+970 rng 1
+971 rng 1
+972 rng 1
+973 rng 2
+974 rng 1
+975 rng 1
+976 rng 1
+977 rng 1
+978 rng 1
+979 rng 1
+980 rng 1
+981 rng 1
+982 rng 1
+983 state 11 1 128.5 58.5
+983 rng 4
+984 state 11 0 128.5 58.5
+984 rng 1
+985 rng 1
+986 rng 1
+987 rng 1
+988 rng 1
+989 rng 1
+990 rng 1
+991 rng 1
+992 rng 1
+993 rng 1
+994 rng 1
+995 rng 1
+996 rng 1
+997 rng 1
+998 rng 1
+999 rng 1
+1000 rng 1
+1001 rng 1
+1002 rng 1
+1003 rng 1
+1004 rng 1
+1005 rng 1
+1006 rng 1
+1007 rng 1
+1008 rng 1
+1009 rng 1
+1010 rng 1
+1011 rng 1
+1012 rng 1
+1013 rng 1
+1014 rng 1
+1015 rng 1
+1016 rng 1
+1017 rng 1
+1018 state 2 1 126.5 58.5
+1018 rng 4
+1019 state 2 0 126.5 58.5
+1019 rng 1
+1020 rng 1
+1021 rng 1
+1022 rng 1
+1023 rng 1
+1024 rng 1
+1025 rng 1
+1026 rng 1
+1027 rng 1
+1028 rng 1
+1029 rng 1
+1030 rng 1
+1031 rng 1
+1032 rng 1
+1033 rng 1
+1034 rng 1
+1035 rng 1
+1036 rng 1
+1037 rng 1
+1038 rng 1
+1039 rng 1
+1040 rng 1
+1041 rng 1
+1042 rng 1
+1043 state 11 1 128.558929 58.4410744
+1043 rng 1
+1044 rng 1
+1045 rng 1
+1046 rng 1
+1047 rng 1
+1048 rng 1
+1049 rng 1
+1050 rng 1
+1051 rng 1
+1052 rng 1
+1053 rng 1
+1054 rng 1
+1055 rng 1
+1056 rng 1
+1057 rng 1
+1058 rng 1
+1059 rng 1
+1060 rng 1
+1061 rng 1
+1062 rng 1
+1063 rng 1
+1064 rng 1
+1065 rng 1
+1066 rng 1
+1067 rng 1
+1068 rng 1
+1069 rng 1
+1070 rng 1
+1071 rng 1
+1072 rng 3
+1073 state 13 0 128.5 58.5
+1073 rng 1
+1074 rng 1
+1075 rng 1
+1076 rng 1
+1077 rng 1
+1078 state 2 1 126.458755 58.5412483
+1078 rng 1
+1079 rng 3
+1080 state 1 0 133.5 58.5
+1080 rng 1
+1081 rng 1
+1082 rng 1
+1083 rng 1
+1084 rng 1
+1085 rng 1
+1086 rng 1
+1087 rng 1
+1088 rng 3
+1089 state 11 0 131.5 56.5
+1089 rng 1
+1090 rng 1
+1091 rng 1
+1092 rng 1
+1093 rng 1
+1094 rng 1
+1095 rng 1
+1096 rng 1
+1097 rng 1
+1098 rng 1
+1099 rng 1
+1100 rng 1
+1101 rng 1
+1102 rng 1
+1103 rng 1
+1104 rng 1
+1105 rng 1
+1106 rng 1
+1107 rng 1
+1108 rng 1
+1109 rng 1
+1110 rng 1
+1111 rng 1
+1112 rng 1
+1113 rng 1
+1114 rng 1
+1115 rng 1
+1116 rng 1
+1117 rng 1
+1118 rng 1
+1119 rng 1
+1120 rng 1
+1121 rng 1
+1122 rng 1
+1123 rng 1
+1124 rng 1
+1125 rng 1
+1126 rng 1
+1127 rng 1
+1128 rng 1
+1129 rng 1
+1130 rng 1
+1131 rng 1
+1132 state 13 1 128.523575 58.476429
+1132 rng 1
+1133 rng 1
+1134 rng 1
+1135 rng 1
+1136 rng 1
+1137 rng 1
+1138 rng 1
+1139 state 1 1 133.558334 58.5
+1139 rng 1
+1140 rng 1
+1141 rng 1
+1142 rng 3
+1143 state 2 0 123.5 60.5
+1143 rng 1
+1144 rng 1
+1145 rng 1
+1146 rng 1
+1147 rng 1
+1148 state 11 1 131.5 56.5
+1148 rng 4
+1149 state 11 0 131.5 56.5
+1149 rng 1
+1150 rng 1
+1151 rng 1
+1152 rng 1
+1153 rng 1
+1154 rng 1
+1155 rng 3
+1156 state 1 0 134.5 58.5
+1156 rng 1
+1157 rng 1
+1158 rng 1
+1159 rng 1
+1160 rng 1
+1161 rng 1
+1162 rng 1
+1163 rng 1
+1164 rng 1
+1165 rng 1
+1166 rng 1
+1167 rng 1
+1168 rng 1
+1169 rng 1
+1170 rng 1
+1171 rng 1
+1172 rng 1
+1173 rng 1
+1174 rng 1
+1175 rng 1
+1176 rng 1
+1177 rng 1
+1178 rng 1
+1179 rng 1
+1180 rng 1
+1181 rng 1
+1182 rng 1
+1183 rng 1
+1184 rng 1
+1185 rng 1
+1186 rng 1
+1187 rng 1
+1188 rng 1
+1189 rng 1
+1190 rng 1
+1191 rng 1
+1192 rng 1
+1193 rng 1
+1194 rng 1
+1195 rng 1
+1196 rng 1
+1197 rng 1
+1198 rng 1
+1199 rng 1
+1200 rng 1
+1201 rng 1
+1202 state 2 1 123.541245 60.4587517
+1202 rng 1
+1203 rng 1
+1204 rng 1
+1205 rng 1
+1206 rng 1
+1207 rng 1
+1208 state 11 1 131.5 56.5
+1208 rng 4
+1209 state 11 0 131.5 56.5
+1209 rng 1
+1210 rng 1
+1211 rng 1
+1212 rng 1
+1213 rng 1
+1214 rng 1
+1215 state 1 1 134.5 58.4416656
+1215 rng 1
+1216 rng 1
+1217 rng 1
+1218 rng 1
+1219 rng 1
+1220 rng 1
+1221 rng 1
+1222 rng 1
+1223 rng 1
+1224 rng 1
+1225 rng 1
+1226 rng 1
+1227 rng 1
+1228 rng 1
+1229 rng 1
+1230 rng 1
+1231 rng 1
+1232 rng 1
+1233 rng 1
+1234 rng 1
+1235 rng 1
+1236 rng 1
+1237 rng 1
+1238 rng 1
+1239 rng 1
+1240 rng 1
+1241 rng 1
+1242 rng 1
+1243 rng 1
+1244 rng 1
+1245 rng 1
+1246 rng 1
+1247 rng 1
+1248 rng 1
+1249 rng 1
+1250 rng 1
+1251 rng 1
+1252 rng 1
+1253 rng 1
+1254 rng 1
+1255 rng 1
+1256 rng 1
+1257 rng 1
+1258 rng 1
+1259 rng 1
+1260 rng 1
+1261 rng 1
+1262 rng 1
+1263 rng 1
+1264 rng 1
+1265 rng 1
+1266 rng 1
+1267 rng 1
+1268 state 11 1 131.5 56.5833321
+1268 rng 1
+1269 rng 1
+1270 rng 1
+1271 rng 1
+1272 rng 3
+1273 state 13 0 130.5 54.5
+1273 rng 1
+1274 rng 1
+1275 rng 1
+1276 rng 1
+1277 rng 1
+1278 rng 1
+1279 rng 1
+1280 rng 1
+1281 rng 1
+1282 rng 1
+1283 rng 1
+1284 rng 1
+1285 rng 1
+1286 rng 1
+1287 rng 1
+1288 rng 1
+1289 rng 3
+1290 state 1 0 133.5 54.5
+1290 rng 1
+1291 rng 1
+1292 rng 1
+1293 rng 1
+1294 rng 1
+1295 rng 1
+1296 rng 1
+1297 rng 1
+1298 rng 1
+1299 rng 1
+1300 rng 1
+1301 rng 1
+1302 rng 1
+1303 rng 1
+1304 rng 1
+1305 rng 1
+1306 rng 1
+1307 rng 1
+1308 rng 1
+1309 rng 1
+1310 rng 1
+1311 rng 1
+1312 rng 1
+1313 rng 1
+1314 rng 1
+1315 rng 1
+1316 rng 1
+1317 rng 1
+1318 rng 1
+1319 rng 1
+1320 rng 1
+1321 rng 1
+1322 rng 3
+1323 state 2 0 128.5 55.5
+1323 rng 1
+1324 rng 1
+1325 rng 1
+1326 rng 1
+1327 rng 1
+1328 rng 1
+1329 rng 1
+1330 rng 1
+1331 rng 1
+1332 state 13 1 130.5 54.5
+1332 rng 4
+1333 state 13 0 130.5 54.5
+1333 rng 1
+1334 rng 1
+1335 rng 1
+1336 rng 1
+1337 rng 1
+1338 rng 1
+1339 rng 1
+1340 rng 1
+1341 rng 1
+1342 rng 1
+1343 rng 1
+1344 rng 1
+1345 rng 1
+1346 rng 1
+1347 rng 1
+1348 rng 1
+1349 state 1 1 133.5 54.5
+1349 rng 4
+1350 state 1 0 133.5 54.5
+1350 rng 1
+1351 rng 1
+1352 rng 1
+1353 rng 1
+1354 rng 1
+1355 rng 1
+1356 rng 1
+1357 rng 1
+1358 rng 1
+1359 rng 1
+1360 rng 1
+1361 rng 1
+1362 rng 1
+1363 rng 3
+1364 state 11 0 131.5 64.5
+1364 rng 1
+1365 rng 1
+1366 rng 1
+1367 rng 1
+1368 rng 1
+1369 rng 1
+1370 rng 1
+1371 rng 1
+1372 rng 1
+1373 rng 1
+1374 rng 1
+1375 rng 1
+1376 rng 1
+1377 rng 1
+1378 rng 1
+1379 rng 1
+1380 rng 1
+1381 rng 1
+1382 state 2 1 128.5 55.5
+1382 rng 4
+1383 state 2 0 128.5 55.5
+1383 rng 1
+1384 rng 1
+1385 rng 1
+1386 rng 1
+1387 rng 1
+1388 rng 1
+1389 rng 1
+1390 rng 1
+1391 rng 1
+1392 state 13 1 130.5 54.5
+1392 rng 4
+1393 state 13 0 130.5 54.5
+1393 rng 1
+1394 rng 1
+1395 rng 1
+1396 rng 1
+1397 rng 1
+1398 rng 1
+1399 rng 1
+1400 rng 1
+1401 rng 1
+1402 rng 1
+1403 rng 1
+1404 rng 1
+1405 rng 1
+1406 rng 1
+1407 rng 1
+1408 rng 1
+1409 state 1 1 133.5 54.5
+1409 rng 4
+1410 state 1 0 133.5 54.5
+1410 rng 1
+1411 rng 1
+1412 rng 1
+1413 rng 1
+1414 rng 1
+1415 rng 1
+1416 rng 1
+1417 rng 1
+1418 rng 1
+1419 rng 1
+1420 rng 1
+1421 rng 1
+1422 rng 1
+1423 state 11 1 131.441071 64.4410782
+1423 rng 1
+1424 rng 1
+1425 rng 1
+1426 rng 1
+1427 rng 1
+1428 rng 1
+1429 rng 1
+1430 rng 1
+1431 rng 1
+1432 rng 1
+1433 rng 1
+1434 rng 1
+1435 rng 1
+1436 rng 1
+1437 rng 1
+1438 rng 1
+1439 rng 3
+1440 state 11 0 130.5 63.5
+1440 rng 1
+1441 rng 1
+1442 state 2 1 128.458755 55.5412483
+1442 rng 1
+1443 rng 1
+1444 rng 1
+1445 rng 1
+1446 rng 1
+1447 rng 1
+1448 rng 1
+1449 rng 1
+1450 rng 1
+1451 rng 1
+1452 state 13 1 130.476425 54.476429
+1452 rng 1
+1453 rng 1
+1454 rng 1
+1455 rng 1
+1456 rng 1
+1457 rng 1
+1458 rng 1
+1459 rng 1
+1460 rng 1
+1461 rng 1
+1462 rng 1
+1463 rng 1
+1464 rng 1
+1465 rng 1
+1466 rng 1
+1467 rng 1
+1468 rng 1
+1469 state 1 1 133.5 54.4416656
+1469 rng 1
+1470 rng 1
+1471 rng 1
+1472 rng 1
+1473 rng 1
+1474 rng 1
+1475 rng 1
+1476 rng 1
+1477 rng 1
+1478 rng 1
+1479 rng 1
+1480 rng 1
+1481 rng 1
+1482 rng 1
+1483 rng 1
+1484 rng 1
+1485 rng 3
+1486 state 1 0 133.5 53.5
+1486 rng 1
+1487 rng 1
+1488 rng 1
+1489 rng 1
+1490 rng 1
+1491 rng 1
+1492 rng 1
+1493 rng 1
+1494 rng 1
+1495 rng 1
+1496 rng 1
+1497 rng 1
+1498 rng 1
+1499 state 11 1 130.5 63.5
+1499 rng 4
