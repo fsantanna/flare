@@ -197,6 +197,7 @@ func enemy.stats (path) {
         facing = true, movement = MOVE.NORMAL, waypoint_pause = 60,
         flee_duration = 60, flee_cooldown = 60, animations = "",
         powers = [], loot = [], loot_count = [0, 0],
+        set_by_file = [],       ;; the timers set by the file (setDuration: full)
         sfx_attack = [], sfx_hit = [], sfx_die = [], sfx_critdie = [], sfx_block = [],
         corpse_has_collision = false, suppress_hp = false, humanoid = false,
     ]
@@ -219,16 +220,34 @@ func enemy.stats (path) {
                     set st.threat_range_far = if (l@1 != nil) && (l@1 != "") => parse.float(l@1) => (st.threat_range * 2)
                 }
                 "flee_range" => { set st.flee_range = parse.float(v) }
-                "cooldown" => { set st.cooldown = parse.duration(v) }
-                "cooldown_hit" => { set st.cooldown_hit = parse.duration(v) }
-                "cooldown_los" => { set st.cooldown_los = parse.duration(v) }
+                "cooldown" => {
+                    set st.cooldown = parse.duration(v)
+                    set st.set_by_file.cooldown = true
+                }
+                "cooldown_hit" => {
+                    set st.cooldown_hit = parse.duration(v)
+                    set st.set_by_file.cooldown_hit = true
+                }
+                "cooldown_los" => {
+                    set st.cooldown_los = parse.duration(v)
+                    set st.set_by_file.cooldown_los = true
+                }
                 "combat_style" => { set st.combat_style = v }
                 "facing" => { set st.facing = parse.bool(v) }
                 "flying" => { set st.movement = if parse.bool(v) => MOVE.FLYING => MOVE.NORMAL }
                 "intangible" => { set st.movement = if parse.bool(v) => MOVE.INTANGIBLE => MOVE.NORMAL }
-                "waypoint_pause" => { set st.waypoint_pause = parse.duration(v) }
-                "flee_duration" => { set st.flee_duration = parse.duration(v) }
-                "flee_cooldown" => { set st.flee_cooldown = parse.duration(v) }
+                "waypoint_pause" => {
+                    set st.waypoint_pause = parse.duration(v)
+                    set st.set_by_file.waypoint_pause = true
+                }
+                "flee_duration" => {
+                    set st.flee_duration = parse.duration(v)
+                    set st.set_by_file.flee_duration = true
+                }
+                "flee_cooldown" => {
+                    set st.flee_cooldown = parse.duration(v)
+                    set st.set_by_file.flee_cooldown = true
+                }
                 "animations" => { set st.animations = v }
                 "gfx" => { set st.animations = v }
                 "humanoid" => { set st.humanoid = parse.bool(v) }
