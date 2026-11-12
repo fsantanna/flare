@@ -159,6 +159,10 @@ val fl = [
     cam_target = func (x, y) {
         `fl_cam_target((float)a_dbl($x), (float)a_dbl($y));`
     },
+    ;; the camera shakes for some frames (shake_timer of Camera)
+    cam_shake = func (n) {
+        `FL_SHAKE_TIMER = fl_int($n);`
+    },
     cam_logic = func () {
         `fl_cam_logic();`
     },

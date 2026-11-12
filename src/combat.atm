@@ -214,6 +214,9 @@ func take_hit (t, hz) {
     val crit = percent_f(hz.crit)
     if crit {
         set dmg = fl.f32(fl.f32(dmg * 200) / 100)
+        if !t.hero {
+            fl.cam_shake(30)        ;; half a second
+        }
     } else {
         if overhit {
             set dmg = fl.f32(fl.f32(dmg * 100) / 100)
