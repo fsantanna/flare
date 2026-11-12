@@ -233,8 +233,10 @@ func take_hit (t, hz) {
     set t.hp = fl.f32(t.hp - dmg)
     if t.hp <= 0 {
         set t.hp = 0.0
-        set t.state = if t.hero => STATE.DEAD => STATE.DEAD
-        set t.next = [act = "dead"]
+        ;; a critical death, if the entity has an animation for it
+        val critdie = !t.hero && crit && (t.anims.anims.critdie != nil)
+        set t.state = if critdie => STATE.CRITDEAD => STATE.DEAD
+        set t.next = [act = if critdie => "critdead" => "dead"]
         if !t.hero {
             fl.col_unblock(t.x, t.y)
             set loot.dropping@+ = t
