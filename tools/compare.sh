@@ -10,7 +10,7 @@
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DIR="$ROOT/tst/orig"
-SKIP=${SKIP:-'event'}
+SKIP=${SKIP:-'^$'}
 NAMES="$*"
 if [ -z "$NAMES" ]; then
 	NAMES=$(cd "$DIR" && ls *.in | sed 's/\.in$//')
