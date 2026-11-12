@@ -1,0 +1,10 @@
+# env: FLARE_MAP=maps/frontier_outpost.txt FLARE_POS=3.5,12.5 FLARE_FRAMES=400 FLARE_DUMP=1 FLARE_RNG=1
+# walk west into the exit to the plains, then walk there
+10 key W
+10 key A
+60 keyup W
+60 keyup A
+100 key S
+200 keyup S
+220 key D
+300 keyup D

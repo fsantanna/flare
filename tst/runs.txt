@@ -5,3 +5,4 @@ hero-cliff
 hero-cave
 fight
 walk
+maps
