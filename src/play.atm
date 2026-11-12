@@ -108,12 +108,14 @@ task Play (path, pos, class) {
     pin ens = []                ;; the enemies in order, as EntityManager
     loop _, me in placed {
         val t = spawn @es Enemy(enemy.stats(me.type), me)
+        set t.pub.id = #ens + 1
         set ens@+ = t
         fl.col_block(me.x, me.y, false)
     }
     play.new_map_draws(p@0, p@1, true)
     fl.cam_warp(p@0, p@1)
     pin h = spawn Hero(st, p)
+    set combat.list = []
     fl.col_block(h.pub.x, h.pub.y, false)
     fl.tset_logic()
     fl.cam_logic()
@@ -123,6 +125,10 @@ task Play (path, pos, class) {
         loop on :frame {
             emit @h :hero.logic
             fl.rand()                       ;; handleSpawn: Map_Enemy()
+            loop _, t in ens {
+                emit @t :enemy.logic [hero = h.pub]
+            }
+            hazards_logic(ens, h.pub)
             fl.tset_logic()
             fl.cam_logic()
             play.trace(h.pub, ens)

@@ -12,12 +12,16 @@ include "src/font.atm"
 include "src/map.atm"
 include "src/hero.atm"
 include "src/enemy.atm"
+include "src/power.atm"
+include "src/ai.atm"
+include "src/combat.atm"
 include "src/play.atm"
 
 val dir = os.getenv("FLARE_DATA")
 ini.set_mods(dir, ini.resolve(dir, ["alpha_demo"]))
 font.init()
 enemy.init()
+power.init()
 
 val pos = if os.getenv("FLARE_POS") {
     val l = parse.list(os.getenv("FLARE_POS"))

@@ -195,7 +195,8 @@ task Move (h, turning) {
 ;; The hero in a map, from `pos`. `st`: the stats of hero.stats.
 task Hero (st, pos) {
     set pub = [
-        task = task, name = "Bench",
+        task = task, name = "Bench", id = 0, hero = true, base = st.base,
+        melee_range = 1.0, in_combat = false,
         x = fl.f32(pos@0), y = fl.f32(pos@1), dir = 6,
         speed = st.speed, hp = st.hp, mp = st.mp,
         state = STATE.STANCE,

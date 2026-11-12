@@ -1,0 +1,264 @@
+;; Combat: powers activated, hazards, and hits, as PowerManager,
+;; HazardManager, Hazard, and Entity::takeHit of the original.
+;;
+;; A hazard is a task, alive while its lifespan lasts. The game awakes the
+;; hazards once per logic frame, after the enemies, in the reverse order
+;; of their creation (as HazardManager::logic), with `:hazard.logic`.
+;;
+;;      power_activate(id, src, tx, ty)     PowerManager::activate
+;;      take_hit(target, hz)                Entity::takeHit: true on a hit
+;;
+;; A source or target is the `pub` of the hero or of an enemy: `id`, `x`,
+;; `y`, `dir`, `hp`, `hero`, its stats in `base`, `melee_range`.
+
+val combat = [
+    hazards = nil,      ;; the pool of hazards of the map
+    list = nil,         ;; the hazards in order of creation
+    new = [],           ;; hazards made in this frame (PowerManager::hazards)
+]
+
+;; a stat of a source (StatBlock::get), with no effects nor items yet
+func stat (s, k) {
+    s.base@k || 0
+}
+
+;; the damage types of engine/damage_types.txt, in order
+val DAMAGE = [
+    [id = "melee", min = "dmg_melee_min", max = "dmg_melee_max"],
+    [id = "ranged", min = "dmg_ranged_min", max = "dmg_ranged_max"],
+    [id = "ment", min = "dmg_ment_min", max = "dmg_ment_max"],
+]
+
+;; EngineSettings::Combat::resourceRound, by rounding
+func resource_round (x) {
+    `:number.float (double)roundf((float)a_dbl($x))`
+}
+
+;; Math::randBetweenF, with 32-bit floats
+func rand_between_f (lo, hi) {
+    if fl.f32(lo) == fl.f32(hi) {
+        fl.f32(lo)
+    } else {
+        `:number.float (double)((float)a_dbl($lo) + (((float)fl_rand() / (float)2147483647) * ((float)a_dbl($hi) - (float)a_dbl($lo))))`
+    }
+}
+
+;; PowerManager::initHazard: a new hazard of a power
+func hazard_new (id, pw, src, ox, oy, tx, ty) {
+    val hz = [
+        power = pw, power_id = id, src = src,
+        source = pw.source_type || (if src.hero => "hero" => "enemy"),
+        crit = stat(src, "crit"), accuracy = stat(src, "accuracy"),
+        damage = [], dir = 0, lifespan = pw.lifespan, active = !pw.no_attack,
+        delay = 0, x = ox, y = oy, hit = [],
+    ]
+    ;; the damage of the base type of the power (no conversion, no elements)
+    loop i, d in DAMAGE {
+        set hz.damage@i = if pw.base_damage == d.id {
+            [stat(src, d.min), stat(src, d.max)]
+        } else {
+            [0, 0]
+        }
+    }
+    if pw.directional {
+        set hz.dir = fl.direction(ox, oy, tx, ty)
+    } else {
+        if pw.visual_random > 0 {
+            set hz.dir = ((fl.rand() & 0xFFFF) % pw.visual_random) + pw.visual_option
+        } else {
+            set hz.dir = pw.visual_option
+        }
+    }
+    match pw.starting_pos {
+        "melee" => {
+            val x, y = fl.vector(ox, oy, src.dir, src.melee_range)
+            set hz.x, hz.y = x, y
+        }
+        "target" => {
+            set hz.x, hz.y = tx, ty
+        }
+    }
+    hz
+}
+
+;; PowerManager::activate
+func power_activate (id, src, tx, ty) {
+    val pw = power.get(id)
+    if pw == nil {
+        return false
+    }
+    fl.trace("power " ++ src.id ++ " " ++ id ++ " " ++ string.format("%.9g", fl.f32(tx)) ++ " " ++ string.format("%.9g", fl.f32(ty)))
+    if src.hero && (pw.requires_mp > src.mp) {
+        return false
+    }
+    match pw.type {
+        "fixed" => {
+            if pw.use_hazard {
+                var delay = 0
+                loop _ in pw.count {
+                    val hz = hazard_new(id, pw, src, src.x, src.y, tx, ty)
+                    set hz.delay = delay
+                    set delay += pw.delay
+                    set combat.new@+ = hz
+                }
+            }
+            power_buff(id, pw, src, tx, ty)
+            true
+        }
+        else => true
+    }
+}
+
+;; PowerManager::buff: a teleport to the target (or next to it), and the
+;; effects of the power on its source
+func power_buff (id, pw, src, tx, ty) {
+    if pw.buff_teleport {
+        val lx, ly = fl.clamp_dist(0, pw.target_range, src.x, src.y, tx, ty)
+        if pw.target_neighbor > 0 {
+            ;; the movement of a power is flying
+            val nx, ny = fl.random_neighbor(lx, ly, pw.target_neighbor, MOVE.FLYING, COLLIDE.ALL)
+            if (math.floor(nx) == math.floor(lx)) && (math.floor(ny) == math.floor(ly)) {
+                set src.teleport = nil
+            } else {
+                set src.teleport = [nx, ny]
+            }
+        } else {
+            set src.teleport = [lx, ly]
+        }
+    }
+    if pw.buff {
+        power_effect(src, src, id, pw)
+    }
+}
+
+;; PowerManager::effect: each post effect passes its chance (the effects
+;; themselves come later)
+func power_effect (t, caster, id, pw) {
+    loop _, pe in pw.post_effects {
+        if percent_f(pe.chance) {
+            ;; EffectManager::addEffect
+        }
+    }
+}
+
+;; Entity::takeHit: true if the target was hit
+func take_hit (t, hz) {
+    val pw = hz.power
+    if (t.state == STATE.DEAD) || (t.state == STATE.CRITDEAD) {
+        return false
+    }
+    if !t.in_combat && !t.hero {
+        set t.join_combat = true
+    }
+    if pw.beacon {
+        return false
+    }
+    ;; accuracy against avoidance
+    val accuracy = hz.accuracy
+    val avoidance = stat(t, "avoidance")
+    var true_avoidance = fl.f32(100 - fl.f32(accuracy - avoidance))
+    val overhit = if true_avoidance < 0 => percent_f(math.abs(true_avoidance)) => false
+    set true_avoidance = math.min(math.max(true_avoidance, 0), 100)
+    val missed = percent_f(true_avoidance)
+    ;; the damage of each type
+    var dmg = 0.0
+    loop _, d in hz.damage {
+        set dmg = fl.f32(dmg + rand_between_f(d@0, d@1))
+    }
+    ;; absorption
+    var absorb = rand_between_f(stat(t, "absorb_min"), stat(t, "absorb_max"))
+    if (absorb > 0) && (dmg > 0) {
+        if absorb == 0 {
+            set absorb = 1
+        }
+    }
+    set dmg = fl.f32(dmg - absorb)
+    if dmg <= 0 {
+        ;; max_absorb is 100: no damage
+        set dmg = 0.0
+    }
+    val crit = percent_f(hz.crit)
+    if crit {
+        set dmg = fl.f32(fl.f32(dmg * 200) / 100)
+    } else {
+        if overhit {
+            set dmg = fl.f32(fl.f32(dmg * 100) / 100)
+        }
+    }
+    if missed {
+        set dmg = fl.f32(fl.f32(dmg * 0) / 100)
+    }
+    set dmg = resource_round(dmg)
+    if dmg == 0 {
+        return false
+    }
+    ;; StatBlock::takeDamage
+    set t.hp = fl.f32(t.hp - dmg)
+    if t.hp <= 0 {
+        set t.hp = 0.0
+        set t.dead = true
+    } else {
+        set t.hit = true
+    }
+    true
+}
+
+;; HazardManager::logic, once per frame after the enemies
+func hazards_logic (ens, hero) {
+    val l = combat.list
+    ;; the expired ones go
+    var i = #l
+    loop {
+        while i > 0
+        set i -= 1
+        if l@i.lifespan == 0 {
+            vector.remove(l, i)
+        }
+    }
+    ;; the new ones come
+    loop _, hz in combat.new {
+        set l@+ = hz
+    }
+    set combat.new = []
+    set i = #l
+    loop {
+        while i > 0
+        set i -= 1
+        val hz = l@i
+        ;; Hazard::logic
+        if hz.delay > 0 {
+            set hz.delay = hz.delay - 1
+        } else {
+            if hz.lifespan > 0 {
+                set hz.lifespan = hz.lifespan - 1
+            }
+        }
+        ;; isDangerousNow: active, no delay (no animations yet)
+        if hz.active && (hz.delay == 0) {
+            loop _, et in ens {
+                val e = et.pub
+                if (hz.source == "enemy") {
+                    ;; not the enemies of an enemy source
+                } else {
+                    if (e.hp > 0) && hz.active && (fl.dist(hz.x, hz.y, e.x, e.y) < hz.power.radius) && X.nin(e.id, hz.hit) {
+                        set hz.hit@+ = e.id
+                        if take_hit(e, hz) && !hz.power.multitarget {
+                            set hz.active = false
+                            set hz.lifespan = 0
+                        }
+                    }
+                }
+            }
+            if hz.source != "hero" {
+                val h = hero
+                if (h.hp > 0) && hz.active && (fl.dist(hz.x, hz.y, h.x, h.y) < hz.power.radius) && X.nin(0, hz.hit) {
+                    set hz.hit@+ = 0
+                    if take_hit(h, hz) && !hz.power.multitarget {
+                        set hz.active = false
+                        set hz.lifespan = 0
+                    }
+                }
+            }
+        }
+    }
+}
