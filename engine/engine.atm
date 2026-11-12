@@ -217,6 +217,12 @@ val fl = [
         val ok = `:boolean fl_entity_move((float)a_dbl($x), (float)a_dbl($y), fl_int($dir), (float)a_dbl($speed), (float)a_dbl($eff), fl_int($mt), fl_int($h))`
         return ok, `:number.float (double)FL_MOVE_X`, `:number.float (double)FL_MOVE_Y`
     },
+    ;; map to screen, at a camera (as Utils::mapToScreen)
+    map2scr = func (x, y, cx, cy) {
+        val sx = `:number fl_map2scr((float)a_dbl($x), (float)a_dbl($y), (float)a_dbl($cx), (float)a_dbl($cy)).x`
+        val sy = `:number fl_map2scr((float)a_dbl($x), (float)a_dbl($y), (float)a_dbl($cx), (float)a_dbl($cy)).y`
+        return sx, sy
+    },
     ;; screen to map, at the camera (as Utils::screenToMap)
     scr2map = func (x, y) {
         val p = `:number.float (double)fl_scr2map(fl_int($x), fl_int($y), FL_CAM.x, FL_CAM.y).x`

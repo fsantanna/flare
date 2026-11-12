@@ -14,6 +14,7 @@
 val combat = [
     hazards = nil,      ;; the pool of hazards of the map
     list = nil,         ;; the hazards in order of creation
+    last_enemy = nil,   ;; the enemy of the last hit (HazardManager::last_enemy)
     new = [],           ;; hazards made in this frame (PowerManager::hazards)
 ]
 
@@ -226,9 +227,46 @@ func take_hit (t, hz) {
     set t.hp = fl.f32(t.hp - dmg)
     if t.hp <= 0 {
         set t.hp = 0.0
-        set t.dead = true
-    } else {
-        set t.hit = true
+        set t.state = if t.hero => STATE.DEAD => STATE.DEAD
+        set t.next = [act = "dead"]
+    }
+    ;; the effects of the power, then its post powers
+    power_effect(t, hz.src, hz.power_id, pw)
+    if !t.hero {
+        set t.encountered = true
+    }
+    loop _, c in pw.chain {
+        if c.type == "post_power" {
+            if percent_f(c.chance) {
+                power_activate(c.id, hz.src, t.x, t.y)
+            }
+        }
+    }
+    if t.hp <= 0 {
+        return true
+    }
+    ;; the sound of the hit
+    if timer_end(t.cooldown_hit) && (#(t.sfx_hit || []) > 0) {
+        fl.rand()
+    }
+    ;; on_hit powers of an enemy
+    if !t.hero {
+        val ap = ai_power(t, "on_hit")
+        if ap {
+            set t.ai_hit_power = ap
+        }
+    }
+    ;; poise, as a chance (POISE_STYLE_CHANCE)
+    val poise = percent_f(stat(t, "poise"))
+    if timer_end(t.cooldown_hit) {
+        timer_begin(t.cooldown_hit)
+        if !poise || crit {
+            if !t.hero && (t.state == STATE.POWER) {
+                timer_begin(t.cooldown)
+            }
+            set t.state = STATE.HIT
+            set t.next = if t.hero => [act = HHit] => [act = "hit"]
+        }
     }
     true
 }
@@ -282,7 +320,11 @@ func hazards_logic (ens, hero) {
                 } else {
                     if (e.hp > 0) && hz.active && (fl.dist(hz.x, hz.y, e.x, e.y) < hz.power.radius) && X.nin(e.id, hz.hit) {
                         set hz.hit@+ = e.id
-                        if take_hit(e, hz) && !hz.power.multitarget {
+                        val hit = take_hit(e, hz)
+                        if !hz.power.beacon {
+                            set combat.last_enemy = e
+                        }
+                        if hit && !hz.power.multitarget {
                             set hz.active = false
                             set hz.lifespan = 0
                         }

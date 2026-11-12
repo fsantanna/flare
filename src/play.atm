@@ -65,6 +65,62 @@ func play.trace (h, es) {
     }
 }
 
+;; the screen rectangle of an enemy at the camera (Entity::getRenderBounds)
+func play.bounds (e) {
+    val cx, cy = fl.cam()
+    val sx, sy = fl.map2scr(e.x, e.y, cx, cy)
+    val g = anim.gfx(e.cur.a, e.cur.sub, e.dir)
+    if g => [sx - g@5, sy - g@6, g@3, g@4] => [0, 0, 0, 0]
+}
+
+;; GameStatePlay::checkEnemyFocus, with the mouse: the enemy of the last
+;; hit of a hazard, or the alive enemy under the mouse nearest to its center
+func play.focus (h, ens) {
+    var enemy = nil
+    if combat.last_enemy {
+        set enemy = combat.last_enemy
+        set combat.last_enemy = nil
+    } else {
+        val mx, my = fl.mouse()
+        var best = nil
+        loop _, t in ens {
+            val e = t.pub
+            if (e.state != STATE.DEAD) && (e.state != STATE.CRITDEAD) {
+                val r = play.bounds(e)
+                if (mx >= r@0) && (my >= r@1) && (mx < (r@0 + r@2)) && (my < (r@1 + r@3)) {
+                    val d = fl.dist(mx, my, fl.f32(r@0 + (r@2 / 2)), fl.f32(r@1 + (r@3 / 2)))
+                    if (best == nil) || (d < best) {
+                        set best = d
+                        set enemy = e
+                    }
+                }
+            }
+        }
+    }
+    set h.cursor_enemy = enemy
+}
+
+;; MenuActionBar::checkAction, for the main buttons of the mouse: the power
+;; of the slot, aimed at the mouse (aim_assist of misc.txt: 96)
+func play.actions (h) {
+    loop _, i in [10, 11] {
+        val k = if i == 10 => Input.MAIN1 => Input.MAIN2
+        if fl.pressed(k) {
+            val id = hero.actionbar@i || 0
+            val pw = power.get(id)
+            ;; the slot is disabled while the power is cast
+            val enabled = (h.casting@id == nil) || timer_end(h.casting@id)
+            if pw && enabled && (pw.requires_mp <= h.mp) {
+                val mx, my = fl.mouse()
+                val tx, ty = fl.scr2map(mx, if pw.aim_assist => (my + 96) => my)
+                if (h.state != STATE.POWER) && (h.state != STATE.HIT) {
+                    set h.actions@+ = [power = id, target = [tx, ty]]
+                }
+            }
+        }
+    }
+}
+
 ;; the hidden draws of a map loaded (EntityManager::handleNewMap): a
 ;; Map_Enemy, and getRandomNeighbor of the tiles around the hero
 func play.new_map_draws (x, y, skip) {
@@ -89,6 +145,7 @@ func play.new_map_draws (x, y, skip) {
 ;; A new game in a map, at a position (or at the hero of the map).
 task Play (path, pos, class) {
     val st = hero.stats(class)
+    hero.load_sfx("male")
     hero.load_steps(st.sfx_step)
 
     ;; GameStatePlay(): the hidden draw of its handleNewMap
@@ -123,6 +180,8 @@ task Play (path, pos, class) {
 
     spawn {
         loop on :frame {
+            play.focus(h.pub, ens)
+            play.actions(h.pub)
             emit @h :hero.logic
             fl.rand()                       ;; handleSpawn: Map_Enemy()
             loop _, t in ens {
