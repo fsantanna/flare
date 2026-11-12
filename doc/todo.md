@@ -26,11 +26,16 @@ Status (later): the runs `fight`, the duels of twelve maps, and the
 stands of `cave1` (goblins, the minotaur's quake) and `brothers_lair_ice_hall`
 (the prophet's freeze, a repeater) pass in full, up to the death of the
 hero. The powers that the enemies of the alpha demo use are fixed,
-missile, repeater, and spawn, with post and wall chains. Left in F5: the
-powers of types transform and block (the hero's, later); on_hit,
-on_half_dead, on_death, on_debuff powers checked against runs; fleeing
-and wandering checked against runs; the game over screen; combat text;
-the drawing of enemies, hazards, and loot.
+missile, repeater, and spawn, with post and wall chains. The enemy files
+of the alpha demo give only melee and ranged AI powers (no on_hit,
+half_dead, on_death, debuff), and none sets `chance_flee` (0: enemies
+never flee, but `percentChanceF(0)` still draws). Enemies, corpses, and
+hazards are drawn as the original, pixel by pixel (`tools/compare-shot.sh`
+on duels and stands). Left in F5: the powers of types transform and block
+(the hero's, later); the game over screen; combat text. Left for F6: the
+loot on the ground (the `loot_animation` of items), the layers of the hero
+(its equipment), the NPCs (the captured trader of cave1), the
+animations of effects on entities (shield, heal).
 
 Status (earlier): `hero-cave` is the same as the original up to frame 222, where
 an event of the map (`power=132` of an event with a hotspot) makes event

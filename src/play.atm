@@ -239,6 +239,31 @@ task MapRun (path, pos, h) {
     fl.cam_logic()
     play.trace(hp, ens)
 
+    ;; EntityManager::addRenders and HazardManager::addRenders: the
+    ;; enemies (a corpse below the objects, until its timeout), the hazards
+    ;; (on the floor below the objects); drawn by Play, after the hero
+    spawn {
+        loop on :draw {
+            loop _, t in ens {
+                val e = t.pub
+                val gone = e.corpse && timer_end(e.corpse_timer)
+                val g = anim.gfx(e.cur.a, e.cur.sub, e.dir)
+                if g && !gone && !fl.col_outside(e.x, e.y) {
+                    fl.ren(e.corpse, g@0, g@1, g@2, g@3, g@4, g@5, g@6, e.x, e.y, 1, false)
+                }
+            }
+            loop _, hz in combat.list {
+                if (hz.delay == 0) && hz.cur {
+                    val g = anim.gfx(hz.cur.a, hz.cur.sub, hz.dir)
+                    if g {
+                        val fl_ = hz.power.on_floor
+                        fl.ren(fl_, g@0, g@1, g@2, g@3, g@4, g@5, g@6, hz.x, hz.y, if fl_ => 0 => 2, false)
+                    }
+                }
+            }
+        }
+    }
+
     loop on :frame {
         if hp.hp > 0 {
             event.hotspots(play.events, w)
@@ -298,12 +323,12 @@ task Play (path, pos, class) {
     }
 
     loop on :draw {
-        fl.ren_clear()
         val hp = h.pub
         val g = anim.gfx(hp.cur.a, hp.cur.sub, hp.dir)
-        if g {
+        if g && !os.getenv("FLARE_NOHERO") {
             fl.ren(false, g@0, g@1, g@2, g@3, g@4, g@5, g@6, hp.x, hp.y, 0, true)
         }
         fl.map_render()
+        fl.ren_clear()          ;; the maps add theirs before the next draw
     }
 }

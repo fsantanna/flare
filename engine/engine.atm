@@ -216,6 +216,10 @@ val fl = [
     col_unblock = func (x, y) {
         `fl_col_unblock((float)a_dbl($x), (float)a_dbl($y));`
     },
+    ;; MapCollision::isOutsideMap, of a position
+    col_outside = func (x, y) {
+        `:boolean ((float)a_dbl($x) < 0 || (float)a_dbl($y) < 0 || (float)a_dbl($x) >= (float)FL_MAP_W || (float)a_dbl($y) >= (float)FL_MAP_H)`
+    },
     col_valid = func (x, y, mt, ct) {
         `:boolean fl_col_valid((float)a_dbl($x), (float)a_dbl($y), fl_int($mt), fl_int($ct))`
     },

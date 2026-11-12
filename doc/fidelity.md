@@ -28,6 +28,8 @@ The patch adds `src/Bench.h`, included before every source file
 | `FLARE_MAP=<file>` | the first map of that game, instead of `maps/spawn.txt`, with the hero at its `hero_pos` |
 | `FLARE_POS=<x>,<y>` | the position of the hero in that map |
 | `FLARE_ONLYMAP=1` | draw only the layers of the map: no objects, menus, texts, nor cursor |
+| `FLARE_NOHUD=1` | draw the map and its objects, with no menus, combat text, tooltips, nor cursor |
+| `FLARE_NOHERO=1` | do not draw the hero (port too) |
 | `FLARE_SHOT=<n>:<file>` | save the screen at logic frame n, as BMP |
 | `FLARE_INI=<list>` | do not play: dump each file of the list as `FileParser` reads it across the mods, to the trace |
 | `FLARE_ANIM=<list>` | do not play: dump each animation file of the list as `AnimationSet` loads it, to the trace |
@@ -103,9 +105,13 @@ same trace.
 | `hero-walk` | the first map: walk in the 8 directions, into walls, with quick turns |
 | `hero-cliff` | the first map, from another place: along the cliffs, with slides |
 | `hero-cave` | `cave1`: along the walls of a cave, with its enemies standing |
+| `stand-<map>` | the hero stands (attacking or not) at a place of a map, until the end or its death |
+| `duel-<map>` | the hero attacks the first enemy of a map, next to it, until the end |
 
 The port plays the runs listed in `tst/runs.txt`, and `tools/compare.sh`
-compares its traces with these, line by line.
+compares its traces with these, line by line. `tools/compare-shot.sh <run>
+<frame>...` compares the screens of a run at some frames, pixel by pixel,
+with `FLARE_NOHUD` and `FLARE_NOHERO`.
 
 ## Hidden draws
 
@@ -139,6 +145,18 @@ backtraces at each call.
   animation of its last cast.
 - A timer read from a file starts full (`setDuration`), and one built by
   the constructor starts empty.
+- With no `cooldown_hit` in its file, an entity waits the duration of its
+  hit animation between hits (`Entity::loadAnimations`,
+  `EntityManager::loadEntity`); without it, the sound of a hit draws in
+  more frames.
+- An enemy waits 2 seconds for a path after one failed search
+  (`PATH_FOUND_FAIL_THRESHOLD` is 1 in `EntityBehavior.h`).
+- The images of animations are loaded by the queue of threads
+  (`RenderDevice::loadQueuedImages`), which keeps the format of
+  `IMG_Load` (ABGR8888 for a PNG with alpha); the other images are
+  converted to ARGB8888 (`SDLSoftwareRenderDevice::loadImage`). SDL blends
+  the semi-transparent pixels of the two differently (by 1 to 9 levels):
+  the port keeps the two formats to draw the same pixels.
 
 ## Differences
 

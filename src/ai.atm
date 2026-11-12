@@ -522,6 +522,15 @@ task EDead (e, crit) {
         if anim.is_last(e.cur) || (e.cur.a.name != name) {
             set e.corpse = true
             fl.col_unblock(e.x, e.y)
+            ;; a corpse lasts corpse_timeout (60s by default), or nothing
+            ;; on a blocked tile; aligned to 1/16, against "jumping"
+            set e.corpse_timer = timer(60 * 60)
+            set e.corpse_timer.cur = e.corpse_timer.dur
+            if !fl.col_valid(e.x, e.y, MOVE.NORMAL, COLLIDE.ALL) {
+                set e.corpse_timer.cur = 0
+            }
+            set e.x = fl.f32(math.floor(e.x / 0.0625) * 0.0625)
+            set e.y = fl.f32(math.floor(e.y / 0.0625) * 0.0625)
             await(false)
         }
         await :enemy.step
@@ -604,6 +613,7 @@ task Enemy (st, me) {
         ;; EntityBehavior::logic
         if e.corpse {
             ;; a corpse only waits
+            timer_tick(e.corpse_timer)
         } else {
           if fl.dist(e.x, e.y, hero_st.x, hero_st.y) <= ENCOUNTER_DIST {
             set e.encountered = true
