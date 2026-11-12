@@ -327,6 +327,7 @@ static void fl_music (const char* path) {
 
 #include "engine/map.h"
 #include "engine/collision.h"
+#include "engine/geom.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // INPUT, as InputState and SDLInputState of the original

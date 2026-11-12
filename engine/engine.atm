@@ -224,6 +224,25 @@ val fl = [
         return p, q
     },
 
+    ;; geometry with 32-bit floats: see `engine/geom.h`
+    direction = func (x0, y0, x1, y1) {
+        `:number fl_direction((float)a_dbl($x0), (float)a_dbl($y0), (float)a_dbl($x1), (float)a_dbl($y1))`
+    },
+    dist = func (x1, y1, x2, y2) {
+        `:number.float (double)fl_distf((float)a_dbl($x1), (float)a_dbl($y1), (float)a_dbl($x2), (float)a_dbl($y2))`
+    },
+    vector = func (x, y, dir, d) {
+        val px = `:number.float (double)fl_vector((float)a_dbl($x), (float)a_dbl($y), fl_int($dir), (float)a_dbl($d)).x`
+        val py = `:number.float (double)fl_vector((float)a_dbl($x), (float)a_dbl($y), fl_int($dir), (float)a_dbl($d)).y`
+        return px, py
+    },
+    rotate = func (dir, v) {
+        `:number fl_rotate(fl_int($dir), fl_int($v))`
+    },
+    face_next = func (dir, x, y, mx, my) {
+        `:number fl_face_next(fl_int($dir), (float)a_dbl($x), (float)a_dbl($y), (float)a_dbl($mx), (float)a_dbl($my))`
+    },
+
     ;; f32(x): x rounded to 32 bits, as a `float` of the original
     f32 = func (x) {
         `:number.float (double)(float)a_dbl($x)`
