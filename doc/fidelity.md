@@ -97,7 +97,7 @@ same trace.
 | Run | What |
 |-----|------|
 | `walk` | the first map: walk with W and D, one attack in the air |
-| `fight` | `cave_of_living_bones1`, next to an antlion: attack it until the hero dies |
+| `fight` | `cave_of_living_bones1`, next to an antlion: attack it until the hero dies (with the draws of each frame) |
 | `hero-walk` | the first map: walk in the 8 directions, into walls, with quick turns |
 | `hero-cliff` | the first map, from another place: along the cliffs, with slides |
 | `hero-cave` | `cave1`: along the walls of a cave, with its enemies standing |
@@ -118,10 +118,25 @@ its generator at the same places, or every later draw differs:
 - `EntityManager::handleNewMap` also calls `getRandomNeighbor` around the
   hero for every map: one draw if any tile around is free.
 - The hero picks a sound of steps (`rand() % 4`) in every frame that it
-  moves, with or without audio.
+  moves, with or without audio. Sounds of attacks, hits, and deaths are
+  picked the same way, also when there is one sound.
+- `Entity::takeHit` tests the reflection of a missile with
+  `percentChanceF(reflect)`, a draw even with no reflection.
+- A critical hit on an enemy shakes the camera for 30 frames, with two
+  draws per frame in `Camera::logic`.
+- The chance of a random number of the same min and max draws nothing
+  (`randBetween`, `randBetweenF`), but `percentChanceF(0)` draws.
 
 They were found with `FLARE_RNG`, and a build of the original with
 backtraces at each call.
+
+## Found in the code, not in the data
+
+- The hero has a global cooldown of 66ms between powers, set in
+  `StatBlock::loadHeroStats`, and a power slot waits as long as the
+  animation of its last cast.
+- A timer read from a file starts full (`setDuration`), and one built by
+  the constructor starts empty.
 
 ## Differences
 
