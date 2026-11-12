@@ -210,6 +210,10 @@ func enemy.stats (path) {
                 "level" => { set st.level = parse.int(v) }
                 "xp" => { set st.xp = parse.int(v) }
                 "stat" => { set st.base@(l@0) = parse.float(l@1) }
+                "vulnerable" => {
+                    ;; deprecated: a resistance of 100 - the value
+                    set st.base@(l@0 ++ "_resist") = fl.f32(fl.f32(parse.float(l@1) * -1) + 100)
+                }
                 "speed" => { set st.speed = fl.f32(parse.float(v, 0) / 60) }
                 "turn_delay" => { set st.turn_delay = parse.duration(v) }
                 "chance_pursue" => { set st.chance_pursue = parse.float(v) }

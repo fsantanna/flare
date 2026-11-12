@@ -27,6 +27,7 @@ enemy.init()
 power.init()
 effect.init()
 loot.init()
+combat.init()
 
 val pos = if os.getenv("FLARE_POS") {
     val l = parse.list(os.getenv("FLARE_POS"))

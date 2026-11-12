@@ -25,10 +25,36 @@ func stat (s, k) {
 
 ;; the damage types of engine/damage_types.txt, in order
 val DAMAGE = [
-    [id = "melee", min = "dmg_melee_min", max = "dmg_melee_max"],
-    [id = "ranged", min = "dmg_ranged_min", max = "dmg_ranged_max"],
-    [id = "ment", min = "dmg_ment_min", max = "dmg_ment_max"],
+    [id = "melee", min = "dmg_melee_min", max = "dmg_melee_max", resist = "melee_resist", elemental = false],
+    [id = "ranged", min = "dmg_ranged_min", max = "dmg_ranged_max", resist = "ranged_resist", elemental = false],
+    [id = "ment", min = "dmg_ment_min", max = "dmg_ment_max", resist = "ment_resist", elemental = false],
 ]
+
+;; the elements of engine/elements.txt, deprecated, are damage types too
+func combat.init () {
+    loop _, s in ini.load("engine/elements.txt") || [] {
+        if s.name == "element" {
+            loop _, kv in s.keys {
+                if kv@0 == "id" {
+                    val id = kv@1
+                    set DAMAGE@+ = [id = id, min = "dmg_" ++ id ++ "_min", max = "dmg_" ++ id ++ "_max",
+                                    resist = id ++ "_resist", elemental = true]
+                }
+            }
+        }
+    }
+}
+
+;; the index of a damage type, or nil
+func damage_index (id) {
+    var r = nil
+    loop i, d in DAMAGE {
+        if d.id == id {
+            set r = i
+        }
+    }
+    r
+}
 
 ;; EngineSettings::Combat::resourceRound, by rounding
 func resource_round (x) {
@@ -54,14 +80,29 @@ func hazard_new (id, pw, src, ox, oy, tx, ty) {
         delay = 0, x = ox, y = oy, hit = [], sx = 0.0, sy = 0.0,
         cur = if pw.animation != "" => anim.cursor(anim.get(anim.load(pw.animation), "")) => nil,
     ]
-    ;; the damage of the base type of the power (no conversion, no elements)
+    ;; the damage of the base type of the power, converted to its element,
+    ;; or with the elements of the source if the base is not elemental
+    val base = damage_index(pw.base_damage)
+    val conv = damage_index(pw.converted_damage)
     loop i, d in DAMAGE {
-        set hz.damage@i = if pw.base_damage == d.id {
-            [stat(src, d.min), stat(src, d.max)]
-        } else {
-            [0, 0]
+        set hz.damage@i = [0, 0]
+    }
+    if base != nil {
+        loop i, d in DAMAGE {
+            if conv != nil {
+                if (i == conv) || (i == base) {
+                    set hz.damage@conv = [fl.f32(hz.damage@conv@0 + stat(src, d.min)),
+                                          fl.f32(hz.damage@conv@1 + stat(src, d.max))]
+                }
+            } else {
+                if (i == base) || (!DAMAGE@base.elemental && d.elemental) {
+                    set hz.damage@i = [fl.f32(hz.damage@i@0 + stat(src, d.min)),
+                                       fl.f32(hz.damage@i@1 + stat(src, d.max))]
+                }
+            }
         }
     }
+    set hz.base, hz.conv = base, conv
     if pw.directional {
         set hz.dir = fl.direction(ox, oy, tx, ty)
     } else {
@@ -226,8 +267,21 @@ func take_hit (t, hz) {
     val missed = percent_f(true_avoidance)
     ;; the damage of each type
     var dmg = 0.0
-    loop _, d in hz.damage {
-        set dmg = fl.f32(dmg + rand_between_f(d@0, d@1))
+    loop i, d in hz.damage {
+        var part = rand_between_f(d@0, d@1)
+        if ((i == hz.base) && (hz.conv == nil)) || (i == hz.conv) {
+            match pw.mod_damage_mode {
+                "multiply" => { set part = fl.f32(fl.f32(part * pw.mod_damage_min) / 100) }
+                "add" => { set part = fl.f32(part + pw.mod_damage_min) }
+                "absolute" => { set part = rand_between_f(pw.mod_damage_min, pw.mod_damage_max) }
+            }
+        }
+        ;; StatBlock::applyResistToDamage
+        var r = stat(t, DAMAGE@i.resist)
+        if r >= 0 {
+            set r = math.min(math.max(r, 0), 100)
+        }
+        set dmg = fl.f32(dmg + fl.f32(fl.f32(part * fl.f32(100 - r)) / 100))
     }
     ;; absorption
     var absorb = rand_between_f(stat(t, "absorb_min"), stat(t, "absorb_max"))
