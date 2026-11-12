@@ -50,7 +50,8 @@ func hazard_new (id, pw, src, ox, oy, tx, ty) {
         source = pw.source_type || (if src.hero => "hero" => "enemy"),
         crit = stat(src, "crit"), accuracy = stat(src, "accuracy"),
         damage = [], dir = 0, lifespan = pw.lifespan, active = !pw.no_attack,
-        delay = 0, x = ox, y = oy, hit = [],
+        delay = 0, x = ox, y = oy, hit = [], sx = 0.0, sy = 0.0,
+        cur = if pw.animation != "" => anim.cursor(anim.get(anim.load(pw.animation), "")) => nil,
     ]
     ;; the damage of the base type of the power (no conversion, no elements)
     loop i, d in DAMAGE {
@@ -105,6 +106,31 @@ func power_activate (id, src, tx, ty) {
             power_buff(id, pw, src, tx, ty)
             true
         }
+        "missile" => {
+            ;; PowerManager::missile
+            val sx, sy = if pw.starting_pos == "target" => (tx, ty) => (src.x, src.y)
+            val theta = fl.theta(sx, sy, tx, ty)
+            var delay = 0
+            loop i in pw.count {
+                val hz = hazard_new(id, pw, src, src.x, src.y, tx, ty)
+                val cnt, ang = pw.count, pw.missile_angle
+                val off = `:number.float (double)(((1.0f - (float)a_dbl($cnt)) / 2 + (float)a_dbl($i)) * ((float)a_dbl($ang) * (float)M_PI / 180.0f))`
+                var variance = 0.0
+                if pw.angle_variance != 0 {
+                    set variance = fl.f32(fl.f32(rand_between_f(fl.f32(pw.angle_variance * -1), pw.angle_variance) * `:number.float (double)(float)M_PI`) / 180)
+                }
+                val alpha = fl.f32(fl.f32(theta + off) + variance)
+                val vx, vy = fl.missile_speed(pw.speed, alpha)
+                set hz.sx, hz.sy = vx, vy
+                if pw.directional {
+                    set hz.dir = fl.direction(hz.x, hz.y, fl.f32(hz.x + vx), fl.f32(hz.y + vy))
+                }
+                set hz.delay = delay
+                set delay += pw.delay
+                set combat.new@+ = hz
+            }
+            true
+        }
         else => true
     }
 }
@@ -151,6 +177,10 @@ func take_hit (t, hz) {
         set t.join_combat = true
     }
     if pw.beacon {
+        return false
+    }
+    ;; a missile may be reflected (a draw, even with no reflect)
+    if (pw.type == "missile") && percent_f(stat(t, "reflect_chance")) {
         return false
     }
     ;; accuracy against avoidance
@@ -232,9 +262,19 @@ func hazards_logic (ens, hero) {
             if hz.lifespan > 0 {
                 set hz.lifespan = hz.lifespan - 1
             }
+            if hz.cur {
+                anim.advance(hz.cur)
+            }
+            if (hz.sx != 0) || (hz.sy != 0) {
+                set hz.x = fl.f32(hz.x + hz.sx)
+                set hz.y = fl.f32(hz.y + hz.sy)
+                if !fl.col_valid(hz.x, hz.y, MOVE.FLYING, COLLIDE.HAZARD) {
+                    set hz.lifespan = 0
+                }
+            }
         }
-        ;; isDangerousNow: active, no delay (no animations yet)
-        if hz.active && (hz.delay == 0) {
+        ;; isDangerousNow: active, no delay, at an active frame of its animation
+        if hz.active && (hz.delay == 0) && ((hz.cur == nil) || anim.is_active(hz.cur)) {
             loop _, et in ens {
                 val e = et.pub
                 if (hz.source == "enemy") {

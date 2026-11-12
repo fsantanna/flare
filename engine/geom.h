@@ -107,3 +107,11 @@ static FlPt fl_random_neighbor (int tx, int ty, int range, int mt, int ct) {
     FlPt p = { (float)tx, (float)ty };
     return p;
 }
+
+// Hazard::setAngle: the speed of a missile at an angle
+static FlPt fl_missile_speed (float base, float angle) {
+    while (angle >= (float)M_PI * 2) angle -= (float)M_PI * 2;
+    while (angle < 0.0) angle += (float)M_PI * 2;
+    FlPt s = { base * cosf(angle), base * sinf(angle) };
+    return s;
+}

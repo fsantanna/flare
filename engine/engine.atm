@@ -250,6 +250,15 @@ val fl = [
         `{ FlPt p = fl_random_neighbor((int)a_dbl($x), (int)a_dbl($y), fl_int($range), fl_int($mt), fl_int($ct)); FL_MOVE_X = p.x; FL_MOVE_Y = p.y; }`
         return `:number.float (double)FL_MOVE_X`, `:number.float (double)FL_MOVE_Y`
     },
+    theta = func (x1, y1, x2, y2) {
+        `:number.float (double)fl_theta((float)a_dbl($x1), (float)a_dbl($y1), (float)a_dbl($x2), (float)a_dbl($y2))`
+    },
+    ;; the speed of a missile at an angle (Hazard::setAngle): sx, sy
+    missile_speed = func (base, angle) {
+        val sx = `:number.float (double)fl_missile_speed((float)a_dbl($base), (float)a_dbl($angle)).x`
+        val sy = `:number.float (double)fl_missile_speed((float)a_dbl($base), (float)a_dbl($angle)).y`
+        return sx, sy
+    },
     rotate = func (dir, v) {
         `:number fl_rotate(fl_int($dir), fl_int($v))`
     },
