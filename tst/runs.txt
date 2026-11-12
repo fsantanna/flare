@@ -2,3 +2,4 @@
 # tools/compare.sh with the stored traces of the original.
 hero-walk
 hero-cliff
+fight

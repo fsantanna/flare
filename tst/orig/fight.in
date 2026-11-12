@@ -1,4 +1,4 @@
-# env: FLARE_MAP=maps/cave_of_living_bones1.txt FLARE_POS=15.5,20.5 FLARE_FRAMES=900
+# env: FLARE_MAP=maps/cave_of_living_bones1.txt FLARE_POS=15.5,20.5 FLARE_FRAMES=900 FLARE_RNG=1
 # near an antlion, attack it until the hero dies
 140 move 950 540
 140 down 1
