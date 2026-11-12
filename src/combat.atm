@@ -163,7 +163,10 @@ func power_buff (id, pw, src, tx, ty) {
 func power_effect (t, caster, id, pw) {
     loop _, pe in pw.post_effects {
         if percent_f(pe.chance) {
-            ;; EffectManager::addEffect
+            val dest = t
+            if dest.hp > 0 {
+                effect.add(dest, pe.id, pe.duration, pe.magnitude)
+            }
         }
     }
 }
@@ -230,7 +233,8 @@ func take_hit (t, hz) {
         set t.state = if t.hero => STATE.DEAD => STATE.DEAD
         set t.next = [act = "dead"]
     }
-    ;; the effects of the power, then its post powers
+    ;; a hit breaks a stun; then the effects of the power, and its post powers
+    effect.remove(t, "stun")
     power_effect(t, hz.src, hz.power_id, pw)
     if !t.hero {
         set t.encountered = true

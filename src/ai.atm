@@ -515,7 +515,7 @@ task Enemy (st, me) {
         chance_pursue = st.chance_pursue, chance_flee = st.chance_flee,
         combat_style = st.combat_style, facing = st.facing, turn_delay = st.turn_delay,
         sfx_attack = st.sfx_attack, sfx_hit = st.sfx_hit, sfx_die = st.sfx_die,
-        corpse = false, ai_hit_power = nil,
+        corpse = false, ai_hit_power = nil, stun = false, fx_add = [], fx_remove = [],
         cooldown = timer_of(st, "cooldown", st.cooldown),
         cooldown_hit = timer_of(st, "cooldown_hit", st.cooldown_hit || 0),
         cooldown_los = timer_of(st, "cooldown_los", st.cooldown_los), state_timer = timer(0),
@@ -534,6 +534,7 @@ task Enemy (st, me) {
         anims = anim.load(st.animations),
     ]
     val e = pub
+    pin fx = tasks()
     loop _, p in st.powers {
         set e.powers@+ = [type = p.type, id = p.id, chance = p.chance, cd = timer(0)]
     }
@@ -558,6 +559,7 @@ task Enemy (st, me) {
             set e.encountered = true
           }
           if e.encountered {
+            effect.logic(e, fx, task)
             ai_stats_logic(e, hero_st)
             ;; doUpkeep: a teleport of a power
             if e.teleport {
@@ -566,12 +568,14 @@ task Enemy (st, me) {
                 fl.col_block(e.x, e.y, false)
                 set e.teleport = nil
             }
-            ai_find_target(e, hero_st)
-            ai_check_power(e)
-            ai_check_move(e, hero_st)
-            ;; updateState
-            anim.advance(e.cur)
-            emit @(task) :enemy.step
+            if !e.stun {
+                ai_find_target(e, hero_st)
+                ai_check_power(e)
+                ai_check_move(e, hero_st)
+                ;; updateState
+                anim.advance(e.cur)
+                emit @(task) :enemy.step
+            }
             set e.fleeing = false
           }
         }

@@ -11,6 +11,7 @@ include "src/anim.atm"
 include "src/font.atm"
 include "src/map.atm"
 include "src/power.atm"
+include "src/effect.atm"
 include "src/hero.atm"
 include "src/enemy.atm"
 include "src/ai.atm"
@@ -22,6 +23,7 @@ ini.set_mods(dir, ini.resolve(dir, ["alpha_demo"]))
 font.init()
 enemy.init()
 power.init()
+effect.init()
 
 val pos = if os.getenv("FLARE_POS") {
     val l = parse.list(os.getenv("FLARE_POS"))
