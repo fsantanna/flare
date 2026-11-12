@@ -1,0 +1,11 @@
+include "../engine/engine.atm"
+include "../src/ini.atm"
+include "../src/parse.atm"
+include "../src/power.atm"
+val dir = os.getenv("FLARE_DATA")
+ini.set_mods(dir, ini.resolve(dir, ["alpha_demo"]))
+power.init()
+var n = 0
+loop _ in power.all { set n += 1 }
+print("powers", n)
+X.print(power.get(1).type, power.get(1).attack_anim, power.get(1).lifespan, power.get(1).radius, power.get(132).beacon, power.get(132).lifespan)

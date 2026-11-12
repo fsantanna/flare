@@ -44,8 +44,8 @@ check () {     # name, file
 [ "$1" = "update" ] && UPDATE=1
 
 # units: tst/<name>.atm, each with its output
-for t in ini parse; do
-	./run.sh tst/$t.atm > "$OUT/$t.out" 2>&1
+for t in ini parse power; do
+	FLARE_FRAMES=1 FLARE_MUTE=1 ./run.sh tst/$t.atm 2>&1 | grep -v "^flare: frames" > "$OUT/$t.out"
 	check $t "$OUT/$t.out"
 done
 

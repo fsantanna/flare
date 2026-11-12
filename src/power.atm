@@ -1,0 +1,155 @@
+;; Powers: `powers/powers.txt` as PowerManager::loadPowers reads it.
+;;
+;;      power.init()        loads the powers
+;;      power.get(id)       a power, or nil
+;;
+;; A power is a table with the fields of `Power` of the original that the
+;; data of the alpha demo and fantasycore use, with their defaults. The
+;; keys of a power go to the last `id=` read, and a power read again (in
+;; a later mod) keeps its fields, as in the original.
+
+val power = [
+    all = [],       ;; id -> power
+]
+
+func power_new (id) {
+    :Power [
+        id = id, type = nil, name = "", new_state = nil, attack_anim = "",
+        face = false, beacon = false, passive = false, meta_power = false,
+        requires_los = false, requires_los_default = true, requires_targeting = false,
+        requires_empty_target = false, directional = false, aim_assist = false,
+        on_floor = false, complete_animation = false, use_hazard = false,
+        no_attack = false, multitarget = false, buff = false, buff_teleport = false,
+        source_type = nil, count = 1, cooldown = 0, lifespan = 0,
+        starting_pos = "source", delay = 0, target_neighbor = 0,
+        requires_mp = 0, speed = 0.0, attack_speed = 100.0, radius = 0.0,
+        target_range = 0.0, mod_damage_mode = nil, mod_damage_min = 100.0,
+        mod_damage_max = 0.0, hp_steal = 0.0, mp_steal = 0.0, missile_angle = 0.0,
+        angle_variance = 0.0, speed_variance = 0.0, visual_random = 0,
+        visual_option = 0, base_damage = nil, converted_damage = nil,
+        spawn_type = "", animation = "", soundfx = "", icon = -1,
+        post_effects = [], chain = [], requires_flags = [],
+        trait_crits_impaired = 0.0, trait_armor_penetration = false,
+        requires_item = [], requires_equipped_item = [], keep_equipment = false,
+        transform_duration = 0, manual_untransform = false, untransform_on_hit = false,
+        passive_trigger = nil, modifier_accuracy = nil,
+    ]
+}
+
+func power.init () {
+    var p = nil
+    var clear_post = false
+    loop _, s in ini.load("powers/powers.txt") || [] {
+        loop _, kv in s.keys {
+            val k, v = kv@0, kv@1
+            val l = parse.list(v)
+            ifs {
+                k == "id" => {
+                    val id = parse.int(v)
+                    if power.all@id {
+                        set clear_post = true
+                    } else {
+                        set power.all@id = power_new(id)
+                    }
+                    set p = power.all@id
+                }
+                p == nil => nil
+                k == "type" => { set p.type = v }
+                k == "name" => { set p.name = v }
+                k == "icon" => { set p.icon = parse.int(v) }
+                k == "new_state" => {
+                    if v == "instant" {
+                        set p.new_state = "instant"
+                    } else {
+                        set p.new_state = "attack"
+                        set p.attack_anim = v
+                    }
+                }
+                k == "lifespan" => { set p.lifespan = parse.duration(v) }
+                k == "use_hazard" => { set p.use_hazard = parse.bool(v) }
+                k == "base_damage" => { set p.base_damage = v }
+                k == "trait_elemental" => { set p.converted_damage = v }
+                k == "radius" => { set p.radius = parse.float(v) }
+                k == "animation" => { set p.animation = v }
+                k == "soundfx" => { set p.soundfx = v }
+                k == "face" => { set p.face = parse.bool(v) }
+                k == "starting_pos" => { set p.starting_pos = v }
+                k == "directional" => { set p.directional = parse.bool(v) }
+                k == "aim_assist" => { set p.aim_assist = parse.bool(v) }
+                k == "speed" => { set p.speed = fl.f32(parse.float(v) / 60) }
+                k == "requires_mp" => { set p.requires_mp = parse.float(v) }
+                k == "cooldown" => { set p.cooldown = parse.duration(v) }
+                k == "requires_flags" => {
+                    set p.requires_flags = []
+                    loop _, f in l {
+                        until f == ""
+                        set p.requires_flags@+ = f
+                    }
+                }
+                k == "post_effect" => {
+                    if clear_post {
+                        set p.post_effects = []
+                        set clear_post = false
+                    }
+                    ;; id, magnitude, duration, chance
+                    set p.post_effects@+ = [id = l@0, magnitude = parse.float(l@1),
+                        duration = parse.duration(l@2 || ""), chance = parse.float(l@3, 100)]
+                }
+                (k == "post_power") || (k == "wall_power") || (k == "pre_power") => {
+                    val id = parse.int(l@0)
+                    if id > 0 {
+                        set p.chain@+ = [type = k, id = id,
+                            chance = if (l@1 != nil) && (l@1 != "") => parse.float(l@1) => 100.0]
+                    }
+                }
+                k == "modifier_damage" => {
+                    set p.mod_damage_mode = l@0
+                    set p.mod_damage_min = parse.float(l@1)
+                    set p.mod_damage_max = parse.float(l@2)
+                }
+                k == "modifier_accuracy" => { set p.modifier_accuracy = l }
+                k == "multitarget" => { set p.multitarget = parse.bool(v) }
+                k == "buff" => { set p.buff = parse.bool(v) }
+                k == "buff_teleport" => { set p.buff_teleport = parse.bool(v) }
+                k == "requires_los" => {
+                    set p.requires_los = parse.bool(v)
+                    set p.requires_los_default = false
+                }
+                k == "no_attack" => { set p.no_attack = parse.bool(v) }
+                k == "count" => { set p.count = parse.int(v) }
+                k == "visual_random" => { set p.visual_random = parse.int(v) }
+                k == "visual_option" => { set p.visual_option = parse.int(v) }
+                k == "floor" => { set p.on_floor = parse.bool(v) }
+                k == "target_range" => { set p.target_range = parse.float(l@0) }
+                k == "target_neighbor" => { set p.target_neighbor = parse.int(v) }
+                k == "spawn_type" => { set p.spawn_type = v }
+                k == "requires_targeting" => { set p.requires_targeting = parse.bool(v) }
+                k == "requires_empty_target" => { set p.requires_empty_target = parse.bool(v) }
+                k == "meta_power" => { set p.meta_power = parse.bool(v) }
+                k == "source_type" => { set p.source_type = v }
+                k == "delay" => { set p.delay = parse.duration(v) }
+                k == "complete_animation" => { set p.complete_animation = parse.bool(v) }
+                k == "beacon" => { set p.beacon = parse.bool(v) }
+                k == "missile_angle" => { set p.missile_angle = parse.float(v) }
+                k == "angle_variance" => { set p.angle_variance = parse.float(v) }
+                k == "speed_variance" => { set p.speed_variance = parse.float(v) }
+                k == "hp_steal" => { set p.hp_steal = parse.float(v) }
+                k == "mp_steal" => { set p.mp_steal = parse.float(v) }
+                k == "passive" => { set p.passive = parse.bool(v) }
+                k == "passive_trigger" => { set p.passive_trigger = v }
+                k == "trait_crits_impaired" => { set p.trait_crits_impaired = parse.float(v) }
+                k == "trait_armor_penetration" => { set p.trait_armor_penetration = parse.bool(v) }
+                k == "requires_item" => { set p.requires_item@+ = l }
+                k == "requires_equipped_item" => { set p.requires_equipped_item@+ = l }
+                k == "keep_equipment" => { set p.keep_equipment = parse.bool(v) }
+                k == "transform_duration" => { set p.transform_duration = parse.duration(v) }
+                k == "manual_untransform" => { set p.manual_untransform = parse.bool(v) }
+                k == "untransform_on_hit" => { set p.untransform_on_hit = parse.bool(v) }
+            }
+        }
+    }
+}
+
+func power.get (id) {
+    power.all@id
+}
