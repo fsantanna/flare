@@ -181,12 +181,25 @@ func enemy.place (groups) {
     ret
 }
 
-;; the stats of an enemy file (StatBlock::load), for what the port uses
+;; The stats of an enemy file, as StatBlock::load, loaded once. `base` has
+;; the `stat=` values by name (hp, accuracy, dmg_melee_min, ...); the times
+;; are in logic frames; `powers` are the AI powers of `power=` in order:
+;; [type, id, chance].
 func enemy.stats (path) {
     if enemy.protos@path {
         return enemy.protos@path
     }
-    val st = [path = path, name = "", level = 0, hp = 0, speed = 0.2, base = []]
+    val st = [
+        path = path, name = "", level = 0, xp = 0, hp = 0, mp = 0, base = [],
+        speed = fl.f32(0.1), turn_delay = 0, chance_pursue = 0.0, chance_flee = 0.0,
+        melee_range = 1.0, threat_range = 0.0, threat_range_far = 0.0, flee_range = nil,
+        cooldown = 0, cooldown_hit = nil, cooldown_los = 0, combat_style = "default",
+        facing = true, movement = MOVE.NORMAL, waypoint_pause = 60,
+        flee_duration = 60, flee_cooldown = 60, animations = "",
+        powers = [], loot = [], loot_count = [0, 0],
+        sfx_attack = [], sfx_hit = [], sfx_die = [], sfx_critdie = [], sfx_block = [],
+        corpse_has_collision = false, suppress_hp = false, humanoid = false,
+    ]
     loop _, s in ini.load(path) || [] {
         loop _, kv in s.keys {
             val k, v = kv@0, kv@1
@@ -194,13 +207,54 @@ func enemy.stats (path) {
             match k {
                 "name" => { set st.name = v }
                 "level" => { set st.level = parse.int(v) }
+                "xp" => { set st.xp = parse.int(v) }
                 "stat" => { set st.base@(l@0) = parse.float(l@1) }
-                "speed" => { set st.speed = fl.f32(parse.float(v) / 60) }
+                "speed" => { set st.speed = fl.f32(parse.float(v, 0) / 60) }
+                "turn_delay" => { set st.turn_delay = parse.duration(v) }
+                "chance_pursue" => { set st.chance_pursue = parse.float(v) }
+                "chance_flee" => { set st.chance_flee = parse.float(v) }
+                "melee_range" => { set st.melee_range = parse.float(v) }
+                "threat_range" => {
+                    set st.threat_range = parse.float(l@0)
+                    set st.threat_range_far = if (l@1 != nil) && (l@1 != "") => parse.float(l@1) => (st.threat_range * 2)
+                }
+                "flee_range" => { set st.flee_range = parse.float(v) }
+                "cooldown" => { set st.cooldown = parse.duration(v) }
+                "cooldown_hit" => { set st.cooldown_hit = parse.duration(v) }
+                "cooldown_los" => { set st.cooldown_los = parse.duration(v) }
+                "combat_style" => { set st.combat_style = v }
+                "facing" => { set st.facing = parse.bool(v) }
+                "flying" => { set st.movement = if parse.bool(v) => MOVE.FLYING => MOVE.NORMAL }
+                "intangible" => { set st.movement = if parse.bool(v) => MOVE.INTANGIBLE => MOVE.NORMAL }
+                "waypoint_pause" => { set st.waypoint_pause = parse.duration(v) }
+                "flee_duration" => { set st.flee_duration = parse.duration(v) }
+                "flee_cooldown" => { set st.flee_cooldown = parse.duration(v) }
                 "animations" => { set st.animations = v }
+                "gfx" => { set st.animations = v }
+                "humanoid" => { set st.humanoid = parse.bool(v) }
+                "suppress_hp" => { set st.suppress_hp = parse.bool(v) }
+                "corpse_has_collision" => { set st.corpse_has_collision = parse.bool(v) }
+                "power" => {
+                    val id = parse.int(l@1)
+                    if id > 0 {
+                        set st.powers@+ = [type = l@0, id = id, chance = parse.float(l@2)]
+                    }
+                }
+                "loot" => { set st.loot@+ = l }
+                "loot_count" => { set st.loot_count = [parse.int(l@0), parse.int(l@1)] }
+                "sfx_attack" => { set st.sfx_attack@+ = [l@0, l@1] }
+                "sfx_hit" => { set st.sfx_hit@+ = v }
+                "sfx_die" => { set st.sfx_die@+ = v }
+                "sfx_critdie" => { set st.sfx_critdie@+ = v }
+                "sfx_block" => { set st.sfx_block@+ = v }
             }
         }
     }
     set st.hp = st.base.hp || 0
+    set st.mp = st.base.mp || 0
+    if st.flee_range == nil {
+        set st.flee_range = st.threat_range / 2
+    }
     set enemy.protos@path = st
     st
 }
