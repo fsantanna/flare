@@ -72,3 +72,21 @@ where they come from.
 - The fight run: the blinker (id 45) uses power 132 at frame 10, at its
   join_combat: the powers (`PowerManager`, `powers/*.txt`) are needed
   before any of this can be compared.
+
+## Notes on powers (read, not yet ported)
+
+- `PowerManager::activate`: traces `power`; the hero needs `requires_mp`;
+  a source with `hp <= requires_hp` fails; block powers go to `block`;
+  a power with speed and a target at the origin aims at `melee_range` in
+  the direction of the source (or `rand() % 8` if the origin is not the
+  source); then by type: fixed, missile, repeater, spawn, transform.
+- `fixed`: `count` hazards with `delay_frames` stepping by `delay`, then
+  `buff`, the sound, and the cost.
+- `initHazard`: source type (hero, ally, enemy, or the power's), crit and
+  accuracy of the source, damage min/max of the base damage type (or its
+  conversion, and elementals of the source when the base is not), the
+  animation, direction (directional: towards the target; visual_random:
+  `rand() % n` + visual_option), speed, lifespan, active unless
+  no_attack, the position (source, target clamped to target_range,
+  melee: `calcVector(origin, dir, melee_range)`, melee_unlocked), and
+  `getRandomNeighbor` for target_neighbor (a draw).
