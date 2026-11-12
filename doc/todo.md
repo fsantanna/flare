@@ -140,3 +140,11 @@ where they come from.
 - In hero-cave at frame 222, an on_trigger event spawns two hatchlings
   (EntityManager::spawn, then handleSpawn in the same frame, in state
   SPAWN), whose beacons print `power 70` and `power 71`.
+
+## Open
+
+- `ATMOS_ASAN=1` on the fight run reports 132 KB in 1030 allocations not
+  freed at the end, from the animation sets of `anim.cache`
+  (`src/anim.atm`). The unit tests of animations do not leak: it comes
+  with the game (a cycle through the pubs of tasks kept in global
+  tables, such as `combat.last_enemy`, `play.world`?). To find out.
