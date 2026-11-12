@@ -191,6 +191,44 @@ func power_activate (id, src, ox, oy, tx0, ty0) {
             }
             true
         }
+        "repeater" => {
+            ;; PowerManager::repeater: count hazards in a line from the
+            ;; start, one step of speed apart, until a wall; they share
+            ;; the list of what they hit (Hazard::parent)
+            val theta = fl.theta(ox, oy, tx, ty)
+            val vx, vy = fl.repeater_speed(pw.speed, theta)
+            var lx, ly = ox, oy
+            match pw.starting_pos {
+                "target" => {
+                    val cx, cy = fl.clamp_dist(0, pw.target_range, ox, oy, tx, ty)
+                    set lx, ly = cx, cy
+                }
+                "melee" => {
+                    val mx, my = fl.vector(ox, oy, src.dir, src.melee_range)
+                    set lx, ly = mx, my
+                }
+                "melee_unlocked" => {
+                    val cx, cy = fl.clamp_dist(src.melee_range, src.melee_range, ox, oy, tx, ty)
+                    set lx, ly = cx, cy
+                }
+            }
+            var delay = 0
+            var hit = nil
+            loop i in pw.count {
+                set lx, ly = fl.f32(lx + vx), fl.f32(ly + vy)
+                val wall = !fl.col_valid(lx, ly, MOVE.FLYING, COLLIDE.HAZARD)
+                until wall && (i > 0)
+                val hz = hazard_new(id, pw, src, ox, oy, tx, ty)
+                set hz.x, hz.y = lx, ly
+                set hz.delay = delay
+                set delay += pw.delay
+                set hit = hit || hz.hit
+                set hz.hit = hit
+                set combat.new@+ = hz
+                until wall
+            }
+            true
+        }
         "spawn" => {
             ;; PowerManager::spawn: a Map_Enemy, at the source (or near it)
             fl.rand()
