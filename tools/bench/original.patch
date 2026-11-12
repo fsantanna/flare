@@ -37,10 +37,10 @@ index 59cc8c24..024a445a 100644
  	// Traditional way to create an animation.
 diff --git a/src/Bench.h b/src/Bench.h
 new file mode 100644
-index 00000000..56c9e350
+index 00000000..226a082b
 --- /dev/null
 +++ b/src/Bench.h
-@@ -0,0 +1,167 @@
+@@ -0,0 +1,169 @@
 +/*
 +Bench: a fixed seed, scripted input, a trace, and a fast mode, for the
 +comparison of Flare with its port to Atmos (fsantanna/flare).
@@ -56,6 +56,8 @@ index 00000000..56c9e350
 +	FLARE_DUMP=1          trace the hero in every frame
 +	FLARE_RNG=1           trace the calls to rand() in every frame that has some
 +	FLARE_DUMPE=<id>      trace an entity in every frame, by its id in the trace
++	FLARE_NOHUD=1         draw the map and its objects: no menus, combat text, tooltips, nor cursor
++	FLARE_NOHERO=1        do not draw the hero
 +	FLARE_NEWGAME=<class> skip the title: a new game of this class index
 +	FLARE_MAP=<file>      the first map of the new game
 +	FLARE_POS=<x>,<y>     the position of the hero in it (default: the map's)
@@ -222,7 +224,7 @@ index 93c1e6a9..b7255837 100644
  	MapRenderer::MapLoot *map_loot = NULL;
  
 diff --git a/src/GameStatePlay.cpp b/src/GameStatePlay.cpp
-index 51044186..97c888b7 100644
+index 51044186..b30b43bb 100644
 --- a/src/GameStatePlay.cpp
 +++ b/src/GameStatePlay.cpp
 @@ -833,6 +833,63 @@ void GameStatePlay::updateActionBar(unsigned index) {
@@ -298,21 +300,35 @@ index 51044186..97c888b7 100644
  	pc->checkTransform();
  
  	// change hero powers on transformation
-@@ -1013,6 +1072,12 @@ void GameStatePlay::render() {
+@@ -1013,7 +1072,14 @@ void GameStatePlay::render() {
  	std::vector<Renderable> rens;
  	std::vector<Renderable> rens_dead;
  
+-	pc->addRenders(rens);
 +	// Bench: only the layers of the map, with no objects and no menus
 +	if (bench::env("FLARE_ONLYMAP")) {
 +		mapr->render(rens, rens_dead);
 +		return;
 +	}
 +
- 	pc->addRenders(rens);
++	if (!bench::env("FLARE_NOHERO")) // Bench: no hero
++		pc->addRenders(rens);
  
  	entitym->addRenders(rens, rens_dead);
+ 
+@@ -1027,6 +1093,10 @@ void GameStatePlay::render() {
+ 	// render the static map layers plus the renderables
+ 	mapr->render(rens, rens_dead);
+ 
++	// Bench: the map and its objects, with no menus and no combat text
++	if (bench::env("FLARE_NOHUD"))
++		return;
++
+ 	// mouseover tooltips
+ 	loot->renderTooltips(mapr->cam.pos);
+ 
 diff --git a/src/GameSwitcher.cpp b/src/GameSwitcher.cpp
-index 4c0cb0b3..1edd8e3d 100644
+index 4c0cb0b3..86523a1b 100644
 --- a/src/GameSwitcher.cpp
 +++ b/src/GameSwitcher.cpp
 @@ -38,6 +38,11 @@ FLARE.  If not, see http://www.gnu.org/licenses/
@@ -368,7 +384,7 @@ index 4c0cb0b3..1edd8e3d 100644
  	}
  
  	currentState->render();
-+	if (bench::env("FLARE_ONLYMAP")) // Bench: no tooltips and no cursor
++	if (bench::env("FLARE_ONLYMAP") || bench::env("FLARE_NOHUD")) // Bench: no tooltips and no cursor
 +		return;
  	tooltipm->render();
  	curs->render();
