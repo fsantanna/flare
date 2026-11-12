@@ -369,6 +369,8 @@ task Hero (st, pos) {
             emit @(task) :hero.step
         }
         fl.cam_target(h.x, h.y)
+        ;; MapRenderer::checkEvents at the hero
+        play_check_events(h)
         ;; the timers of the casts of the powers
         loop _, t in h.casting {
             timer_tick(t)

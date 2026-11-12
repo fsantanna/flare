@@ -10,6 +10,8 @@
 ;;      the trace                   benchTrace()
 
 val play = [
+    world = nil,        ;; the world of the current map (see play_world)
+    events = [],        ;; the events of the current map
     seen = nil,         ;; what the trace saw in the last frame: the hero
     seen_es = [],       ;; and the enemies, by id
 ]
@@ -143,22 +145,53 @@ func play.new_map_draws (x, y, skip) {
 }
 
 ;; A new game in a map, at a position (or at the hero of the map).
-task Play (path, pos, class) {
-    val st = hero.stats(class)
-    hero.load_sfx("male")
-    hero.load_steps(st.sfx_step)
+;; MapRenderer::checkEvents at the hero, from the frame of the hero
+func play_check_events (h) {
+    if play.world {
+        event.check(play.events, h.x, h.y, play.world)
+    }
+}
 
-    ;; GameStatePlay(): the hidden draw of its handleNewMap
-    fl.rand()
+;; The world of a map: what its events and its entities request in a frame
+func play_world (h) {
+    [hero = h, teleport = nil, spawns = [], powers = [], delayed = [],
+     skip_delay = false, cleared = false]
+}
 
-    ;; frame 0: the hidden draw of the frame, then the map
-    await :frame
-    fl.rand()
+;; EntityManager::handleSpawn: the entities requested in this frame, in
+;; state SPAWN (with the draw of the enemy of their category)
+func play_spawns (w, es, ens) {
+    loop _, sp in w.spawns {
+        fl.col_unblock(sp.x, sp.y)
+        val el = enemy_random(sp.type, 0, 0)
+        if el {
+            val t = spawn @es Enemy(enemy.stats(el.type),
+                [type = el.type, x = sp.x, y = sp.y, dir = sp.dir, wander = 0, waypoints = [], state = "spawn"])
+            set t.pub.id = #ens + 1
+            set ens@+ = t
+            fl.col_block(sp.x, sp.y, false)
+        }
+    }
+    set w.spawns = []
+}
+
+;; A map, from its load (in the checkTeleport of a frame) to the frame in
+;; which a teleport to another map is requested. It ends with that request.
+task MapRun (path, pos, h) {
+    val hp = h.pub
     fl.trace("map " ++ path)
     val m = map.load(path)
     val p = pos || m.hero
+    set hp.x, hp.y = fl.f32(p@0), fl.f32(p@1)
+    set hp.camera_lock = true
+    fl.cam_warp(hp.x, hp.y)
     ;; MapRenderer::load: the groups of enemies
     val placed = enemy.place(enemy.groups(m))
+    ;; the events, then those on load
+    val w = play_world(hp)
+    set play.world = w
+    set play.events = event.load(m)
+    event.on_load(play.events, w)
     ;; EntityManager::handleNewMap: its Map_Enemy, the enemies, the neighbor
     fl.rand()
     pin es = tasks()
@@ -170,28 +203,69 @@ task Play (path, pos, class) {
         fl.col_block(me.x, me.y, false)
     }
     play.new_map_draws(p@0, p@1, true)
-    fl.cam_warp(p@0, p@1)
-    pin h = spawn Hero(st, p)
     set combat.list = []
-    fl.col_block(h.pub.x, h.pub.y, false)
+    set play.seen = nil
+    set play.seen_es = []
+    fl.col_block(hp.x, hp.y, false)
+
+    ;; the rest of the frame of the load
+    event.logic(play.events, w)
     fl.tset_logic()
     fl.cam_logic()
-    play.trace(h.pub, ens)
+    play.trace(hp, ens)
+
+    loop on :frame {
+        play.focus(hp, ens)
+        play.actions(hp)
+        emit @h :hero.logic
+        fl.rand()                       ;; handleSpawn: Map_Enemy()
+        play_spawns(w, es, ens)
+        loop _, t in ens {
+            emit @t :enemy.logic [hero = hp]
+        }
+        hazards_logic(ens, hp)
+        loot.logic(hp)
+        ;; checkTeleport: another map ends this one
+        if w.teleport {
+            val tp = w.teleport
+            set w.teleport = nil
+            if tp.map {
+                break tp
+            }
+            set hp.x, hp.y = fl.f32(tp.pos@0), fl.f32(tp.pos@1)
+        }
+        set w.cleared = true
+        loop _, t in ens {
+            if t.pub.hp > 0 {
+                set w.cleared = false
+            }
+        }
+        event.logic(play.events, w)
+        fl.tset_logic()
+        fl.cam_logic()
+        play.trace(hp, ens)
+    }
+}
+
+;; A new game in a map, at a position (or at the hero of the map), then the
+;; maps it teleports to.
+task Play (path, pos, class) {
+    val st = hero.stats(class)
+    hero.load_sfx("male")
+    hero.load_steps(st.sfx_step)
+
+    ;; GameStatePlay(): the hidden draw of its handleNewMap
+    fl.rand()
+
+    ;; frame 0: the hidden draw of the frame, then the map
+    await :frame
+    fl.rand()
+    pin h = spawn Hero(st, pos || [0, 0])
 
     spawn {
-        loop on :frame {
-            play.focus(h.pub, ens)
-            play.actions(h.pub)
-            emit @h :hero.logic
-            fl.rand()                       ;; handleSpawn: Map_Enemy()
-            loop _, t in ens {
-                emit @t :enemy.logic [hero = h.pub]
-            }
-            hazards_logic(ens, h.pub)
-            loot.logic(h.pub)
-            fl.tset_logic()
-            fl.cam_logic()
-            play.trace(h.pub, ens)
+        var next = [map = path, pos = pos]
+        loop {
+            set next = await MapRun(next.map, next.pos, h)
         }
     }
 

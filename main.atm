@@ -17,6 +17,7 @@ include "src/enemy.atm"
 include "src/loot.atm"
 include "src/ai.atm"
 include "src/combat.atm"
+include "src/event.atm"
 include "src/play.atm"
 
 val dir = os.getenv("FLARE_DATA")
@@ -31,6 +32,8 @@ val pos = if os.getenv("FLARE_POS") {
     val l = parse.list(os.getenv("FLARE_POS"))
     [parse.float(l@0), parse.float(l@1)]
 } else {
-    nil
+    ;; a new game goes to maps/spawn.txt at (0,0): the teleport destination of
+    ;; GameStatePlay::resetGame is not set
+    if os.getenv("FLARE_MAP") => nil => [0, 0]
 }
-await Play(os.getenv("FLARE_MAP") || "maps/frontier_outpost.txt", pos, "Brute")
+await Play(os.getenv("FLARE_MAP") || "maps/spawn.txt", pos, "Brute")
