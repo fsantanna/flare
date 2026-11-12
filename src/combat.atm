@@ -89,7 +89,7 @@ func power_activate (id, src, tx, ty) {
     if pw == nil {
         return false
     }
-    fl.trace("power " ++ src.id ++ " " ++ id ++ " " ++ string.format("%.9g", fl.f32(tx)) ++ " " ++ string.format("%.9g", fl.f32(ty)))
+    fl.trace("power " ++ play_id(src) ++ " " ++ id ++ " " ++ string.format("%.9g", fl.f32(tx)) ++ " " ++ string.format("%.9g", fl.f32(ty)))
     if src.hero && (pw.requires_mp > src.mp) {
         return false
     }
@@ -130,6 +130,36 @@ func power_activate (id, src, tx, ty) {
                 set delay += pw.delay
                 set combat.new@+ = hz
             }
+            true
+        }
+        "spawn" => {
+            ;; PowerManager::spawn: a Map_Enemy, at the source (or near it)
+            fl.rand()
+            var px, py = src.x, src.y
+            match pw.starting_pos {
+                "target" => { set px, py = tx, ty }
+                "melee" => {
+                    val vx, vy = fl.vector(src.x, src.y, src.dir, src.melee_range)
+                    set px, py = vx, vy
+                }
+            }
+            if pw.target_neighbor > 0 {
+                val nx, ny = fl.random_neighbor(px, py, pw.target_neighbor, MOVE.FLYING, COLLIDE.ALL)
+                set px, py = nx, ny
+            }
+            if !fl.col_valid(px, py, MOVE.FLYING, COLLIDE.ALL) {
+                val nx, ny = fl.random_neighbor(src.x, src.y, 1, MOVE.FLYING, COLLIDE.ALL)
+                set px, py = nx, ny
+            }
+            if !fl.col_valid(px, py, MOVE.FLYING, COLLIDE.ALL) {
+                return false
+            }
+            val dir = fl.direction(src.x, src.y, tx, ty)
+            fl.col_block(px, py, src.hero)
+            loop _ in pw.count {
+                play_spawn_request([type = pw.spawn_type, x = fl.f32(px), y = fl.f32(py), dir = dir, summoner = src])
+            }
+            power_buff(id, pw, src, tx, ty)
             true
         }
         else => true

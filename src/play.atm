@@ -14,6 +14,7 @@ val play = [
     events = [],        ;; the events of the current map
     seen = nil,         ;; what the trace saw in the last frame: the hero
     seen_es = [],       ;; and the enemies, by id
+    next_id = 1,        ;; the next id of the trace in this map
 ]
 
 func play.f (x) {
@@ -40,8 +41,8 @@ func play.trace (h, es) {
         set play.seen = [state = h.state, hp = h.hp]
         ;; the enemies, in order, as the entities of EntityManager
         loop i, e in es {
-            val id = i + 1
             val p = e.pub
+            val id = play_id(p)
             val s2 = play.seen_es@id
             if s2 == nil {
                 fl.trace("spawn " ++ id ++ " " ++ p.name ++ " " ++ p.state ++ " " ++ play.f(p.x) ++ " " ++ play.f(p.y) ++ " " ++ play.f(p.hp))
@@ -145,6 +146,23 @@ func play.new_map_draws (x, y, skip) {
 }
 
 ;; A new game in a map, at a position (or at the hero of the map).
+;; the id of an entity or a StatBlock of an event in the trace: the next one
+;; when it is seen for the first time in a map, as bench::id of the patch
+func play_id (p) {
+    if p.id == nil {
+        set p.id = play.next_id
+        set play.next_id = play.next_id + 1
+    }
+    p.id
+}
+
+;; a spawn to the queue of the next handleSpawn (PowerManager::map_enemies)
+func play_spawn_request (sp) {
+    if play.world {
+        set play.world.spawns@+ = sp
+    }
+}
+
 ;; MapRenderer::checkEvents at the hero, from the frame of the hero
 func play_check_events (h) {
     if play.world {
@@ -167,8 +185,11 @@ func play_spawns (w, es, ens) {
         if el {
             val t = spawn @es Enemy(enemy.stats(el.type),
                 [type = el.type, x = sp.x, y = sp.y, dir = sp.dir, wander = 0, waypoints = [], state = "spawn"])
-            set t.pub.id = #ens + 1
-            set ens@+ = t
+                set ens@+ = t
+            if sp.summoner {
+                set sp.summoner.summons = sp.summoner.summons || []
+                set sp.summoner.summons@+ = t.pub
+            }
             fl.col_block(sp.x, sp.y, false)
         }
     }
@@ -181,16 +202,18 @@ task MapRun (path, pos, h) {
     val hp = h.pub
     fl.trace("map " ++ path)
     val m = map.load(path)
+    set play.next_id = 1
     val p = pos || m.hero
     set hp.x, hp.y = fl.f32(p@0), fl.f32(p@1)
     set hp.camera_lock = true
     fl.cam_warp(hp.x, hp.y)
-    ;; MapRenderer::load: the groups of enemies
-    val placed = enemy.place(enemy.groups(m))
-    ;; the events, then those on load
+    ;; Map::load: the events, with a StatBlock for those with a power
     val w = play_world(hp)
     set play.world = w
     set play.events = event.load(m)
+    ;; MapRenderer::load: the groups of enemies
+    val placed = enemy.place(enemy.groups(m))
+    ;; the events on load
     event.on_load(play.events, w)
     ;; EntityManager::handleNewMap: its Map_Enemy, the enemies, the neighbor
     fl.rand()
@@ -198,7 +221,6 @@ task MapRun (path, pos, h) {
     pin ens = []                ;; the enemies in order, as EntityManager
     loop _, me in placed {
         val t = spawn @es Enemy(enemy.stats(me.type), me)
-        set t.pub.id = #ens + 1
         set ens@+ = t
         fl.col_block(me.x, me.y, false)
     }

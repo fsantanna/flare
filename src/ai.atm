@@ -385,6 +385,15 @@ func ai_check_move (e, hero_st) {
     fl.col_block(e.x, e.y, false)
 }
 
+;; StatBlock::removeSummons, recursively
+func ai_remove_summons (e) {
+    loop _, s in e.summons || [] {
+        effect_take(s, s.hp_max)
+        ai_remove_summons(s)
+    }
+    set e.summons = []
+}
+
 ;; StatBlock::logic for an enemy: its timers and the regeneration of hp
 func ai_stats_logic (e, hero_st) {
     timer_tick(e.cooldown_hit)
@@ -406,6 +415,10 @@ func ai_stats_logic (e, hero_st) {
         set e.hp = math.max(0.0, math.min(fl.f32(e.hp + regen), e.hp_max))
     }
     effect.damage(e)
+    ;; StatBlock::removeSummons: the summons die with their summoner
+    if e.hp == 0 {
+        ai_remove_summons(e)
+    }
 }
 
 ;; ENTITY_STANCE and ENTITY_MOVE of updateState: the animation of the

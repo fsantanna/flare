@@ -113,6 +113,34 @@ func event.load (m) {
             set evs@+ = ev
         }
     }
+    ;; Map::addEventStatBlock for the events with a power: the source of
+    ;; their power, immune by an effect of RESIST_ALL, whose addEffect draws
+    ;; the 5 resistances of RESIST_DAMAGE_OVER_TIME to RESIST_STAT_DEBUFF
+    loop _, ev in evs {
+        loop _, c in ev.comps {
+            if c.type == "power" {
+                var sx, sy = ev.loc@0 + 0.5, ev.loc@1 + 0.5
+                var dmin, dmax = 0, 0
+                loop _, p in ev.comps {
+                    if p.type == "power_path" {
+                        set sx, sy = p.x + 0.5, p.y + 0.5
+                    }
+                    if p.type == "power_damage" {
+                        set dmin, dmax = p.min, p.max
+                    }
+                }
+                set ev.stats = [
+                    x = fl.f32(sx), y = fl.f32(sy), dir = 0, hp = 1.0, hero = false,
+                    melee_range = 1.0, perfect_accuracy = true,
+                    base = [dmg_melee_min = dmin, dmg_melee_max = dmax, dmg_ranged_min = dmin,
+                            dmg_ranged_max = dmax, dmg_ment_min = dmin, dmg_ment_max = dmax],
+                ]
+                loop _ in 5 {
+                    percent_f(100)
+                }
+            }
+        }
+    }
     evs
 }
 
