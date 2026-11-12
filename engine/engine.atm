@@ -236,6 +236,20 @@ val fl = [
         val py = `:number.float (double)fl_vector((float)a_dbl($x), (float)a_dbl($y), fl_int($dir), (float)a_dbl($d)).y`
         return px, py
     },
+    ;; speed * SPEED_MULTIPLIER[dir] * effect_speed / 100, in floats
+    real_speed = func (speed, dir, eff) {
+        `:number.float (double)((float)a_dbl($speed) * FL_SPEED_MULT[fl_int($dir)] * (float)a_dbl($eff) / 100)`
+    },
+    clamp_dist = func (rmin, rmax, sx, sy, tx, ty) {
+        val x = `:number.float (double)fl_clamp_dist((float)a_dbl($rmin), (float)a_dbl($rmax), (float)a_dbl($sx), (float)a_dbl($sy), (float)a_dbl($tx), (float)a_dbl($ty)).x`
+        val y = `:number.float (double)fl_clamp_dist((float)a_dbl($rmin), (float)a_dbl($rmax), (float)a_dbl($sx), (float)a_dbl($sy), (float)a_dbl($tx), (float)a_dbl($ty)).y`
+        return x, y
+    },
+    ;; a free tile around the tile of (x,y), with a draw if any (getRandomNeighbor)
+    random_neighbor = func (x, y, range, mt, ct) {
+        `{ FlPt p = fl_random_neighbor((int)a_dbl($x), (int)a_dbl($y), fl_int($range), fl_int($mt), fl_int($ct)); FL_MOVE_X = p.x; FL_MOVE_Y = p.y; }`
+        return `:number.float (double)FL_MOVE_X`, `:number.float (double)FL_MOVE_Y`
+    },
     rotate = func (dir, v) {
         `:number fl_rotate(fl_int($dir), fl_int($v))`
     },

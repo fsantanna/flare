@@ -71,3 +71,39 @@ static int fl_face_next (int dir, float x, float y, float mx, float my) {
     }
     return 0;
 }
+
+// Utils::clampDistance
+static FlPt fl_clamp_dist (float rmin, float rmax, float sx, float sy, float tx, float ty) {
+    FlPt p = { tx, ty };
+    if (rmin > 0 || rmax > 0) {
+        if (rmin > rmax) rmax = rmin;
+        float dist = sqrtf(powf(tx - sx, 2.f) + powf(ty - sy, 2.f));
+        if (dist < rmin) {
+            float ratio = rmin / dist;
+            p.x = sx + (ratio * (tx - sx));
+            p.y = sy + (ratio * (ty - sy));
+        } else if (dist > rmax) {
+            float ratio = rmax / dist;
+            p.x = sx + (ratio * (tx - sx));
+            p.y = sy + (ratio * (ty - sy));
+        }
+    }
+    return p;
+}
+
+// MapCollision::getRandomNeighbor of a tile: a free tile around (a draw if
+// there is any), or the tile itself
+static FlPt fl_random_neighbor (int tx, int ty, int range, int mt, int ct) {
+    FlPt valid[(2*8+1)*(2*8+1)];
+    int n = 0;
+    for (int i=-range; i<=range; i++) {
+        for (int j=-range; j<=range; j++) {
+            if (i == 0 && j == 0) continue;
+            FlPt p = { (float)(tx + i) + 0.5f, (float)(ty + j) + 0.5f };
+            if (n < (int)(sizeof(valid)/sizeof(valid[0])) && fl_col_valid(p.x, p.y, mt, ct)) valid[n++] = p;
+        }
+    }
+    if (n > 0) return valid[fl_rand() % n];
+    FlPt p = { (float)tx, (float)ty };
+    return p;
+}
