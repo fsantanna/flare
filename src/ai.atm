@@ -336,7 +336,7 @@ func ai_check_move (e, hero_st) {
                     set e.path_found = #e.path > 0
                     if !e.path_found {
                         set e.path_fails = e.path_fails + 1
-                        if e.path_fails >= 3 {
+                        if e.path_fails >= 1 {
                             timer_begin(e.path_fail_timer)
                         }
                     } else {
