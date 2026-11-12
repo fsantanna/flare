@@ -115,3 +115,28 @@ where they come from.
   multipliers `randBetweenF`; `resourceRound`; "miss" if 0; then
   `takeDamage`, the effects of the power, hp and mp steal; a beacon only
   makes the target join combat.
+
+## F6: events of maps (notes, being ported)
+
+- Keys of `[event]` in the alpha demo (count): type, location (526),
+  activate (525), soundfx (422), hotspot (251), tooltip (233), repeat
+  (212), mapmod (198), loot (134), intermap (56), msg (50),
+  requires_status (39), power (32), power_damage (29), set_status (28),
+  requires_not_status (25), cooldown (21), power_path (16), intramap
+  (14), unset_status (9), shakycam (7), spawn (5), requires_item (5),
+  remove_item (4), stash (1), reachable_from (1).
+- `loadEvent`: activate on_trigger (0), on_interact (1), on_mapexit (2),
+  on_leave (3), on_load (4, not kept), on_clear (5, not kept), static
+  (6); location x,y,w,h and its center; hotspot (or "location"); cooldown
+  and delay (set, then ended); reachable_from.
+- Components, one per key, but a list makes several of the same type:
+  mapmod (layer,x,y,tile ...), set/unset/requires(_not)_status (s ...),
+  spawn (type,x,y ...), requires/remove_item (id:qty ...), loot (with
+  its tables, as parseLoot). soundfx (file, x, y, loop), intermap (map,
+  x, y, spawn id), intramap (x, y), power (id), power_damage (min, max),
+  power_path (x, y, "hero" | x, y), shakycam (duration), msg, tooltip,
+  repeat (bool).
+- The trace prints `event <activate> <x> <y> <w> <h> <components>`.
+- In hero-cave at frame 222, an on_trigger event spawns two hatchlings
+  (EntityManager::spawn, then handleSpawn in the same frame, in state
+  SPAWN), whose beacons print `power 70` and `power 71`.
