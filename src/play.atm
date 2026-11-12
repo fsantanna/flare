@@ -113,7 +113,7 @@ func play.actions (h) {
             if pw && enabled && (pw.requires_mp <= h.mp) {
                 val mx, my = fl.mouse()
                 val tx, ty = fl.scr2map(mx, if pw.aim_assist => (my + 96) => my)
-                if (h.state != STATE.POWER) && (h.state != STATE.HIT) {
+                if timer_end(h.cooldown) && (h.state != STATE.POWER) && (h.state != STATE.HIT) {
                     set h.actions@+ = [power = id, target = [tx, ty]]
                 }
             }

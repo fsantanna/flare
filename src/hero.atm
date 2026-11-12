@@ -284,6 +284,7 @@ task HPower (h, turning) {
             power_activate(id, h, tgt@0, tgt@1)
         }
         if anim.is_last(h.cur) || (h.cur.a.name != pw.attack_anim) {
+            timer_begin(h.cooldown)
             break Stance
         }
         await :hero.step
@@ -312,7 +313,9 @@ task Hero (st, pos) {
     set pub = [
         task = task, name = "Bench", id = 0, hero = true, base = st.base,
         melee_range = 1.0, in_combat = false, next = nil, cursor_enemy = nil,
-        actions = [], casting = [], hp_max = st.hp, sfx_hit = hero.sfx.hit, cooldown_hit = timer(0),
+        actions = [], casting = [], hp_max = st.hp,
+        ;; the global cooldown between powers: 66ms in StatBlock::loadHeroStats
+        cooldown = timer(parse.duration("66ms")), sfx_hit = hero.sfx.hit, cooldown_hit = timer(0),
         x = fl.f32(pos@0), y = fl.f32(pos@1), dir = 6,
         speed = st.speed, hp = st.hp, mp = st.mp,
         state = STATE.STANCE,
@@ -336,6 +339,7 @@ task Hero (st, pos) {
         fl.col_unblock(h.x, h.y)
         ;; StatBlock::logic: timers and regeneration
         timer_tick(h.cooldown_hit)
+        timer_tick(h.cooldown)
         if (h.hp <= h.hp_max) && (h.hp > 0) {
             val regen = fl.f32(fl.f32((h.base.hp_regen || 0) / fl.f32(60.0)) / 60)
             set h.hp = math.max(0.0, math.min(fl.f32(h.hp + regen), h.hp_max))
