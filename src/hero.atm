@@ -21,7 +21,30 @@ val STATE = [STANCE=0, MOVE=1, POWER=2, SPAWN=3, BLOCK=4, HIT=5, DEAD=6, CRITDEA
 
 val hero = [
     steps = [],         ;; the sounds of steps (items/step_sounds.txt)
+    sfx = [attack = [], hit = [], die = [], critdie = [], block = []],
+                        ;; the sounds of the avatar (engine/avatar/<base>.txt)
+    actionbar = [],     ;; the powers of the slots of the class
+    equipment = [],     ;; the items of the class
 ]
+
+;; the sounds of the avatar, as StatBlock::loadHeroSFX
+func hero.load_sfx (base) {
+    loop _, s in ini.load("engine/avatar/" ++ base ++ ".txt") || [] {
+        loop _, kv in s.keys {
+            val l = parse.list(kv@1)
+            match kv@0 {
+                "sfx_attack" => {
+                    set hero.sfx.attack@(l@0) = hero.sfx.attack@(l@0) || []
+                    set hero.sfx.attack@(l@0)@+ = l@1
+                }
+                "sfx_hit" => { set hero.sfx.hit@+ = kv@1 }
+                "sfx_die" => { set hero.sfx.die@+ = kv@1 }
+                "sfx_critdie" => { set hero.sfx.critdie@+ = kv@1 }
+                "sfx_block" => { set hero.sfx.block@+ = kv@1 }
+            }
+        }
+    }
+}
 
 ;; the stats of the hero, as StatBlock::calcBase for level 1 with no items
 ;; and no effects: `stat=`, then `stat_per_primary=` times the primary
@@ -38,6 +61,18 @@ func hero.stats (class) {
                 if kv@0 == "primary" {
                     val l = parse.list(kv@1)
                     set primary@(l@0) = primary@(l@0) + parse.int(l@1)
+                }
+                if kv@0 == "equipment" {
+                    set hero.equipment = []
+                    loop _, x in parse.list(kv@1) {
+                        set hero.equipment@+ = parse.int(x)
+                    }
+                }
+                if kv@0 == "actionbar" {
+                    set hero.actionbar = []
+                    loop _, x in parse.list(kv@1) {
+                        set hero.actionbar@+ = parse.int(x)
+                    }
                 }
             }
         }
@@ -62,6 +97,24 @@ func hero.stats (class) {
                 }
                 "sfx_step" => {
                     set st.sfx_step = v
+                }
+            }
+        }
+    }
+    ;; the damage of the items equipped (dmg=type,min,max of items/items.txt)
+    loop _, s in ini.load("items/items.txt") || [] {
+        var id = nil
+        loop _, kv in s.keys {
+            ifs {
+                kv@0 == "id" => {
+                    set id = parse.int(kv@1)
+                }
+                (kv@0 == "dmg") && X.xin(id, hero.equipment) => {
+                    val l = parse.list(kv@1)
+                    val kmin = "dmg_" ++ l@0 ++ "_min"
+                    val kmax = "dmg_" ++ l@0 ++ "_max"
+                    set base@kmin = (base@kmin || 0) + parse.float(l@1)
+                    set base@kmax = (base@kmax || 0) + parse.float(l@2)
                 }
             }
         }
@@ -167,6 +220,9 @@ task Stance (h, turning) {
     set h.state = STATE.STANCE
     loop {
         await :hero.step
+        if h.next {
+            break h.next.act
+        }
         hero_anim(h, "stance")
         hero_turn(h, turning)
         until hero_pressing_move(h) && hero_move(h), Move
@@ -178,6 +234,9 @@ task Move (h, turning) {
     set h.state = STATE.MOVE
     loop {
         await :hero.step
+        if h.next {
+            break h.next.act
+        }
         hero_anim(h, "run")
         if #hero.steps > 0 {
             val i = fl.rand() % #hero.steps
@@ -192,11 +251,68 @@ task Move (h, turning) {
     }
 }
 
+;; ENTITY_POWER: the animation of the power, the power at its active frame,
+;; and the stance at its last frame. It starts in the step of the action
+;; queue that chose it.
+task HPower (h, turning) {
+    set h.state = STATE.POWER
+    val id = h.next.power
+    var tgt = h.next.target
+    set h.next = nil
+    val pw = power.get(id)
+    loop {
+        hero_anim(h, pw.attack_anim)
+        if anim.is_first(h.cur) {
+            ;; Avatar::beginPower
+            if h.cursor_enemy {
+                set tgt = [h.cursor_enemy.x, h.cursor_enemy.y]
+            }
+            if pw.face {
+                set h.dir = fl.direction(h.x, h.y, tgt@0, tgt@1)
+            }
+            ;; Entity::playAttackSound
+            val snds = hero.sfx.attack@(pw.attack_anim) || []
+            if #snds > 0 {
+                fl.rand()
+            }
+            ;; the slot of the power waits as long as the animation
+            set h.casting@id = h.casting@id || timer(0)
+            timer_set(h.casting@id, #h.cur.a.sub)
+        }
+        if anim.is_active(h.cur) {
+            fl.col_block(h.x, h.y, false)
+            power_activate(id, h, tgt@0, tgt@1)
+        }
+        if anim.is_last(h.cur) || (h.cur.a.name != pw.attack_anim) {
+            break Stance
+        }
+        await :hero.step
+        if h.next {
+            break h.next.act
+        }
+    }
+}
+
+;; ENTITY_HIT: the animation of the hit, played once
+task HHit (h, turning) {
+    set h.state = STATE.HIT
+    set h.next = nil
+    loop {
+        hero_anim(h, "hit")
+        until (anim.played(h.cur) >= 1) || (h.cur.a.name != "hit"), Stance
+        await :hero.step
+        if h.next {
+            break h.next.act
+        }
+    }
+}
+
 ;; The hero in a map, from `pos`. `st`: the stats of hero.stats.
 task Hero (st, pos) {
     set pub = [
         task = task, name = "Bench", id = 0, hero = true, base = st.base,
-        melee_range = 1.0, in_combat = false,
+        melee_range = 1.0, in_combat = false, next = nil, cursor_enemy = nil,
+        actions = [], casting = [], hp_max = st.hp, sfx_hit = hero.sfx.hit, cooldown_hit = timer(0),
         x = fl.f32(pos@0), y = fl.f32(pos@1), dir = 6,
         speed = st.speed, hp = st.hp, mp = st.mp,
         state = STATE.STANCE,
@@ -218,6 +334,12 @@ task Hero (st, pos) {
     ;; each logic frame, around the action
     loop on :hero.logic {
         fl.col_unblock(h.x, h.y)
+        ;; StatBlock::logic: timers and regeneration
+        timer_tick(h.cooldown_hit)
+        if (h.hp <= h.hp_max) && (h.hp > 0) {
+            val regen = fl.f32(fl.f32((h.base.hp_regen || 0) / fl.f32(60.0)) / 60)
+            set h.hp = math.max(0.0, math.min(fl.f32(h.hp + regen), h.hp_max))
+        }
         anim.advance(h.cur)
         if h.camera_lock {
             val cx, cy = fl.cam()
@@ -226,8 +348,21 @@ task Hero (st, pos) {
             }
         }
         emit @(task) :hero.prologue
+        ;; the action queue: a power, if in stance or moving
+        loop _, a in h.actions {
+            if (h.state == STATE.STANCE) || (h.state == STATE.MOVE) {
+                set h.next = [act = HPower, power = a.power, target = a.target]
+                set h.state = STATE.POWER
+                set h.cur = anim.cursor(h.cur.a)
+            }
+        }
+        set h.actions = []
         emit @(task) :hero.step
         fl.cam_target(h.x, h.y)
+        ;; the timers of the casts of the powers
+        loop _, t in h.casting {
+            timer_tick(t)
+        }
         fl.col_block(h.x, h.y, false)
     }
 }
