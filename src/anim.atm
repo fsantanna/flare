@@ -210,7 +210,7 @@ func anim.load (path) {
                 match k {
                     "image" => {
                         val l = parse.list(v)
-                        val img = fl.img(ini.locate(l@0) || l@0)
+                        val img = fl.img(ini.locate(l@0) || l@0, true)
                         set imgs@(l@1 || "") = img
                         if first_img == nil {
                             set first_img = img

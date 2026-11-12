@@ -132,6 +132,7 @@ static void fl_trace (const char* s) {
 
 typedef struct {
     char*        path;
+    int          raw;
     SDL_Surface* tex;
     int          w, h;
 } FlImg;
@@ -140,10 +141,13 @@ typedef struct {
 static FlImg FL_IMGS[FL_IMGS_MAX];
 static int   FL_IMGS_N = 0;
 
-// The image of a path, loaded once. Returns its index, or -1.
-static int fl_img_load (const char* path) {
+// The image of a path, loaded once. Returns its index, or -1. A raw image
+// keeps the format of IMG_Load, as the images of animations of the
+// original (RenderDevice::loadQueuedImages), which SDL blends differently
+// from the ARGB8888 of the others (SDLSoftwareRenderDevice::loadImage).
+static int fl_img_load (const char* path, int raw) {
     for (int i=0; i<FL_IMGS_N; i++) {
-        if (strcmp(FL_IMGS[i].path, path) == 0) {
+        if (strcmp(FL_IMGS[i].path, path) == 0 && FL_IMGS[i].raw == raw) {
             return FL_IMGS[i].tex ? i : -1;
         }
     }
@@ -152,14 +156,19 @@ static int fl_img_load (const char* path) {
     }
     FlImg* img = &FL_IMGS[FL_IMGS_N];
     img->path = strdup(path);
-    SDL_Surface* raw = IMG_Load(path);
+    img->raw = raw;
+    SDL_Surface* ld = IMG_Load(path);
     img->tex = NULL;
     img->w = img->h = 0;
-    if (raw == NULL) {
+    if (ld == NULL) {
         fprintf(stderr, "flare : image : %s : %s\n", path, IMG_GetError());
     } else {
-        img->tex = SDL_ConvertSurfaceFormat(raw, SDL_PIXELFORMAT_ARGB8888, 0);
-        SDL_FreeSurface(raw);
+        if (img->raw) {
+            img->tex = ld;
+        } else {
+            img->tex = SDL_ConvertSurfaceFormat(ld, SDL_PIXELFORMAT_ARGB8888, 0);
+            SDL_FreeSurface(ld);
+        }
         img->w = img->tex->w;
         img->h = img->tex->h;
     }
