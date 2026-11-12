@@ -51,3 +51,9 @@ meanwhile.
 - What would help: a binding of a module field for the lifetime of a
   block, weak references to tasks, a task allowed in its own `pub`, or
   the error naming the destination. Sent to the ceu-atmos session.
+- Answer of the ceu-atmos session (2026-11-12): language decisions, for
+  the author; the third port with this friction. What works today: one
+  pinned context table in the block of the pool (`pin ens = []` and the
+  other tables each on its own line, then `pin ctx = [ens = ens, ...]`),
+  passed as one argument, or functions defined inside that block. A task
+  in its own `pub` works only for a task pinned at the top level.
