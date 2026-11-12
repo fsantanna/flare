@@ -38,3 +38,37 @@ in the `spawn` lines (to look at when events come).
 Tools: `FLARE_RNG=1` gives the draws per frame; a build of the original
 with backtraces at each draw (see `doc/fidelity.md`, Hidden draws) finds
 where they come from.
+
+## Notes on EntityBehavior (read, not yet ported)
+
+- `logic`: a corpse only ticks its timer; an enemy farther than
+  `encounter_dist` from the hero (10.77 tiles here: sqrt(8^2 + 20^2)/2,
+  with integer divisions of the render by the tile) does nothing until
+  `encountered`; then `doUpkeep` (passives, `stats.logic`, teleport),
+  `findTarget`, `checkPower`, `checkMove`, `updateState`.
+- `findTarget`: target the hero (or allies), line of sight within
+  `threat_range` (raycast 0.1), `join_combat` (beacon power, then the
+  `on_join_combat` power sets ENTITY_POWER), leaving combat beyond
+  `threat_range_far` or at the end of `cooldown_los`; wander points;
+  fleeing: `percentChanceF(chance_flee)` only when in combat, in stance,
+  between `melee_range` and `flee_range` (= threat_range/2 by default),
+  then `randBetween` over the free directions.
+- `checkPower`: only in combat, with `stats.cooldown` ended, in stance or
+  move: `getAIPower` of half_dead, ranged (beyond melee_range), or melee;
+  power needs line of sight if `requires_los`; sets ENTITY_POWER and
+  resets the animation.
+- `checkMove`: the turn timer (`turn_delay`, capped by 1/real_speed), the
+  path (A*, with `percentChance(chance_calc_path += 5)`, -100 after a
+  computation), the direction to `pursue_pos`; stance moves on
+  `percentChanceF(chance_pursue)` beyond melee range; `faceNextBest` when
+  blocked; waypoints.
+- `updateState`: advance the animation, then STANCE/MOVE set animations;
+  POWER: at the first frame pre chain powers, attack speed, sound,
+  state_duration, charge; at the active frame `powers->activate` and the
+  cooldown of the AI power; at the last frame `stats.cooldown` begins and
+  back to stance; SPAWN until the last frame; HIT until the last frame;
+  DEAD/CRITDEAD: die animation, death power at the second-last frame,
+  corpse at the last.
+- The fight run: the blinker (id 45) uses power 132 at frame 10, at its
+  join_combat: the powers (`PowerManager`, `powers/*.txt`) are needed
+  before any of this can be compared.
