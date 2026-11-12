@@ -144,6 +144,11 @@ func loot_check (list, x, y, hero) {
     }
 }
 
+;; LootManager::addEnemyLoot
+func loot_dropping (e) {
+    set loot.dropping@+ = e
+}
+
 ;; LootManager::checkEnemiesForLoot, once per frame after the hazards
 func loot.logic (hero) {
     loop _, en in loot.dropping {

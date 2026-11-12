@@ -60,21 +60,26 @@ func effect.remove (t, type) {
 
 ;; An effect: alive while its timer runs (forever with no duration).
 task Effect (e, fx) {
-    val func status () {
+    ;; the status, with the timer at `cur`: damage over time on each whole
+    ;; second of the timer (or at its begin, if shorter than a second)
+    val func status (cur) {
+        val timed = ((cur % 60) == 0) || ((fx.dur < 60) && (cur == fx.dur))
         match fx.type {
             "stun" => { set e.stun = true }
+            "damage" => { if timed { set e.dot = e.dot + fx.m } }
+            "damage_percent" => { if timed { set e.dot_percent = e.dot_percent + fx.m } }
         }
     }
     watching :fx.remove until (it@0 == fx.type) || (it@0 == fx.id) {
         if fx.dur == 0 {
             loop on :fx.logic {
-                status()
+                status(0)
             }
         } else {
             ;; ticked in each logic after the one that sets the status
-            loop _ in fx.dur {
+            loop i in fx.dur {
                 await :fx.logic
-                status()
+                status(fx.dur - i)
             }
             await :fx.logic
         }
@@ -95,5 +100,33 @@ func effect.logic (e, pool, t) {
     }
     set e.fx_add = []
     set e.stun = false
+    set e.dot = 0.0
+    set e.dot_percent = 0.0
     emit @t :fx.logic
+}
+
+;; the damage of the effects in StatBlock::logic, after the regeneration
+func effect.damage (e) {
+    if e.hp > 0 {
+        if e.dot > 0 {
+            effect_take(e, resource_round(e.dot))
+        }
+        if e.dot_percent > 0 {
+            effect_take(e, resource_round(fl.f32(fl.f32(e.hp_max * e.dot_percent) / 100)))
+        }
+    }
+}
+
+;; StatBlock::takeDamage of an effect
+func effect_take (e, d) {
+    set e.hp = fl.f32(e.hp - d)
+    if e.hp <= 0 {
+        set e.hp = 0.0
+        set e.state = STATE.DEAD
+        set e.next = if e.hero => [act = HDead] => [act = "dead"]
+        if !e.hero {
+            fl.col_unblock(e.x, e.y)
+            loot_dropping(e)
+        }
+    }
 }

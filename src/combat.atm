@@ -236,7 +236,7 @@ func take_hit (t, hz) {
         ;; a critical death, if the entity has an animation for it
         val critdie = !t.hero && crit && (t.anims.anims.critdie != nil)
         set t.state = if critdie => STATE.CRITDEAD => STATE.DEAD
-        set t.next = [act = if critdie => "critdead" => "dead"]
+        set t.next = if t.hero => [act = HDead] => [act = if critdie => "critdead" => "dead"]
         if !t.hero {
             fl.col_unblock(t.x, t.y)
             set loot.dropping@+ = t
