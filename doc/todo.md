@@ -90,3 +90,23 @@ where they come from.
   no_attack, the position (source, target clamped to target_range,
   melee: `calcVector(origin, dir, melee_range)`, melee_unlocked), and
   `getRandomNeighbor` for target_neighbor (a draw).
+- `Hazard::logic`: waits `delay_frames`, counts down `lifespan`, advances
+  its animation, moves by speed (or follows the source), and dies at a
+  wall (`COLLIDE_TYPE_HAZARD`). `isDangerousNow`: active, no delay, and
+  its animation at an active frame (or no animation).
+- `HazardManager::logic`: removes the expired (in reverse, with expire
+  chain powers), takes the new ones, then for each hazard in reverse:
+  logic, wall chain powers, and if dangerous, each entity in order (not
+  the allies of a hero source, not the enemies of an enemy source), in
+  radius, once per hazard: `takeHit`; then the hero for enemy and
+  neutral sources. A hit of a hazard that is not multitarget makes it
+  inactive and ends it (unless complete_animation).
+- `Entity::takeHit` (Entity.cpp:319-600), the draws in order: reflect for
+  missiles; overhit if accuracy beats avoidance by more than 100; the
+  miss `percentChanceF(true_avoidance)` clamped by min/max avoidance;
+  `randBetweenF(min, max)` per damage type (all types, also zero ones);
+  absorption `randBetweenF(abs_min, abs_max)` with min/max absorb or
+  block; crit `percentChanceF`; crit, overhit, and miss damage
+  multipliers `randBetweenF`; `resourceRound`; "miss" if 0; then
+  `takeDamage`, the effects of the power, hp and mp steal; a beacon only
+  makes the target join combat.
