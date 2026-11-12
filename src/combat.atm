@@ -423,6 +423,16 @@ func hazards_logic (ens, hero) {
                 set hz.y = fl.f32(hz.y + hz.sy)
                 if !fl.col_valid(hz.x, hz.y, MOVE.FLYING, COLLIDE.HAZARD) {
                     set hz.lifespan = 0
+                    ;; the wall powers of the chain, at the hazard
+                    loop _, c in hz.power.chain {
+                        if (c.type == "wall_power") && percent_f(c.chance) {
+                            val n = #combat.new
+                            power_activate(c.id, hz.src, hz.x, hz.y, hz.x, hz.y)
+                            if power.get(c.id).directional && (#combat.new > n) {
+                                set combat.new@(#combat.new - 1).dir = hz.dir
+                            }
+                        }
+                    }
                 }
             }
         }
