@@ -441,7 +441,9 @@ func hazards_logic (ens, hero) {
                         }
                         if hit && !hz.power.multitarget {
                             set hz.active = false
-                            set hz.lifespan = 0
+                            if !hz.power.complete_animation {
+                                set hz.lifespan = 0
+                            }
                         }
                     }
                 }
@@ -452,7 +454,9 @@ func hazards_logic (ens, hero) {
                     set hz.hit@+ = 0
                     if take_hit(h, hz) && !hz.power.multitarget {
                         set hz.active = false
-                        set hz.lifespan = 0
+                        if !hz.power.complete_animation {
+                            set hz.lifespan = 0
+                        }
                     }
                 }
             }
