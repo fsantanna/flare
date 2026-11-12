@@ -1,0 +1,99 @@
+;; Effects: `powers/effects.txt`, and an effect on an entity as a task.
+;;
+;;      effect.init()               loads the definitions of the effects
+;;      effect.add(t, id, d, m)     EffectManager::addEffect: the draw of the
+;;                                  resistance, then a request to the entity
+;;      task Effect(e, fx)          an effect alive for its duration
+;;
+;; An entity has a pool of effects. At the place of EffectManager::logic in
+;; its frame (in StatBlock::logic), it takes the requests (`fx_add`,
+;; `fx_remove`), clears its status, and emits `:fx.logic` to its effects:
+;; each live one sets the status (`stun`), and ends after its duration.
+
+val effect = [
+    defs = [],          ;; id -> [id, type, can_stack]
+]
+
+func effect.init () {
+    loop _, s in ini.load("powers/effects.txt") || [] {
+        var d = nil
+        loop _, kv in s.keys {
+            match kv@0 {
+                "id" => {
+                    set d = effect.defs@(kv@1) || [id = kv@1, type = kv@1, can_stack = true]
+                    set effect.defs@(kv@1) = d
+                }
+                "type" => { if d { set d.type = kv@1 } }
+                "can_stack" => { if d { set d.can_stack = parse.bool(kv@1) } }
+            }
+        }
+    }
+}
+
+;; the stat that resists an effect type, if any
+func effect_resist (type, m) {
+    match type {
+        "damage" => "resist_damage_over_time"
+        "damage_percent" => "resist_damage_over_time"
+        "speed" => if m < 100 => "resist_slow" => nil
+        "stun" => "resist_stun"
+        "knockback" => "resist_knockback"
+        else => nil
+    }
+}
+
+;; EffectManager::addEffect, up to the request: false if resisted
+func effect.add (t, id, d, m) {
+    val def = effect.defs@id || [id = id, type = id, can_stack = true]
+    val r = effect_resist(def.type, m)
+    if r && percent_f(stat(t, r)) {
+        return false
+    }
+    set t.fx_add@+ = [id = id, type = def.type, dur = d, m = m, can_stack = def.can_stack]
+    true
+}
+
+;; EffectManager::removeEffectType
+func effect.remove (t, type) {
+    set t.fx_remove@+ = type
+}
+
+;; An effect: alive while its timer runs (forever with no duration).
+task Effect (e, fx) {
+    val func status () {
+        match fx.type {
+            "stun" => { set e.stun = true }
+        }
+    }
+    watching :fx.remove until (it@0 == fx.type) || (it@0 == fx.id) {
+        if fx.dur == 0 {
+            loop on :fx.logic {
+                status()
+            }
+        } else {
+            ;; ticked in each logic after the one that sets the status
+            loop _ in fx.dur {
+                await :fx.logic
+                status()
+            }
+            await :fx.logic
+        }
+    }
+}
+
+;; EffectManager::logic of an entity, with its pool of effects
+func effect.logic (e, pool, t) {
+    loop _, type in e.fx_remove {
+        emit @t :fx.remove [type]
+    }
+    set e.fx_remove = []
+    loop _, fx in e.fx_add {
+        if !fx.can_stack {
+            emit @t :fx.remove [fx.id]
+        }
+        spawn @pool Effect(e, fx)
+    }
+    set e.fx_add = []
+    set e.stun = false
+    emit @t :fx.logic
+}
