@@ -243,6 +243,21 @@ val fl = [
         `:number fl_face_next(fl_int($dir), (float)a_dbl($x), (float)a_dbl($y), (float)a_dbl($mx), (float)a_dbl($my))`
     },
 
+    ;; the path from one point to another (MapCollision::computePath): its
+    ;; points from the end to the start, or an empty vector
+    path = func (sx, sy, ex, ey, mt) {
+        `fl_path((float)a_dbl($sx), (float)a_dbl($sy), (float)a_dbl($ex), (float)a_dbl($ey), fl_int($mt), 0);`
+        val n = `:number FL_PATH_N`
+        val ret = []
+        loop i in n {
+            set ret@+ = [`:number.float (double)FL_PATH[(int)a_dbl($i)].x`, `:number.float (double)FL_PATH[(int)a_dbl($i)].y`]
+        }
+        ret
+    },
+    line_move = func (x1, y1, x2, y2, mt) {
+        `:boolean fl_col_line_move((float)a_dbl($x1), (float)a_dbl($y1), (float)a_dbl($x2), (float)a_dbl($y2), fl_int($mt))`
+    },
+
     ;; f32(x): x rounded to 32 bits, as a `float` of the original
     f32 = func (x) {
         `:number.float (double)(float)a_dbl($x)`
