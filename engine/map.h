@@ -616,6 +616,21 @@ static void fl_render_front (FlRen* r, int n) {
     }
 }
 
+// MapRenderer::checkHotspots: is the mouse on a tile of (x,y), in a layer
+// up to the object layer
+static int fl_hotspot_hit (int x, int y, int mx, int my) {
+    if (x < 0 || y < 0 || x >= FL_MAP_W || y >= FL_MAP_H) return 0;
+    for (int i=0; i<=FL_OBJ_LAYER && i<FL_LAYERS_N; i++) {
+        FlTile* t = fl_tile(FL_LAYERS[i][x * FL_MAP_H + y]);
+        if (t != NULL) {
+            FlIPt p = fl_center(fl_map2scr((float)x, (float)y, FL_SHAKE.x, FL_SHAKE.y));
+            int dx = p.x - t->ox, dy = p.y - t->oy;
+            if (mx >= dx && my >= dy && mx < dx + t->w && my < dy + t->h) return 1;
+        }
+    }
+    return 0;
+}
+
 // MapRenderer::render and renderIso: the background color, the layers
 // below the object layer, the dead objects, the object layer with the
 // objects, and the layers above

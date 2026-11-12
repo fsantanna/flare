@@ -215,6 +215,9 @@ task MapRun (path, pos, h) {
     play.trace(hp, ens)
 
     loop on :frame {
+        if hp.hp > 0 {
+            event.hotspots(play.events, w)
+        }
         play.focus(hp, ens)
         play.actions(hp)
         emit @h :hero.logic

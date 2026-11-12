@@ -338,6 +338,7 @@ task Hero (st, pos) {
     ;; each logic frame, around the action
     loop on :hero.logic {
         fl.col_unblock(h.x, h.y)
+        set h.using_main1 = fl.pressed(Input.MAIN1)
         ;; StatBlock::logic: timers and regeneration
         effect.logic(h, fx, task)
         timer_tick(h.cooldown_hit)

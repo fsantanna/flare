@@ -247,6 +247,44 @@ func event.check (evs, x, y, w) {
     }
 }
 
+;; MapRenderer::checkHotspots, with the mouse: the first event (in reverse)
+;; whose hotspot is under the mouse; a click on it, near the hero, runs it
+func event.hotspots (evs, w) {
+    val h = w.hero
+    val mx, my = fl.mouse()
+    var i = #evs
+    loop {
+        while i > 0
+        set i -= 1
+        val ev = evs@i
+        if event_active(ev) && (ev.hotspot@3 != 0) && timer_end(ev.cooldown) && timer_end(ev.delay) {
+            var matched = false
+            loop x in (ev.hotspot@0, ev.hotspot@0 + ev.hotspot@2 - 1) {
+                loop y in (ev.hotspot@1, ev.hotspot@1 + ev.hotspot@3 - 1) {
+                    if fl.hotspot_hit(x, y, mx, my) {
+                        set matched = true
+                    }
+                }
+            }
+            if matched {
+                ;; the center of the event, as floats
+                val cx = fl.f32(ev.hotspot@0 + fl.f32(ev.hotspot@2 / 2))
+                val cy = fl.f32(ev.hotspot@1 + fl.f32(ev.hotspot@3 / 2))
+                if fl.dist(h.x, h.y, cx, cy) < 3 {
+                    if !fl.pressed(Input.MAIN1) || h.using_main1 {
+                        return nil
+                    }
+                    fl.lock(Input.MAIN1, true)
+                    if event.execute(ev, w) {
+                        vector.remove(evs, i)
+                    }
+                }
+                return nil
+            }
+        }
+    }
+}
+
 ;; MapRenderer::logic: the delays and cooldowns of the events, and the
 ;; delayed events that are due
 func event.logic (evs, w) {

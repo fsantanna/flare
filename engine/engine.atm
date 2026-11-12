@@ -149,6 +149,9 @@ val fl = [
         `FL_BG = (int64_t)a_dbl($bg);`
         `fl_map_done();`
     },
+    hotspot_hit = func (x, y, mx, my) {
+        `:boolean fl_hotspot_hit(fl_int($x), fl_int($y), fl_int($mx), fl_int($my))`
+    },
     map_mod = func (layer, x, y, tile) {
         `fl_map_mod(fl_cstr($layer), fl_int($x), fl_int($y), fl_int($tile));`
     },
