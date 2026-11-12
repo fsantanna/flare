@@ -1,0 +1,2 @@
+# env: FLARE_MAP=maps/cave1.txt FLARE_POS=25.5,53.5 FLARE_FRAMES=900 FLARE_RNG=1
+# standing next to the minotaur and skeletal archers of cave1, until the hero dies

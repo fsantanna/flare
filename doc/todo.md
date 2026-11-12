@@ -22,10 +22,15 @@ Target runs: `hero-cave` (enemies standing while the hero walks), then
    `mapr->enemies`, in order; `enemy.stats` reads only name, level, hp,
    and speed of the enemy file so far.
 
-Status (later): the run `fight` passes in full. Left in F5: the powers of
-types repeater, spawn, transform, block; on_hit, on_half_dead, on_death,
-on_debuff powers; fleeing and wandering checked against runs; the death
-of the hero (game over); combat text; the drawing of enemies and hazards.
+Status (later): the runs `fight`, the duels of twelve maps, and the
+stands of `cave1` (goblins, the minotaur's quake) and `brothers_lair_ice_hall`
+(the prophet's freeze, a repeater) pass in full, up to the death of the
+hero. The powers that the enemies of the alpha demo use are fixed,
+missile, repeater, and spawn, with post and wall chains. Left in F5: the
+powers of types transform and block (the hero's, later); on_hit,
+on_half_dead, on_death, on_debuff powers checked against runs; fleeing
+and wandering checked against runs; the game over screen; combat text;
+the drawing of enemies, hazards, and loot.
 
 Status (earlier): `hero-cave` is the same as the original up to frame 222, where
 an event of the map (`power=132` of an event with a hotspot) makes event

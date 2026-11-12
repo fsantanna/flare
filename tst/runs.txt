@@ -27,3 +27,6 @@ duel-mineshaft_longsword
 duel-river_encampment
 duel-white_wind
 duel-ydrakka_pass
+stand-ice_hall
+stand-cave_goblins
+stand-cave_minotaur
