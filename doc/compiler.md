@@ -22,3 +22,14 @@ meanwhile.
   their own bodies, with no capture. `ini.resolve` uses it again. Two
   local functions that call each other still need a function of the
   program.
+
+## The values of `until` are evaluated with its condition
+
+- Where: the actions of the hero (`src/hero.atm`): `until h.next, h.next.act`
+  failed with `expected table : got nil` when `h.next` was nil.
+- The manual says that `until <cnd>, ...` is `if <cnd> { break (... ||
+  <cnd>) }`, which reads as if the values were evaluated only when the
+  condition holds; they are evaluated before.
+- Meanwhile: `if h.next { break h.next.act }`.
+- What would help: the manual saying so, or the values evaluated only
+  on a break.
