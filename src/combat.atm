@@ -235,6 +235,10 @@ func take_hit (t, hz) {
         set t.hp = 0.0
         set t.state = if t.hero => STATE.DEAD => STATE.DEAD
         set t.next = [act = "dead"]
+        if !t.hero {
+            fl.col_unblock(t.x, t.y)
+            set loot.dropping@+ = t
+        }
     }
     ;; a hit breaks a stun; then the effects of the power, and its post powers
     effect.remove(t, "stun")

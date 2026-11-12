@@ -188,6 +188,7 @@ task Play (path, pos, class) {
                 emit @t :enemy.logic [hero = h.pub]
             }
             hazards_logic(ens, h.pub)
+            loot.logic(h.pub)
             fl.tset_logic()
             fl.cam_logic()
             play.trace(h.pub, ens)

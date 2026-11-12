@@ -515,7 +515,7 @@ task Enemy (st, me) {
         chance_pursue = st.chance_pursue, chance_flee = st.chance_flee,
         combat_style = st.combat_style, facing = st.facing, turn_delay = st.turn_delay,
         sfx_attack = st.sfx_attack, sfx_hit = st.sfx_hit, sfx_die = st.sfx_die,
-        corpse = false, ai_hit_power = nil, stun = false, fx_add = [], fx_remove = [],
+        corpse = false, ai_hit_power = nil, loot = [], loot_count = st.loot_count, stun = false, fx_add = [], fx_remove = [],
         cooldown = timer_of(st, "cooldown", st.cooldown),
         cooldown_hit = timer_of(st, "cooldown_hit", st.cooldown_hit || 0),
         cooldown_los = timer_of(st, "cooldown_los", st.cooldown_los), state_timer = timer(0),
@@ -534,6 +534,9 @@ task Enemy (st, me) {
         anims = anim.load(st.animations),
     ]
     val e = pub
+    loop _, l in st.loot {
+        loot.parse(l, e.loot)
+    }
     pin fx = tasks()
     loop _, p in st.powers {
         set e.powers@+ = [type = p.type, id = p.id, chance = p.chance, cd = timer(0)]

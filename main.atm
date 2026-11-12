@@ -14,6 +14,7 @@ include "src/power.atm"
 include "src/effect.atm"
 include "src/hero.atm"
 include "src/enemy.atm"
+include "src/loot.atm"
 include "src/ai.atm"
 include "src/combat.atm"
 include "src/play.atm"
@@ -24,6 +25,7 @@ font.init()
 enemy.init()
 power.init()
 effect.init()
+loot.init()
 
 val pos = if os.getenv("FLARE_POS") {
     val l = parse.list(os.getenv("FLARE_POS"))

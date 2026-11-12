@@ -1,0 +1,159 @@
+;; Loot: the tables of `loot/`, the loot of an enemy, and the drops at its
+;; death, as LootManager of the original (loadLootTables, parseLoot,
+;; checkEnemiesForLoot, checkLoot, checkLootComponent).
+;;
+;; An entry: [table = true] for the name of a table (its entries follow
+;; it), or [id, chance, qmin, qmax, max_drops]; a chance of 0 is fixed.
+
+val loot = [
+    tables = [],        ;; path -> entries
+    dropping = [],      ;; the enemies that died in this frame
+    drop_max = 1,       ;; of engine/loot.txt
+    drop_radius = 1,
+    currency = 10,      ;; currency_id of engine/misc.txt
+]
+
+func loot_entry (id, chance, l, k) {
+    val qmin = math.max(parse.int(l@k), 1)
+    [id = id, chance = if chance == "fixed" => 0.0 => parse.float(chance),
+     qmin = qmin, qmax = math.max(parse.int(l@(k+1)), qmin), max_drops = -1]
+}
+
+func loot_id (s) {
+    if s == "currency" => loot.currency => parse.int(s, -1)
+}
+
+;; LootManager::parseLoot: the entries of `loot=` into a list
+func loot.parse (l, list) {
+    var k = 0
+    loop {
+        while (l@k != nil) && (l@k != "")
+        val id = loot_id(l@k)
+        if id == -1 {
+            set list@+ = [table = true]
+            loop _, e in loot.tables@(l@k) || [] {
+                set list@+ = X.copy(e)
+            }
+            set k += 1
+        } else {
+            set list@+ = loot_entry(id, l@(k+1) || "", l, k+2)
+            set k += 4
+        }
+    }
+}
+
+func loot.init () {
+    loop _, s in ini.load("engine/loot.txt") || [] {
+        loop _, kv in s.keys {
+            match kv@0 {
+                "drop_max" => { set loot.drop_max = parse.int(kv@1) }
+                "drop_radius" => { set loot.drop_radius = parse.int(kv@1) }
+            }
+        }
+    }
+    loop _, s in ini.load("engine/misc.txt") || [] {
+        loop _, kv in s.keys {
+            if kv@0 == "currency_id" {
+                set loot.currency = parse.int(kv@1)
+            }
+        }
+    }
+    loop _, path in list_dir("loot") {
+        val list = []
+        loop _, s in ini.load(path) || [] {
+            if s.name == "loot" {
+                var id = nil
+                var chance = ""
+                var q = []
+                loop _, kv in s.keys {
+                    match kv@0 {
+                        "id" => { set id = loot_id(kv@1) }
+                        "chance" => { set chance = kv@1 }
+                        "quantity" => { set q = parse.list(kv@1) }
+                    }
+                }
+                set list@+ = loot_entry(id, chance, q, 0)
+            } else {
+                loop _, kv in s.keys {
+                    if kv@0 == "loot" {
+                        loot.parse(parse.list(kv@1), list)
+                    }
+                }
+            }
+        }
+        set loot.tables@path = list
+    }
+}
+
+;; LootManager::checkLootComponent: a stack at a free place
+func loot_drop (e, x, y, hero) {
+    val sx, sy = math.floor(x), math.floor(y)
+    var px, py = sx + 0.5, sy + 0.5
+    if !fl.col_valid(px, py, MOVE.NORMAL, COLLIDE.ALL) {
+        val nx, ny = fl.random_neighbor(sx, sy, loot.drop_radius, MOVE.NORMAL, COLLIDE.ALL)
+        set px, py = nx, ny
+        if !fl.col_valid(px, py, MOVE.NORMAL, COLLIDE.ALL) {
+            set px, py = hero.x, hero.y
+        } else {
+            if (sx == math.floor(px)) && (sy == math.floor(py)) {
+                set px, py = hero.x, hero.y
+            }
+        }
+    }
+    val q = rand_between(e.qmin, e.qmax)
+    fl.trace(string.format("loot %d %d %.9g %.9g", e.id, q, fl.f32(px), fl.f32(py)))
+}
+
+;; LootManager::checkLoot
+func loot_check (list, x, y, hero) {
+    val chance = rand_between_f(0, 100)
+    ;; the fixed ones drop, and leave the list
+    var i = #list
+    loop {
+        while i > 0
+        set i -= 1
+        val e = list@i
+        if !e.table && (e.chance == 0) {
+            loot_drop(e, x, y, hero)
+            vector.remove(list, i)
+        }
+    }
+    var threshold = 100.0
+    var possible = []
+    loop _, e in list {
+        if !e.table {
+            if e.chance >= chance {
+                if e.chance <= threshold {
+                    if e.chance != threshold {
+                        set possible = []
+                    }
+                    set threshold = e.chance
+                }
+                if (chance <= threshold) && (e.max_drops != 0) {
+                    set possible@+ = e
+                }
+            }
+        }
+    }
+    if #possible > 0 {
+        val e = possible@(fl.rand() % #possible)
+        loot_drop(e, x, y, hero)
+        if e.max_drops > 0 {
+            set e.max_drops = e.max_drops - 1
+        }
+    }
+}
+
+;; LootManager::checkEnemiesForLoot, once per frame after the hazards
+func loot.logic (hero) {
+    loop _, en in loot.dropping {
+        if #en.loot > 0 {
+            val n = if en.loot_count@1 != 0 => rand_between(en.loot_count@0, en.loot_count@1) => rand_between(1, loot.drop_max)
+            loop _ in n {
+                loot_check(en.loot, en.x, en.y, hero)
+            }
+            set en.loot = []
+        }
+    }
+    set loot.dropping = []
+}
