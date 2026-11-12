@@ -22,7 +22,12 @@ Target runs: `hero-cave` (enemies standing while the hero walks), then
    `mapr->enemies`, in order; `enemy.stats` reads only name, level, hp,
    and speed of the enemy file so far.
 
-Status: `hero-cave` is the same as the original up to frame 222, where
+Status (later): the run `fight` passes in full. Left in F5: the powers of
+types repeater, spawn, transform, block; on_hit, on_half_dead, on_death,
+on_debuff powers; fleeing and wandering checked against runs; the death
+of the hero (game over); combat text; the drawing of enemies and hazards.
+
+Status (earlier): `hero-cave` is the same as the original up to frame 222, where
 an event of the map (`power=132` of an event with a hotspot) makes event
 StatBlocks spawn two hatchlings. In the trace, the ids of the patch go
 by first sight of a StatBlock pointer: the two event StatBlocks print as

@@ -70,6 +70,11 @@ In respect of the
       first map (`tools/compare.sh`). The path finding is used only by
       enemies and by moving with the mouse: it comes with the enemies, in
       F5.
+- [ ] F5 (in course): enemies (`src/ai.atm`, `src/enemy.atm`), powers
+      (`src/power.atm`), hazards and hits (`src/combat.atm`), effects
+      (`src/effect.atm`), loot (`src/loot.atm`), path finding
+      (`engine/astar.h`). The run `fight` (an antlion fights the hero to
+      its death) is the same as the original, with its draws.
 
 ## Tests
 
