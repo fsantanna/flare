@@ -149,6 +149,9 @@ val fl = [
         `FL_BG = (int64_t)a_dbl($bg);`
         `fl_map_done();`
     },
+    map_mod = func (layer, x, y, tile) {
+        `fl_map_mod(fl_cstr($layer), fl_int($x), fl_int($y), fl_int($tile));`
+    },
     map_render = func () {
         `fl_map_render();`
     },

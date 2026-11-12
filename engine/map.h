@@ -222,6 +222,22 @@ static void fl_map_done (void) {
     }
 }
 
+// a mapmod of an event: a tile of a layer, or of the collision
+static void fl_map_mod (const char* layer, int x, int y, int tile) {
+    if (x < 0 || y < 0 || x >= FL_MAP_W || y >= FL_MAP_H) return;
+    if (!strcmp(layer, "collision")) {
+        FL_COLLISION[x * FL_MAP_H + y] = (unsigned short)tile;
+        return;
+    }
+    if (tile != 0 && fl_tile(tile) == NULL) return;
+    for (int i=0; i<FL_LAYERS_N; i++) {
+        if (!strcmp(FL_LAYER_NAMES[i], layer)) {
+            FL_LAYERS[i][x * FL_MAP_H + y] = (unsigned short)tile;
+            return;
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // CAMERA, as Camera of the original
 ///////////////////////////////////////////////////////////////////////////////

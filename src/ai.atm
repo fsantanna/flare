@@ -464,6 +464,22 @@ task EPower (e, p) {
     }
 }
 
+;; ENTITY_SPAWN: the animation of the spawn, to its last frame
+task ESpawn (e) {
+    set e.state = STATE.SPAWN
+    loop {
+        await :enemy.step
+        if e.next {
+            break e.next
+        }
+        ai_anim(e, "spawn")
+        if anim.is_last(e.cur) || (e.cur.a.name != "spawn") {
+            set e.state = STATE.STANCE
+            break [act = "stance"]
+        }
+    }
+}
+
 ;; ENTITY_HIT: the animation of the hit, to its last frame
 task EHit (e) {
     set e.state = STATE.HIT
@@ -501,6 +517,7 @@ func ai_act (e, next) {
         "power" => EPower
         "hit" => EHit
         "dead" => EDead
+        "spawn" => ESpawn
         else => EStance
     }
 }
@@ -509,7 +526,7 @@ task Enemy (st, me) {
     set pub = [
         name = st.name, x = fl.f32(me.x), y = fl.f32(me.y), dir = me.dir,
         hp = st.hp, hp_max = st.hp, mp = st.mp, base = st.base, speed = st.speed,
-        state = STATE.STANCE, movement = st.movement,
+        state = if me.state == "spawn" => STATE.SPAWN => STATE.STANCE, movement = st.movement,
         melee_range = st.melee_range, threat_range = st.threat_range,
         threat_range_far = st.threat_range_far, flee_range = st.flee_range,
         chance_pursue = st.chance_pursue, chance_flee = st.chance_flee,
@@ -544,7 +561,7 @@ task Enemy (st, me) {
     set e.cur = anim.cursor(anim.get(e.anims, ""))
 
     spawn {
-        var next = [act = "stance"]
+        var next = [act = me.state || "stance"]
         loop {
             set e.next = nil
             val act = ai_act(e, next)
