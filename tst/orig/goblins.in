@@ -1,0 +1,5 @@
+# env: FLARE_MAP=maps/frontier_plains.txt FLARE_POS=220.5,165.5 FLARE_FRAMES=900 FLARE_RNG=1
+# near goblins in the plains: attack upward until the end
+60 move 853 330
+60 down 1
+880 up 1

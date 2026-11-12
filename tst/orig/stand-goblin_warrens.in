@@ -1,0 +1,8 @@
+# env: FLARE_MAP=maps/goblin_warrens.txt FLARE_FRAMES=1200 FLARE_RNG=1
+# stand at the start of the map, attacking up, then down
+30 move 853 330
+30 down 1
+600 up 1
+620 move 853 640
+620 down 1
+1190 up 1

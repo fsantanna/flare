@@ -6,3 +6,12 @@ hero-cave
 fight
 walk
 maps
+goblins
+stand-averguard_atrium
+stand-brothers_lair_atrium
+stand-goblin_warrens
+stand-lost_mines1
+stand-mineshaft_longsword
+stand-river_encampment
+stand-white_wind
+stand-ydrakka_pass
