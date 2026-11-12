@@ -1,0 +1,273 @@
+;; Events of maps: the `[event]` sections of a map, as EventManager of the
+;; original loads and executes them, and the statuses of the campaign.
+;;
+;;      event.load(m)           the events of a map, in order
+;;      event.execute(ev, w)    EventManager::executeEvent: false if kept
+;;      event.check(evs, x, y, w)   MapRenderer::checkEvents at a position
+;;      event.on_load(evs, w)   MapRenderer::executeOnLoadEvents
+;;      event.logic(evs, w)     the cooldowns and delays (MapRenderer::logic)
+;;
+;; `w` is the world of the map: the hero, the requests to teleport and to
+;; spawn, the statuses. An event is data: what it does when its activation
+;; comes is its list of components, in the order of the file.
+
+val event = []
+
+val ACTIVATE = [on_trigger = 0, on_interact = 1, on_mapexit = 2, on_leave = 3,
+                on_load = 4, on_clear = 5, static = 6]
+
+val campaign = [
+    status = [],        ;; the statuses of the campaign that are set
+]
+
+;; the components of a key: a list makes several components of a type
+func event_components (ev, k, v) {
+    val l = parse.list(v)
+    match k {
+        "mapmod" => {
+            var i = 0
+            loop {
+                while (l@i != nil) && (l@i != "")
+                set ev.comps@+ = [type = "mapmod", s = l@i, x = parse.int(l@(i+1)),
+                                  y = parse.int(l@(i+2)), tile = parse.int(l@(i+3))]
+                set i += 4
+            }
+        }
+        "spawn" => {
+            var i = 0
+            loop {
+                while (l@i != nil) && (l@i != "")
+                set ev.comps@+ = [type = "spawn", s = l@i, x = parse.int(l@(i+1)), y = parse.int(l@(i+2))]
+                set i += 3
+            }
+        }
+        "set_status" => { loop _, s in l { until s == "" ; set ev.comps@+ = [type = k, s = s] } }
+        "unset_status" => { loop _, s in l { until s == "" ; set ev.comps@+ = [type = k, s = s] } }
+        "requires_status" => { loop _, s in l { until s == "" ; set ev.comps@+ = [type = k, s = s] } }
+        "requires_not_status" => { loop _, s in l { until s == "" ; set ev.comps@+ = [type = k, s = s] } }
+        "requires_item" => { loop _, s in l { until s == "" ; set ev.comps@+ = [type = k, s = s] } }
+        "remove_item" => { loop _, s in l { until s == "" ; set ev.comps@+ = [type = k, s = s] } }
+        "loot" => {
+            val list = []
+            loot.parse(l, list)
+            loop _, e in list {
+                set e.type = "loot"
+                set ev.comps@+ = e
+            }
+        }
+        "intermap" => {
+            set ev.comps@+ = [type = k, s = l@0,
+                x = if (l@1 != nil) && (l@1 != "") => parse.int(l@1) => -1,
+                y = if (l@1 != nil) && (l@1 != "") => parse.int(l@2) => -1]
+        }
+        "intramap" => { set ev.comps@+ = [type = k, x = parse.int(l@0), y = parse.int(l@1)] }
+        "soundfx" => { set ev.comps@+ = [type = k, s = l@0] }
+        "power" => { set ev.comps@+ = [type = k, id = parse.int(v)] }
+        "power_damage" => { set ev.comps@+ = [type = k, min = parse.float(l@0), max = parse.float(l@1)] }
+        "power_path" => {
+            set ev.comps@+ = [type = k, x = parse.int(l@0), y = parse.int(l@1),
+                hero = l@2 == "hero", tx = parse.int(l@2), ty = parse.int(l@3)]
+        }
+        "shakycam" => { set ev.comps@+ = [type = k, d = parse.duration(v)] }
+        "repeat" => { set ev.comps@+ = [type = k, b = parse.bool(v)] }
+        else => { set ev.comps@+ = [type = k, s = v] }
+    }
+}
+
+;; EventManager::loadEvent for each `[event]` of a map
+func event.load (m) {
+    val evs = []
+    loop _, s in m.secs {
+        if s.name == "event" {
+            val ev = [type = "", activate = 0, loc = [0, 0, 0, 0], hotspot = [0, 0, 0, 0],
+                      center = [-1, -1], comps = [], keep = true,
+                      cooldown = timer(0), delay = timer(0), inside = false]
+            loop _, kv in s.keys {
+                val k, v = kv@0, kv@1
+                val l = parse.list(v)
+                match k {
+                    "type" => { set ev.type = v }
+                    "activate" => {
+                        set ev.activate = ACTIVATE@v || 0
+                        if (v == "on_load") || (v == "on_clear") {
+                            set ev.keep = false
+                        }
+                    }
+                    "location" => {
+                        set ev.loc = [parse.int(l@0), parse.int(l@1), parse.int(l@2), parse.int(l@3)]
+                        if (ev.center@0 == -1) && (ev.center@1 == -1) {
+                            set ev.center = [ev.loc@0 + (ev.loc@2 / 2), ev.loc@1 + (ev.loc@3 / 2)]
+                        }
+                    }
+                    "hotspot" => {
+                        set ev.hotspot = if v == "location" => X.copy(ev.loc) =>
+                            [parse.int(l@0), parse.int(l@1), parse.int(l@2), parse.int(l@3)]
+                        set ev.center = [ev.hotspot@0 + (ev.hotspot@2 / 2), ev.hotspot@1 + (ev.hotspot@3 / 2)]
+                    }
+                    "cooldown" => { timer_set(ev.cooldown, parse.duration(v)) ; set ev.cooldown.cur = 0 }
+                    "delay" => { timer_set(ev.delay, parse.duration(v)) ; set ev.delay.cur = 0 }
+                    "reachable_from" => { set ev.reachable = l }
+                    else => { event_components(ev, k, v) }
+                }
+            }
+            set evs@+ = ev
+        }
+    }
+    evs
+}
+
+;; CampaignManager::checkRequirementsInVector (statuses only, for now)
+func event_active (ev) {
+    var ok = true
+    loop _, c in ev.comps {
+        if (c.type == "requires_status") && !campaign.status@(c.s) {
+            set ok = false
+        }
+        if (c.type == "requires_not_status") && campaign.status@(c.s) {
+            set ok = false
+        }
+    }
+    ok
+}
+
+;; EventManager::executeEventInternal: false while the event is kept
+func event.execute (ev, w) {
+    if !timer_end(ev.delay) || !timer_end(ev.cooldown) {
+        return false
+    }
+    loop _, c in ev.comps {
+        if c.type == "repeat" {
+            set ev.keep = c.b
+        }
+    }
+    if (ev.delay.dur > 0) && !w.skip_delay {
+        timer_begin(ev.delay)
+        val copy = X.copy(ev)
+        set w.delayed@+ = copy
+        timer_begin(ev.cooldown)
+        return !ev.keep
+    }
+    timer_begin(ev.cooldown)
+    fl.trace("event " ++ ev.activate ++ " " ++ ev.loc@0 ++ " " ++ ev.loc@1 ++ " " ++ ev.loc@2 ++ " " ++ ev.loc@3 ++ " " ++ #ev.comps)
+    loop _, c in ev.comps {
+        match c.type {
+            "set_status" => { set campaign.status@(c.s) = true }
+            "unset_status" => { set campaign.status@(c.s) = nil }
+            "intermap" => {
+                set w.teleport = [map = c.s,
+                    pos = if (c.x == -1) && (c.y == -1) => nil => [c.x + 0.5, c.y + 0.5]]
+            }
+            "intramap" => {
+                set w.teleport = [map = nil, pos = [c.x + 0.5, c.y + 0.5]]
+            }
+            "mapmod" => {
+                fl.map_mod(c.s, c.x, c.y, c.tile)
+            }
+            "shakycam" => {
+                fl.cam_shake(c.d)
+            }
+            "spawn" => {
+                ;; EntityManager::spawn: a Map_Enemy, and a random direction
+                fl.rand()
+                val dir = fl.rand() % 8
+                val x, y = c.x + 0.5, c.y + 0.5
+                if fl.col_valid(x, y, MOVE.NORMAL, COLLIDE.NONE) {
+                    fl.col_block(x, y, false)
+                    set w.spawns@+ = [type = c.s, x = x, y = y, dir = dir]
+                }
+            }
+            "power" => {
+                var tx, ty = ev.loc@0 + 0.5, ev.loc@1 + 0.5
+                loop _, p in ev.comps {
+                    if p.type == "power_path" {
+                        if p.hero {
+                            set tx, ty = w.hero.x, w.hero.y
+                        } else {
+                            set tx, ty = p.tx + 0.5, p.ty + 0.5
+                        }
+                    }
+                }
+                set w.powers@+ = [ev = ev, id = c.id, x = tx, y = ty]
+            }
+        }
+    }
+    !ev.keep
+}
+
+;; MapRenderer::executeOnLoadEvents: on_load, then static, each in reverse
+func event.on_load (evs, w) {
+    loop _, act in [ACTIVATE.on_load, ACTIVATE.static] {
+        var i = #evs
+        loop {
+            while i > 0
+            set i -= 1
+            val ev = evs@i
+            if event_active(ev) && (ev.activate == act) {
+                if event.execute(ev, w) {
+                    vector.remove(evs, i)
+                }
+            }
+        }
+    }
+}
+
+;; MapRenderer::checkEvents, in reverse
+func event.check (evs, x, y, w) {
+    val mx, my = math.floor(x), math.floor(y)
+    var i = #evs
+    loop {
+        while i > 0
+        set i -= 1
+        val ev = evs@i
+        if event_active(ev) {
+            val inside = (mx >= ev.loc@0) && (my >= ev.loc@1) &&
+                         (mx <= (ev.loc@0 + ev.loc@2 - 1)) && (my <= (ev.loc@1 + ev.loc@3 - 1))
+            match ev.activate {
+                6 => {
+                    if event.execute(ev, w) { vector.remove(evs, i) }
+                }
+                5 => {
+                    if w.cleared && event.execute(ev, w) { vector.remove(evs, i) }
+                }
+                3 => {
+                    if inside {
+                        set ev.inside = true
+                    } else {
+                        if ev.inside {
+                            set ev.inside = false
+                            if event.execute(ev, w) { vector.remove(evs, i) }
+                        }
+                    }
+                }
+                0 => {
+                    if inside && event.execute(ev, w) { vector.remove(evs, i) }
+                }
+            }
+        }
+    }
+}
+
+;; MapRenderer::logic: the delays and cooldowns of the events, and the
+;; delayed events that are due
+func event.logic (evs, w) {
+    loop _, ev in evs {
+        if !timer_end(ev.delay) {
+            timer_tick(ev.delay)
+        } else {
+            timer_tick(ev.cooldown)
+        }
+    }
+    var i = #w.delayed
+    loop {
+        while i > 0
+        set i -= 1
+        val ev = w.delayed@i
+        timer_tick(ev.delay)
+        if timer_end(ev.delay) {
+            set w.skip_delay = true
+            event.execute(ev, w)
+            set w.skip_delay = false
+            vector.remove(w.delayed, i)
+        }
+    }
+}
