@@ -280,7 +280,7 @@ task HPower (h, turning) {
         }
         if anim.is_active(h.cur) {
             fl.col_block(h.x, h.y, false)
-            power_activate(id, h, tgt@0, tgt@1)
+            power_activate(id, h, h.x, h.y, tgt@0, tgt@1)
         }
         if anim.is_last(h.cur) || (h.cur.a.name != pw.attack_anim) {
             timer_begin(h.cooldown)

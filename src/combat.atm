@@ -5,7 +5,7 @@
 ;; hazards once per logic frame, after the enemies, in the reverse order
 ;; of their creation (as HazardManager::logic), with `:hazard.logic`.
 ;;
-;;      power_activate(id, src, tx, ty)     PowerManager::activate
+;;      power_activate(id, src, ox, oy, tx, ty)     PowerManager::activate
 ;;      take_hit(target, hz)                Entity::takeHit: true on a hit
 ;;
 ;; A source or target is the `pub` of the hero or of an enemy: `id`, `x`,
@@ -118,28 +118,46 @@ func hazard_new (id, pw, src, ox, oy, tx, ty) {
             set hz.x, hz.y = x, y
         }
         "target" => {
-            set hz.x, hz.y = tx, ty
+            val cx, cy = fl.clamp_dist(0, pw.target_range, ox, oy, tx, ty)
+            set hz.x, hz.y = cx, cy
         }
+        "melee_unlocked" => {
+            val cx, cy = fl.clamp_dist(src.melee_range, src.melee_range, ox, oy, tx, ty)
+            set hz.x, hz.y = cx, cy
+        }
+    }
+    if pw.target_neighbor > 0 {
+        val nx, ny = fl.random_neighbor(hz.x, hz.y, pw.target_neighbor, MOVE.FLYING, COLLIDE.HAZARD)
+        set hz.x, hz.y = nx, ny
     }
     hz
 }
 
 ;; PowerManager::activate
-func power_activate (id, src, tx, ty) {
+func power_activate (id, src, ox, oy, tx0, ty0) {
     val pw = power.get(id)
     if pw == nil {
         return false
     }
-    fl.trace("power " ++ play_id(src) ++ " " ++ id ++ " " ++ string.format("%.9g", fl.f32(tx)) ++ " " ++ string.format("%.9g", fl.f32(ty)))
+    fl.trace("power " ++ play_id(src) ++ " " ++ id ++ " " ++ string.format("%.9g", fl.f32(tx0)) ++ " " ++ string.format("%.9g", fl.f32(ty0)))
     if src.hero && (pw.requires_mp > src.mp) {
         return false
+    }
+    ;; a power that moves, with no direction: one from the source (or a
+    ;; random one, away from it)
+    var tx, ty = tx0, ty0
+    if (pw.speed != 0) && (ox == tx0) && (oy == ty0) {
+        val dist = math.max(0.1, src.melee_range || 0)
+        val d = if (src.x == ox) && (src.y == oy) => src.dir => ((fl.rand() & 0xFFFF) % 8)
+        val vx, vy = fl.vector(ox, oy, d, dist)
+        set tx, ty = vx, vy
     }
     match pw.type {
         "fixed" => {
             if pw.use_hazard {
                 var delay = 0
                 loop _ in pw.count {
-                    val hz = hazard_new(id, pw, src, src.x, src.y, tx, ty)
+                    val hz = hazard_new(id, pw, src, ox, oy, tx, ty)
                     set hz.delay = delay
                     set delay += pw.delay
                     set combat.new@+ = hz
@@ -150,11 +168,11 @@ func power_activate (id, src, tx, ty) {
         }
         "missile" => {
             ;; PowerManager::missile
-            val sx, sy = if pw.starting_pos == "target" => (tx, ty) => (src.x, src.y)
+            val sx, sy = if pw.starting_pos == "target" => (tx, ty) => (ox, oy)
             val theta = fl.theta(sx, sy, tx, ty)
             var delay = 0
             loop i in pw.count {
-                val hz = hazard_new(id, pw, src, src.x, src.y, tx, ty)
+                val hz = hazard_new(id, pw, src, ox, oy, tx, ty)
                 val cnt, ang = pw.count, pw.missile_angle
                 val off = `:number.float (double)(((1.0f - (float)a_dbl($cnt)) / 2 + (float)a_dbl($i)) * ((float)a_dbl($ang) * (float)M_PI / 180.0f))`
                 var variance = 0.0
@@ -176,11 +194,11 @@ func power_activate (id, src, tx, ty) {
         "spawn" => {
             ;; PowerManager::spawn: a Map_Enemy, at the source (or near it)
             fl.rand()
-            var px, py = src.x, src.y
+            var px, py = ox, oy
             match pw.starting_pos {
                 "target" => { set px, py = tx, ty }
                 "melee" => {
-                    val vx, vy = fl.vector(src.x, src.y, src.dir, src.melee_range)
+                    val vx, vy = fl.vector(ox, oy, src.dir, src.melee_range)
                     set px, py = vx, vy
                 }
             }
@@ -189,13 +207,13 @@ func power_activate (id, src, tx, ty) {
                 set px, py = nx, ny
             }
             if !fl.col_valid(px, py, MOVE.FLYING, COLLIDE.ALL) {
-                val nx, ny = fl.random_neighbor(src.x, src.y, 1, MOVE.FLYING, COLLIDE.ALL)
+                val nx, ny = fl.random_neighbor(ox, oy, 1, MOVE.FLYING, COLLIDE.ALL)
                 set px, py = nx, ny
             }
             if !fl.col_valid(px, py, MOVE.FLYING, COLLIDE.ALL) {
                 return false
             }
-            val dir = fl.direction(src.x, src.y, tx, ty)
+            val dir = fl.direction(ox, oy, tx, ty)
             fl.col_block(px, py, src.hero)
             loop _ in pw.count {
                 play_spawn_request([type = pw.spawn_type, x = fl.f32(px), y = fl.f32(py), dir = dir, summoner = src])
@@ -335,7 +353,7 @@ func take_hit (t, hz) {
     loop _, c in pw.chain {
         if c.type == "post_power" {
             if percent_f(c.chance) {
-                power_activate(c.id, hz.src, t.x, t.y)
+                power_activate(c.id, hz.src, hz.x, hz.y, t.x, t.y)
             }
         }
     }
