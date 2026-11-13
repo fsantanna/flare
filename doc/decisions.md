@@ -1,6 +1,6 @@
 # Decisions
 
-The plan (`fsantanna/ceu-atmos`, `.claude/plans/261111-flare.md`) left
+The plan (`ia-atmos/lang`, formerly `fsantanna/ceu-atmos`, `.claude/plans/261111-flare.md`) left
 three items to confirm. The author told this session to go ahead, so
 they are settled as the plan recommended:
 

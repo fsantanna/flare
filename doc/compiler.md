@@ -1,6 +1,6 @@
 # The compiler
 
-What the port found in `fsantanna/ceu-atmos`: problems, limits, and what
+What the port found in `ia-atmos/lang` (formerly `fsantanna/ceu-atmos`): problems, limits, and what
 would help. Each item says where it showed and what the port does
 meanwhile.
 
@@ -18,7 +18,7 @@ meanwhile.
 - Meanwhile: a function of the program (`func g` outside functions),
   with what it would capture passed as arguments.
 - What would help: `val func g` visible in its own body, with no cycle.
-- Fixed in `ceu-atmos@5b25d89`: `val func` and `val task` are visible in
+- Fixed in `ia-atmos/lang@5b25d89`: `val func` and `val task` are visible in
   their own bodies, with no capture. `ini.resolve` uses it again. Two
   local functions that call each other still need a function of the
   program.
@@ -50,8 +50,8 @@ meanwhile.
   a while when the pin and the escaping `set` are far apart.
 - What would help: a binding of a module field for the lifetime of a
   block, weak references to tasks, a task allowed in its own `pub`, or
-  the error naming the destination. Sent to the ceu-atmos session.
-- Answer of the ceu-atmos session (2026-11-12): language decisions, for
+  the error naming the destination. Sent to the session of the compiler.
+- Answer of the session of the compiler (2026-11-12): language decisions, for
   the author; the third port with this friction. What works today: one
   pinned context table in the block of the pool (`pin ens = []` and the
   other tables each on its own line, then `pin ctx = [ens = ens, ...]`),

@@ -2,7 +2,7 @@
 
 A port of a slice of [Flare](https://flarerpg.org) (Free Libre Action
 Roleplaying Engine), a 2D action RPG, to
-[Atmos](https://github.com/fsantanna/ceu-atmos), over SDL2.
+[Atmos](https://github.com/ia-atmos/lang), over SDL2.
 
 The goal is a study: in the C++ original, behavior is kept in state
 enums, timers, and flags that are tested every frame; here each entity,
@@ -19,7 +19,7 @@ power, hazard, effect, and screen is one task, written as a sequence.
   the art of `fantasycore`.
 - Second version: the Empyrean Campaign with its menus.
 
-The plan is in `fsantanna/ceu-atmos`, `.claude/plans/261111-flare.md`.
+The plan is in `ia-atmos/lang` (formerly `fsantanna/ceu-atmos`), `.claude/plans/261111-flare.md`.
 
 ## Licenses and credits
 

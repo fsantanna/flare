@@ -158,3 +158,6 @@ where they come from.
   (`src/anim.atm`). The unit tests of animations do not leak: it comes
   with the game (a cycle through the pubs of tasks kept in global
   tables, such as `combat.last_enemy`, `play.world`?). To find out.
+- The compiler has `await(n, :e)` (and `watching n, :e`, `loop on n, :e`)
+  since `ia-atmos/lang` main of 2026-11-13: it may replace the task
+  `Frames` of `engine/engine.atm` and the counters of frames of the port.

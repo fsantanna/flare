@@ -4,7 +4,8 @@
 #   ./run.sh [file.atm] [args]      (default: main.atm)
 #
 # Environment:
-#   ATMOS        the compiler (default: ../ceu-atmos/atmos, or `atmos`)
+#   ATMOS        the compiler, ia-atmos/lang (default: ../lang/atmos,
+#                ../ceu-atmos/atmos, its former name, or `atmos`)
 #   ATMOS_ASAN=1 builds with the address sanitizer
 #   FLARE_DATA   the directory with the folder `mods` of the original
 #                (default: ../flare-orig/data, made by tools/bench/setup.sh)
@@ -12,7 +13,9 @@
 ROOT=$(cd "$(dirname "$0")" && pwd)
 
 if [ -z "$ATMOS" ]; then
-	if [ -x "$ROOT/../ceu-atmos/atmos" ]; then
+	if [ -x "$ROOT/../lang/atmos" ]; then
+		ATMOS="$ROOT/../lang/atmos"
+	elif [ -x "$ROOT/../ceu-atmos/atmos" ]; then
 		ATMOS="$ROOT/../ceu-atmos/atmos"
 	else
 		ATMOS=atmos
