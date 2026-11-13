@@ -73,8 +73,10 @@ In respect of the
 - [ ] F5 (in course): enemies (`src/ai.atm`, `src/enemy.atm`), powers
       (`src/power.atm`), hazards and hits (`src/combat.atm`), effects
       (`src/effect.atm`), loot (`src/loot.atm`), path finding
-      (`engine/astar.h`). The run `fight` (an antlion fights the hero to
-      its death) is the same as the original, with its draws.
+      (`engine/astar.h`). 30 scripted runs (walks, a fight, duels and
+      stands in 13 maps) give the same trace as the original, with its
+      draws; enemies and hazards are drawn with the same pixels
+      (`tools/compare-shot.sh`).
 
 ## Tests
 
