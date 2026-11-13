@@ -37,13 +37,13 @@ index 59cc8c24..024a445a 100644
  	// Traditional way to create an animation.
 diff --git a/src/Bench.h b/src/Bench.h
 new file mode 100644
-index 00000000..28b7eaaa
+index 00000000..057bad3a
 --- /dev/null
 +++ b/src/Bench.h
 @@ -0,0 +1,169 @@
 +/*
 +Bench: a fixed seed, scripted input, a trace, and a fast mode, for the
-+comparison of Flare with its port to Atmos (ia-atmos/flare).
++comparison of Flare with its port to Atmos (ia-atmos/sdl-flare).
 +
 +It is included before every source file (-include Bench.h), and all is
 +driven by environment variables:
