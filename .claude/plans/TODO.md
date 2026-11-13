@@ -10,7 +10,9 @@ the whole conversation.
    `ia-atmos/lang`; `git remote set-url origin
    https://github.com/ia-atmos/lang` in `../ceu-atmos` was denied by the
    permission check of the session. Recommended: the author runs it, or
-   allows it. Meanwhile the old address redirects; nothing breaks.
+   allows it. Meanwhile the old address redirects; nothing breaks. The
+   same for this repository, moved to `ia-atmos/flare` (GitHub says so
+   on push): the `origin` of this checkout still names `fsantanna/flare`.
 2. **The friction of `pin` with module tables** (item 40 of the TODO of
    `ia-atmos/lang`): a pool's tasks in a global table, a per-map context
    in a module, a task in its own `pub`. Recommended, in order: the error
