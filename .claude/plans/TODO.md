@@ -42,6 +42,15 @@ the whole conversation.
    frame counters of the port.
 9. Mark F5 done in the README when it closes.
 
+10a. To come: move the platform part of the layer (window, images,
+    fonts, sounds, input, the test mode of `engine/flare.h` and
+    `engine/engine.atm`) to the shared environment `ia-atmos/env-sdl`,
+    when asked (Flare is planned third, after Pingus and SNKRX), with
+    the golden outputs identical; the game part (`astar.h`,
+    `collision.h`, `map.h`, `geom.h`) stays. Meanwhile, keep new
+    platform code apart from game code, and answer the questions of the
+    session `env-sdl` about the layer.
+
 ## C. Reported or decided, not acknowledged
 
 10. The three items of the plan marked to confirm (slice, data read as
