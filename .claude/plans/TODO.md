@@ -23,6 +23,21 @@ the whole conversation.
    field for the lifetime of a block. Meanwhile: arguments, or one
    pinned context table (`doc/compiler.md`).
 
+3a. **When to relax exactness for expressiveness** (the rule of the
+    author of 2026-11-14, relayed by the compiler session: allowed once a
+    port is fully faithful, keeping the intent of the original). Where
+    Flare stands: the 30 stored runs (walks, a fight, duels and stands in
+    13 maps) give the same trace as the original, draws included, and the
+    enemies and hazards the same pixels; but the slice is not complete
+    (F5 to F7 open), so the rule of the plan still holds: a difference
+    is a defect. Recommended: relax only after F7 (the alpha demo played
+    by script, identical end to end), with a tag on the faithful commit,
+    one small commit per relaxation, and a list of deliberate
+    differences in `doc/fidelity.md`; not mixed with the move to
+    `env-sdl`. Candidates then: the AI timers and flags kept as state
+    only to keep the order of the draws (`doc/state.md`), and the hidden
+    draws of the original. To ask the author before any of it.
+
 ## B. Known work, not done
 
 3. F5, left: the game over screen; combat text; the powers of types
